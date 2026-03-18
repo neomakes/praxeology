@@ -22,4 +22,8 @@ rad.json
 TestResults.xml
 
 #PrivateDocs
-/docs
+# /docs  # removed — docs/ is now tracked
+
+# OS & tool artifacts
+.DS_Store
+.omc/

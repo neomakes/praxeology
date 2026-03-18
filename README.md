@@ -1,113 +1,125 @@
-# NeoTOC: Total Operational Command 🕴️
+# NeoTOC
 
-[![Swift](https://img.shields.io/badge/Swift-6.0+-orange.svg)](https://swift.org)
-[![macOS](https://img.shields.io/badge/macOS-15.0+-blue.svg)](https://developer.apple.com/macos/)
-[![iOS](https://img.shields.io/badge/iOS-18.0+-blue.svg)](https://developer.apple.com/ios/)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+> **An open-source framework that gives AI agents concrete Personas and Behavior Trees, controlling them safely while operating them as a crew.**
 
-> **Commanding an Ecosystem of Software-Defined Agents through Active Inference.**
+Inspired by the Straw Hat Pirates from One Piece — each agent has a distinct personality, role, and set of behavioral rules. They don't just execute tasks; they inhabit roles, respect boundaries, and report like real crew members.
 
-`NeoTOC` 🕴️ is a holistic agentic ecosystem for macOS/iOS that orchestrates a personal swarm of AI Agents via somatic context. It is a native, privacy-first intelligence ecosystem for macOS and iOS. It orchestrates a "Personal Palantir Swarm"—a collection of specialized, local sLLMs (`neocog`) that autonomously sense, critique, and act on your behalf. By grounding digital logic in physical reality, `neotoc` creates a seamless synergy between the commander (Use) and their highly specialized "Software-Defined Agents."
+## Vision
 
----
+### v1 — Current Architecture
 
-## 🎖 The Core Philosophy: From Assistant to Mastery
-
-Traditional AI assistants are passive and monolithic. `neotoc` evolves this into a **Mastery Ecosystem**:
-
-- **Software-Defined Agents (SDS)**: Individualized intelligence units (`neocog`) that are localized, specialized, and swappable.
-- **Somatic Grounding**: Closing the loop between logic and life. Your agents "feel" your environment via high-frequency sensory feeds (`iphoneLogger`).
-- **Doctrine over Design**: Commands are issued as **Rules of Engagement (ROE)**. Your agents don't just follow tasks; they uphold your personal or professional doctrine.
-- **Quantitative Mastery**: A rigorous evaluation framework (`neolat`) ensures every agent in your registry meets the required mastery score before deployment.
-
----
-
-## 🌟 Ecosystem Pillars
-
-### 1. [neocog](../01_neocog): The Active Agent Kernel
-
-The "brain" of each agent. A lightweight, decoupled kernel (2-3B sLLMs) that prioritizes **critical review** and **proactive intervention** over simple responses.
-
-### 2. [neolat](../02_neolat): The Quantitative Crucible
-
-The "training ground." A rigorous benchmark framework that measures the **Cognitive, Operational, Social, and Personality** mastery of every deployed agent.
-
-### 3. [iphoneLogger](../_utils/iphoneLogger): The Somatic Sensorium
-
-The "body." A high-frequency telemetry engine that feeds real-world physical context (stress, motion, location) directly into the agentic loop.
-
----
-
-## 🏗 Holistic Architecture
-
-```mermaid
-graph TD
-    %% Node Styling
-    classDef commander fill:#1E1E1E,stroke:#FB923C,stroke-width:2px,color:#fff
-    classDef hub fill:#2C3E50,stroke:#3498DB,stroke-width:2px,color:#fff
-    classDef engine fill:#D35400,stroke:#E67E22,stroke-width:2px,color:#fff
-    classDef body fill:#8E44AD,stroke:#9B59B6,stroke-width:2px,color:#fff
-    classDef verify fill:#27AE60,stroke:#2ECC71,stroke-width:2px,color:#fff
-
-    User([Use: Commander]):::commander <--> Hub[neotoc macOS Hub]:::hub
-
-    subgraph IntelligenceSwarm [Intelligence Swarm]
-        Hub <--> Registry[Agent Registry]:::hub
-        Registry -- "Deploy" --> Agent[neocog: Active Agent]:::engine
-    end
-
-    subgraph Sensing [Somatic Feed]
-        Agent <--> Body[iphoneLogger: Sensory Feed]:::body
-    end
-
-    subgraph QualityControl [Validation]
-        Registry <--> neolat[neolat: Mastery Check]:::verify
-    end
+```
+Luffy (You) → OMC Orchestrator → Agent Assignment → Telegram One-Way Reporting
 ```
 
----
+The captain gives orders. The orchestrator (oh-my-claudecode) assigns the right crew member. Each agent executes within their Behavior Tree rules and reports back via Telegram.
 
-## 🛠 Technical Stack
+### v2 — The Dream (Roadmap)
 
-- **Kernel**: Apple MLX / Ollama (Accelerated for M-series NPU).
-- **Control**: neocog Arbiter (Behavior Tree & ROE Interpretation).
-- **Communication**: gRPC for ultra-low latency sensor ingestion.
-- **Orchestration**: Internal D2A (Doctrine-to-Action) Engine + optional n8n nodes.
-- **UI/UX**: SwiftUI (Native macOS/iOS) & Next.js (Dashboard & Registry Management).
+**Thousand Sunny**: A Telegram group where you drop a task and the crew self-organizes.
 
----
+```
+Luffy:  "We need a Bayesian Search algorithm."
+Robin:  "I found 3 relevant papers. Let me analyze them first."
+Zoro:   "Ready to implement. Starting as soon as Robin finishes."
+Nami:   "Estimated token cost: $2.30. Off-peak hours recommended."
+Usopp:  "I'll prepare the test suite. This thing better not have bugs!"
+Sanji:  "Dependencies locked. Environment is served."
+```
 
-## 🗺 Platform Roadmap
+Each crew member autonomously discusses, divides labor, executes, and reports. The captain intervenes only when needed.
 
-### Phase 1: Structural Synthesis (Current)
+## Philosophy — NeoRoger
 
-- [x] Holistic Ecosystem Design & Critical Evaluation.
-- [x] Initial `neocog` D2A Kernel R&D.
-- [ ] Cross-component communication protocol (gRPC) finalized.
+NeoTOC is built on the **NeoRoger** foundation:
 
-### Phase 2: Somatic Intelligence
+| Pillar | Origin | Application |
+|--------|--------|-------------|
+| **Praxeology** | Mises — the logic of human action | Agents act purposefully within defined constraints |
+| **Thymology** | Mises — understanding of human values | Each persona has values that drive behavior |
+| **Behavior Tree** | Game AI — structured decision trees | Actions are controlled, predictable, and debuggable |
+| **Ralph Loop** | Persistence engine | Tasks repeat until truly complete — no silent failures |
+| **Root Guard** | Safety mechanism | The root node enforces boundaries every tick |
+| **AAR** | Military — After Action Review | Every significant action requires human review and approval |
 
-- [ ] Real-time integration of `iphoneLogger` streams into `neocog` internal state.
-- [ ] Context-aware ROE adjustment (Automatic persona switching based on physical stress).
+## The Crew
 
-### Phase 3: The Mastery Marketplace
+| Member | Role | Specialty |
+|--------|------|-----------|
+| **Zoro** | Code Executor | Core implementation, refactoring, commits |
+| **Nami** | Navigator & CFO | Project planning, token costs, resource management |
+| **Usopp** | QA Engineer & Tester | Testing, bug hunting, edge case detection |
+| **Sanji** | DevOps & Dependency Manager | Packages, environments, supply chain |
+| **Chopper** | Health & Wellbeing Monitor | User burnout detection, health checks |
+| **Robin** | Intelligence & Research Analyst | Research, architecture analysis, competitive intel |
+| **Franky** | Infrastructure Engineer | CI/CD, builds, deployment, infra |
+| **Brook** | Documentation & Session Archivist | Logs, reports, changelogs, knowledge preservation |
+| **Jinbe** | Integration & Stability Engineer | MCP connectors, external services, system stability |
 
-- [ ] Official `Prof` (Professional Agent) Registry launch.
-- [ ] `neolat`-verified mastery scores for all community-contributed agents.
+## Documentation
 
----
+- **Vision & Specs**: `docs/vision/` — PRD, SDS, Schema, Engineering Plan, Market Analysis, Critical Evaluation
+- **Philosophy**: `docs/philosophy/` — NeoRoger Blueprint
+- **Crew Personas**: `crew/` — 9 crew member persona definitions with BT rules
+- **Behavior Rules**: `RULES.md` — Root Guard, Ralph Loop, and all crew BT sequences
 
-## 📁 Repository Structure
+## Current Stack
 
-```text
+- **[Claude Code](https://docs.anthropic.com/en/docs/claude-code)** — AI agent runtime
+- **[oh-my-claudecode (OMC)](https://github.com/nicobailon/oh-my-claudecode)** — Multi-agent orchestration layer
+- **[gstack](https://github.com/anthropics/claude-code)** — Development tooling
+- **Telegram G-Staff** — Crew reporting channel
+
+## Project Structure
+
+```
 neotoc/
-├── docs/                  # Ecosystem-wide specs, PRD, and SDS
-├── neocog/                # The Software-Defined Agent kernel
-├── neolat/                # The Quantitative Evaluation testbed
-├── iphoneLogger/          # High-frequency somatic telemetry engine
-└── README.md              # Holistic platform overview
+├── README.md              # This file (English)
+├── README.ko.md           # Korean version
+├── CLAUDE.md              # Claude Code global settings
+├── RULES.md               # Behavior Tree rules
+├── LICENSE
+├── crew/                  # Crew member persona definitions
+│   ├── zoro.md            # Code Executor
+│   ├── nami.md            # Navigator & CFO
+│   ├── usopp.md           # QA Engineer & Tester
+│   ├── sanji.md           # DevOps & Dependency Manager
+│   ├── chopper.md         # Health & Wellbeing Monitor
+│   ├── robin.md           # Intelligence & Research Analyst
+│   ├── franky.md          # Infrastructure Engineer
+│   ├── brook.md           # Documentation & Session Archivist
+│   └── jinbe.md           # Integration & Stability Engineer
+├── templates/             # Task and session templates
+│   ├── TASKS.md
+│   └── SESSION.md
+└── docs/
+    ├── vision/            # PRD, SDS, Schema, Engineering Plan, etc.
+    └── philosophy/        # NeoRoger Blueprint
 ```
 
----
+## Getting Started
 
-_"Intelligence that listens, then leads. Securely on your device, always by your side."_
+```bash
+# Clone the repository
+git clone https://github.com/neomakes/neotoc.git
+cd neotoc
+
+# Explore the crew
+ls crew/
+
+# Read the rules
+cat RULES.md
+
+# Check the blueprint
+cat docs/neeroger-blueprint.md
+```
+
+## Contributing
+
+NeoTOC is open source. Issues and PRs are welcome.
+
+Whether you want to refine a crew member's persona, add new BT rules, or propose a new crew member — jump in. The Thousand Sunny has room for everyone.
+
+## License
+
+MIT License
