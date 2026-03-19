@@ -27,3 +27,7 @@ TestResults.xml
 # OS & tool artifacts
 .DS_Store
 .omc/
+
+# Python
+__pycache__/
+*.pyc
