@@ -1,125 +1,171 @@
-# NeoTOC
+<p align="center">
+  <img src="assets/banner.svg" alt="praxeology — Human–AI Collaborative Governance for Purposeful Action" width="100%">
+</p>
 
-> **An open-source framework that gives AI agents concrete Personas and Behavior Trees, controlling them safely while operating them as a crew.**
+<p align="center">
+  <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="MIT License">
+  <img src="https://img.shields.io/badge/version-0.1.0-green.svg" alt="v0.1.0">
+  <img src="https://img.shields.io/badge/status-active-brightgreen.svg" alt="Active">
+  <img src="https://img.shields.io/badge/built%20by-NeoMakes-black.svg" alt="NeoMakes">
+</p>
 
-Inspired by the Straw Hat Pirates from One Piece — each agent has a distinct personality, role, and set of behavioral rules. They don't just execute tasks; they inhabit roles, respect boundaries, and report like real crew members.
+---
 
-## Vision
+## What Is This?
 
-### v1 — Current Architecture
-
-```
-Luffy (You) → OMC Orchestrator → Agent Assignment → Telegram One-Way Reporting
-```
-
-The captain gives orders. The orchestrator (oh-my-claudecode) assigns the right crew member. Each agent executes within their Behavior Tree rules and reports back via Telegram.
-
-### v2 — The Dream (Roadmap)
-
-**Thousand Sunny**: A Telegram group where you drop a task and the crew self-organizes.
+**Praxeology** is a human–AI collaborative operating system built on a universal 4+1 tier governance hierarchy. Humans set the strategy and principles; agentic AI executes within those bounds, learns from experience, and proposes improvements back. It captures the observation that all purposeful action — from nations to agentic AI — follows the same structural pattern.
 
 ```
-Luffy:  "We need a Bayesian Search algorithm."
-Robin:  "I found 3 relevant papers. Let me analyze them first."
-Zoro:   "Ready to implement. Starting as soon as Robin finishes."
-Nami:   "Estimated token cost: $2.30. Off-peak hours recommended."
-Usopp:  "I'll prepare the test suite. This thing better not have bugs!"
-Sanji:  "Dependencies locked. Environment is served."
+Strategy (WHY) → Doctrine (WHAT) → Procedure (HOW) → Playbook (PATTERNS) → Execution (NOW)
 ```
 
-Each crew member autonomously discusses, divides labor, executes, and reports. The captain intervenes only when needed.
+Higher tiers always override lower ones. No exceptions.
 
-## Philosophy — NeoRoger
+---
 
-NeoTOC is built on the **NeoRoger** foundation:
+## The Isomorphism
 
-| Pillar | Origin | Application |
-|--------|--------|-------------|
-| **Praxeology** | Mises — the logic of human action | Agents act purposefully within defined constraints |
-| **Thymology** | Mises — understanding of human values | Each persona has values that drive behavior |
-| **Behavior Tree** | Game AI — structured decision trees | Actions are controlled, predictable, and debuggable |
-| **Ralph Loop** | Persistence engine | Tasks repeat until truly complete — no silent failures |
-| **Root Guard** | Safety mechanism | The root node enforces boundaries every tick |
-| **AAR** | Military — After Action Review | Every significant action requires human review and approval |
+The same 4+1 tier structure appears across every domain of organized action:
 
-## The Crew
+| Tier | National Law | Military | Corporate | Individual | AI Agent |
+|------|-------------|----------|-----------|------------|----------|
+| **1 Strategy** | Constitution | Campaign Objective | Mission & Vision | Personal Values | System Prompt / Prime Directive |
+| **2 Doctrine** | Statute Law | Rules of Engagement | Corporate Policy | Life Principles | Behavioral Guidelines |
+| **3 Procedure** | Regulations | Standard Operating Procedures | SOPs / Protocols | Habits & Routines | Task Instructions |
+| **4 Playbook** | Case Law / Precedent | Tactics & Drills | Best Practices | Learned Patterns | Few-shot Examples |
+| **Exec Work Plan** | Executive Order | Mission Orders | Sprint / Work Plan | Daily To-Do | Active Context |
 
-| Member | Role | Specialty |
-|--------|------|-----------|
-| **Zoro** | Code Executor | Core implementation, refactoring, commits |
-| **Nami** | Navigator & CFO | Project planning, token costs, resource management |
-| **Usopp** | QA Engineer & Tester | Testing, bug hunting, edge case detection |
-| **Sanji** | DevOps & Dependency Manager | Packages, environments, supply chain |
-| **Chopper** | Health & Wellbeing Monitor | User burnout detection, health checks |
-| **Robin** | Intelligence & Research Analyst | Research, architecture analysis, competitive intel |
-| **Franky** | Infrastructure Engineer | CI/CD, builds, deployment, infra |
-| **Brook** | Documentation & Session Archivist | Logs, reports, changelogs, knowledge preservation |
-| **Jinbe** | Integration & Stability Engineer | MCP connectors, external services, system stability |
+This isomorphism is the core thesis: governance is not domain-specific. The pattern is universal. A framework that works for a military unit works for a startup, a research lab, or an AI agent fleet.
 
-## Documentation
+---
 
-- **Vision & Specs**: `docs/vision/` — PRD, SDS, Schema, Engineering Plan, Market Analysis, Critical Evaluation
-- **Philosophy**: `docs/philosophy/` — NeoRoger Blueprint
-- **Crew Personas**: `crew/` — 9 crew member persona definitions with BT rules
-- **Behavior Rules**: `RULES.md` — Root Guard, Ralph Loop, and all crew BT sequences
+## Quick Start
 
-## Current Stack
-
-- **[Claude Code](https://docs.anthropic.com/en/docs/claude-code)** — AI agent runtime
-- **[oh-my-claudecode (OMC)](https://github.com/nicobailon/oh-my-claudecode)** — Multi-agent orchestration layer
-- **[gstack](https://github.com/anthropics/claude-code)** — Development tooling
-- **Telegram G-Staff** — Crew reporting channel
-
-## Project Structure
-
-```
-neotoc/
-├── README.md              # This file (English)
-├── README.ko.md           # Korean version
-├── CLAUDE.md              # Claude Code global settings
-├── RULES.md               # Behavior Tree rules
-├── LICENSE
-├── crew/                  # Crew member persona definitions
-│   ├── zoro.md            # Code Executor
-│   ├── nami.md            # Navigator & CFO
-│   ├── usopp.md           # QA Engineer & Tester
-│   ├── sanji.md           # DevOps & Dependency Manager
-│   ├── chopper.md         # Health & Wellbeing Monitor
-│   ├── robin.md           # Intelligence & Research Analyst
-│   ├── franky.md          # Infrastructure Engineer
-│   ├── brook.md           # Documentation & Session Archivist
-│   └── jinbe.md           # Integration & Stability Engineer
-├── templates/             # Task and session templates
-│   ├── TASKS.md
-│   └── SESSION.md
-└── docs/
-    ├── vision/            # PRD, SDS, Schema, Engineering Plan, etc.
-    └── philosophy/        # NeoRoger Blueprint
-```
-
-## Getting Started
+**Step 1 — Clone**
 
 ```bash
-# Clone the repository
-git clone https://github.com/neomakes/neotoc.git
-cd neotoc
-
-# Explore the crew
-ls crew/
-
-# Read the rules
-cat RULES.md
-
-# Check the blueprint
-cat docs/neeroger-blueprint.md
+git clone https://github.com/neomakes/praxeology.git my-org
+cd my-org
 ```
 
-## Contributing
+**Step 2 — Run setup**
 
-NeoTOC is open source. Issues and PRs are welcome.
+```bash
+bash setup.sh
+```
 
-Whether you want to refine a crew member's persona, add new BT rules, or propose a new crew member — jump in. The Thousand Sunny has room for everyone.
+The interactive wizard asks for your organization name, mission, departments, agents, and projects. It generates the full directory structure and all bootstrap documents.
+
+**Step 3 — Launch**
+
+```bash
+bash launch.sh
+```
+
+Your governance system is live. Open `CLAUDE.md` at the root to see the generated context for AI agents.
+
+---
+
+## Key Features
+
+| Feature | Description |
+|---------|-------------|
+| **SafetyGate** | Higher-tier documents can declare hard limits that no lower-tier document can override |
+| **Proposal Flow** | Any agent or team member can propose an amendment via the structured Proposal format |
+| **SOP Evolution** | Procedures and Playbooks evolve through the Review Cascade before promotion |
+| **Review Cascade** | Changes propagate upward: Playbook → Procedure → Doctrine → Strategy for consistency checks |
+| **Reverse Flow** | Strategy changes cascade downward: all lower tiers are flagged for review |
+| **Department Codes** | 7 standard departments (1xx–7xx) with C-level + G-Staff assignments |
+
+---
+
+## Directory Structure
+
+```
+your-org/
+├── CLAUDE.md                  # Root context for AI agents (generated)
+├── launch.sh                  # Daily launch script (generated)
+├── _standard/                 # Governance documents
+│   ├── README.md              # Master index of all governance artifacts
+│   ├── ceo/                   # CEO — Strategy & Vision (1xx)
+│   │   ├── strategy.md        # WHY: Mission, values, long-term vision
+│   │   ├── doctrine.md        # WHAT: Governing principles
+│   │   ├── procedure.md       # HOW: Executive processes
+│   │   └── playbook.md        # PATTERNS: Recurring decision patterns
+│   ├── coo/                   # COO — Operations & Execution (2xx)
+│   ├── cfo/                   # CFO — Finance & Resources (3xx)
+│   ├── cto/                   # CTO — Technology & R&D (4xx)
+│   ├── cdo/                   # CDO — Diplomacy & Network (5xx)
+│   ├── chro/                  # CHRO — HR & Wellbeing (6xx)
+│   └── ciso/                  # CISO — Intelligence & Security (7xx)
+├── _crew/                     # Agent / team member definitions
+│   ├── CLAUDE.md              # Shared crew rules
+│   └── {agent}/               # Per-agent subdirectory
+│       ├── CLAUDE.md          # Agent context and persona
+│       └── sop.md             # Agent SOPs
+├── _project/                  # Active projects
+│   ├── .praxe/                # Project cards (governance metadata)
+│   │   └── {project}.md       # Status, priority, crew assignment, milestones
+│   └── {project}/             # Each project directory (code)
+├── _setting/                  # Operational settings
+│   ├── permissions.md         # Access control matrix
+│   └── integrations.md        # External service config
+├── docs/                      # Framework documentation
+├── templates/                 # Reusable document templates
+└── examples/                  # Reference implementations
+```
+
+---
+
+## Domain Applications
+
+### Corporate
+
+Map departments to C-suite roles. Use CEO/COO/CFO/CTO/CDO/CHRO/CISO departments. Each department owns its governance stack. The CEO Strategy document is the organization's constitution.
+
+### Research Lab
+
+Map roles to PI, Lab Manager, Finance Lead, Systems Lead, Partnerships, HR, and Security. Use the same tier structure. The Strategy document captures the lab's research mission and ethical constraints. See [docs/tutorial.md](docs/tutorial.md) for a full research lab walkthrough.
+
+### Personal Productivity
+
+A single-person implementation. CEO = you. Strategy = your life mission. Doctrine = your non-negotiables. Procedure = your weekly rituals. Playbook = your accumulated best practices. Work Plan = your daily list.
+
+### AI Agent Team
+
+Each AI agent gets a `_crew/{agent}/CLAUDE.md` defining its role, authority level, and operating constraints. The root `CLAUDE.md` is the team's shared constitution. Higher-tier documents are prepended to agent contexts before execution.
+
+---
+
+## Framework Documentation
+
+| Document | Description |
+|----------|-------------|
+| [docs/architecture.md](docs/architecture.md) | Design philosophy, core mechanisms, and the universal governance pattern |
+| [docs/getting-started.md](docs/getting-started.md) | Prerequisites, installation, and first steps |
+| [docs/standard-system.md](docs/standard-system.md) | The 4+1 tier document system in depth |
+| [docs/crew-system.md](docs/crew-system.md) | Agent management, SOP self-evolution, and review cascade |
+| [docs/tutorial.md](docs/tutorial.md) | Full walkthrough building a governed AI agent team |
+
+---
+
+## Examples
+
+- [examples/tech-startup/](examples/tech-startup/) — Early-stage software company
+- [examples/one-piece-crew/](examples/one-piece-crew/) — Fictional crew (demonstration)
+
+---
+
+## Origin
+
+Praxeology was built by **[NeoMakes](https://neomakes.com)** — a one-person company developing foundational human-AI interaction technology for extreme environments. The framework emerged from the need to govern a growing fleet of AI agents with the same rigor applied to human organizations.
+
+The name comes from praxeology, the study of human action. The insight: purposeful action has structure. That structure is universal. Make it explicit, and you can govern anything.
+
+---
 
 ## License
 
-MIT License
+MIT License — see [LICENSE](LICENSE).
+
+Copyright (c) 2026 NeoMakes

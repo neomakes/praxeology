@@ -1,0 +1,278 @@
+# Getting Started with Praxeology
+
+This guide takes you from zero to a running governed AI agent team in under 30 minutes.
+
+---
+
+## Prerequisites
+
+### Required
+
+**Claude Code** — the host environment for all agents.
+Install from [claude.ai/code](https://claude.ai/code) or via the Anthropic CLI.
+Verify: `claude --version`
+
+**Git** — version control for all governance documents.
+```bash
+# macOS
+brew install git
+
+# Ubuntu/Debian
+apt-get install git
+```
+Verify: `git --version`
+
+### Optional
+
+**Telegram** — enables async communication between agents and the principal.
+Set up a Telegram bot via [@BotFather](https://t.me/BotFather) and note your bot token.
+Not required for local-only operation.
+
+---
+
+## Installation
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/neomakes/praxeology.git
+cd praxeology
+```
+
+### 2. Run setup
+
+```bash
+bash setup.sh
+```
+
+The setup script:
+- Creates the org directory scaffold
+- Initializes git tracking for governance documents
+- Configures CLAUDE.md auto-loading
+- Optionally sets up Telegram integration
+
+---
+
+## First Steps
+
+### Step 1: Create your organization
+
+The organization is the root of your governance tree. It defines Strategy-tier constraints that apply to every agent in the system.
+
+Create `org/CLAUDE.md`:
+
+```markdown
+# [Your Org Name] — Strategy
+
+## Mission
+[One sentence: what this org exists to accomplish]
+
+## Values
+1. [Core value 1]
+2. [Core value 2]
+3. [Core value 3]
+
+## Hard Constraints (SafetyGate: Strategy)
+- NEVER [constraint 1]
+- NEVER [constraint 2]
+- ALWAYS [constraint 1]
+
+## Scope
+This governance applies to all agents operating under this organization.
+```
+
+Commit this file:
+```bash
+git add org/CLAUDE.md
+git commit -m "feat: initialize org strategy"
+```
+
+### Step 2: Define departments
+
+Departments segment your agent team by function. Each department inherits org-level Strategy and adds its own Doctrine and Procedures.
+
+Create `org/departments/research/CLAUDE.md`:
+
+```markdown
+# Research Department — Doctrine
+
+## Inherits
+- org/CLAUDE.md (Strategy)
+
+## Department Mission
+Produce rigorous, reproducible research outputs.
+
+## Principles
+1. Cite sources for all factual claims
+2. Prefer primary sources over secondary
+3. Flag uncertainty explicitly — never feign confidence
+4. All outputs are reproducible from documented methods
+
+## Procedures
+- See procedure/literature-search.md
+- See procedure/report-writing.md
+```
+
+### Step 3: Deploy agents
+
+An agent is a Claude Code session configured with the appropriate CLAUDE.md context. Deploy by opening Claude Code in the relevant department directory.
+
+```bash
+# Open a research agent session
+cd org/departments/research
+claude
+```
+
+When Claude Code starts, it automatically loads:
+1. `org/CLAUDE.md` (Strategy)
+2. `org/departments/research/CLAUDE.md` (Department Doctrine)
+3. Any CLAUDE.md in intermediate directories
+
+The agent now has its full governance context loaded without any manual prompt engineering.
+
+**Naming convention**: Give each agent a persona that reflects its role.
+
+```markdown
+<!-- Add to department CLAUDE.md -->
+## Agent Identity
+You are Alex, a research analyst at [Org Name].
+Your role: literature review, data synthesis, report drafting.
+Your authority tier: Playbook (can self-approve Playbook changes;
+must propose Procedure changes and above).
+```
+
+### Step 4: Run your first task
+
+With an agent session open, assign a task through a Work Plan:
+
+```markdown
+# Work Plan: WP-2026-001
+Date: 2026-03-22
+Agent: Alex (research)
+Assigned by: Principal
+
+## Task
+Survey recent literature on transformer attention mechanisms.
+Produce a 2-page summary with key papers, findings, and open questions.
+
+## Constraints
+- Time budget: 2 hours
+- Output format: Markdown, committed to research/outputs/
+- Citation style: APA
+
+## Definition of Done
+- [ ] Minimum 10 papers reviewed
+- [ ] Summary committed to git
+- [ ] Learning log updated
+```
+
+Save this as `org/departments/research/work-plans/WP-2026-001.md` and share it with the agent session.
+
+The agent will:
+1. Run SafetyGate on the task
+2. Check for applicable Procedures and Playbooks
+3. Execute the task
+4. Commit outputs
+5. Update learning log
+6. Mark work plan complete
+
+### Step 5: Verify the first cycle
+
+After the agent completes the task, verify:
+
+```bash
+# Check outputs were committed
+git log --oneline -5
+
+# Check learning log was updated
+cat org/departments/research/agents/alex/learning-log.md
+
+# Check no SafetyGate violations
+grep -r "HALT" org/departments/research/agents/alex/
+```
+
+---
+
+## Verification Checklist
+
+Before considering your installation production-ready:
+
+### Governance structure
+- [ ] `org/CLAUDE.md` exists and contains Strategy
+- [ ] At least one department CLAUDE.md with Doctrine
+- [ ] At least one Procedure document
+- [ ] At least one Playbook document
+- [ ] Git initialized and tracking all governance files
+
+### Agent configuration
+- [ ] Each agent has a defined identity and authority tier
+- [ ] Each agent knows how to invoke SafetyGate
+- [ ] Each agent knows how to file a Proposal
+- [ ] Each agent has a learning log file
+
+### Operational readiness
+- [ ] Test task completed successfully
+- [ ] Outputs committed to git
+- [ ] Learning log updated
+- [ ] No unresolved SafetyGate HALT conditions
+
+### Review schedule
+- [ ] Weekly Playbook review scheduled
+- [ ] Monthly Procedure review scheduled
+- [ ] Quarterly Doctrine review scheduled
+- [ ] Annual Strategy review scheduled
+
+---
+
+## Common Setup Issues
+
+### Agent is not loading governance documents
+
+Verify that CLAUDE.md files are in directories that are parent to the agent's working directory. Claude Code loads CLAUDE.md files from the working directory upward to the filesystem root.
+
+```bash
+# Check what CLAUDE.md files exist
+find org/ -name "CLAUDE.md" | sort
+```
+
+### Agent is modifying documents above its authority tier
+
+Add explicit authority statements to the agent's department CLAUDE.md:
+
+```markdown
+## Authority
+- You MAY modify files in: playbook/, work-plans/, agents/[your-name]/
+- You MUST NOT modify files in: strategy/, doctrine/, procedure/
+- You MAY submit Proposals to: procedure/, doctrine/, strategy/
+- Proposals go in: proposals/[tier]/[YYYY-MM-DD]-[title].md
+```
+
+### Proposals are not being reviewed
+
+Set up a review trigger. The simplest approach is a git hook or a periodic work plan assigned to the department head agent:
+
+```markdown
+# Work Plan: WP-WEEKLY-REVIEW
+Recurrence: Every Monday
+Agent: [Department Head]
+Task: Review all pending proposals in proposals/. Accept, reject, or request revision.
+```
+
+### Git conflicts in governance documents
+
+This usually means two agents modified the same document. Prevent this with file ownership conventions:
+
+```markdown
+## File Ownership (in CLAUDE.md)
+- research/agents/alex/ — owned by Alex, no other agent modifies
+- research/playbook/ — owned by department head; agents submit proposals only
+```
+
+---
+
+## Next Steps
+
+- Read [standard-system.md](./standard-system.md) to understand each tier in depth
+- Read [crew-system.md](./crew-system.md) to learn agent management patterns
+- Follow [tutorial.md](./tutorial.md) for a full walkthrough building a research lab
+- Read [architecture.md](./architecture.md) for the underlying design philosophy
