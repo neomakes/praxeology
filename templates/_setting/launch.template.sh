@@ -1,10 +1,13 @@
 #!/usr/bin/env bash
 # =============================================================================
-# {ORGANIZATION_NAME} — Launch Script
+# {ORGANIZATION_NAME} — Crew Launch Script
 # =============================================================================
-# Purpose: Initialize the governance environment for a session or deployment.
-# Usage:   ./launch.sh [--env {dev|prod}] [--agent {AGENT_NAME}]
-# Version: {VERSION}
+# Launch agents as independent tmux sessions with optional channel integrations.
+# Usage:
+#   ./launch.sh                     # Launch CORE crew
+#   ./launch.sh all                 # Launch ALL crew
+#   ./launch.sh stop                # Stop all crew sessions
+#   ./launch.sh agent1 agent2 ...   # Launch specific agents
 # =============================================================================
 
 set -euo pipefail
@@ -13,176 +16,99 @@ set -euo pipefail
 # Configuration — fill in these values for your organization
 # -----------------------------------------------------------------------------
 
-ORG_NAME="{ORGANIZATION_NAME}"
 ORG_ROOT="{ABSOLUTE_PATH_TO_PROJECT_ROOT}"
-GOVERNANCE_DIR="${ORG_ROOT}/_standard"
 CREW_DIR="${ORG_ROOT}/_crew"
-LOG_DIR="${ORG_ROOT}/{LOG_DIRECTORY}"
-LOG_FILE="${LOG_DIR}/launch-$(date +%Y%m%d-%H%M%S).log"
 
-# Default environment (override with --env flag)
-ENV="${LAUNCH_ENV:-dev}"
+# Channel plugin (e.g., "plugin:telegram@claude-plugins-official")
+# Leave empty to launch without channel integration.
+CHANNEL_PLUGIN="{CHANNEL_PLUGIN}"
 
-# Default agent (override with --agent flag)
-AGENT="{DEFAULT_AGENT_NAME}"
+# Channel state base directory (per-agent state isolation)
+CHANNELS_BASE="${HOME}/.claude/channels"
 
-# Required tools — add any tools your environment depends on
-REQUIRED_TOOLS=("{TOOL_1}" "{TOOL_2}")
+# Core crew — minimal set for daily operations
+CORE_CREW=({CORE_AGENT_NAMES})
 
-# Environment-specific settings
-DEV_BASE_URL="{DEV_BASE_URL}"
-PROD_BASE_URL="{PROD_BASE_URL}"
+# All crew
+ALL_CREW=({ALL_AGENT_NAMES})
 
 # -----------------------------------------------------------------------------
-# Argument parsing
+# Launch function
 # -----------------------------------------------------------------------------
 
-while [[ $# -gt 0 ]]; do
-  case "$1" in
-    --env)
-      ENV="$2"
-      shift 2
-      ;;
-    --agent)
-      AGENT="$2"
-      shift 2
-      ;;
-    --help|-h)
-      echo "Usage: $0 [--env dev|prod] [--agent AGENT_NAME]"
-      exit 0
-      ;;
-    *)
-      echo "Unknown argument: $1"
-      exit 1
-      ;;
-  esac
-done
+launch_agent() {
+  local name=$1
+  local session="crew_${name}"
+  local agent_dir="${CREW_DIR}/${name}"
+  local env_file="${agent_dir}/.env"
+  local state_dir="${CHANNELS_BASE}/${name}"
 
-# -----------------------------------------------------------------------------
-# Logging
-# -----------------------------------------------------------------------------
+  if tmux has-session -t "$session" 2>/dev/null; then
+    echo "  [skip] $session already running"
+    return
+  fi
 
-mkdir -p "${LOG_DIR}"
+  if [[ ! -d "$agent_dir" ]]; then
+    echo "  [skip] $name — directory not found: $agent_dir"
+    return
+  fi
 
-log() {
-  local level="$1"
-  shift
-  local message="$*"
-  local timestamp
-  timestamp="$(date +%Y-%m-%dT%H:%M:%S)"
-  echo "[${timestamp}] [${level}] ${message}" | tee -a "${LOG_FILE}"
+  # If agent has .env and channel plugin is configured, launch with channel
+  if [[ -n "${CHANNEL_PLUGIN}" && -f "$env_file" ]]; then
+    mkdir -p "$state_dir"
+    cp "$env_file" "$state_dir/.env"
+
+    tmux new-session -d -s "$session" \
+      "cd $agent_dir && TELEGRAM_STATE_DIR=$state_dir claude --channels $CHANNEL_PLUGIN"
+    echo "  [ok]   $session launched (channel: $name)"
+  else
+    tmux new-session -d -s "$session" \
+      "cd $agent_dir && claude"
+    echo "  [ok]   $session launched (no channel)"
+  fi
 }
 
-log INFO "Starting ${ORG_NAME} launch sequence"
-log INFO "Environment: ${ENV} | Agent: ${AGENT}"
-
 # -----------------------------------------------------------------------------
-# Preflight checks
+# Main
 # -----------------------------------------------------------------------------
 
-log INFO "Running preflight checks..."
-
-# Check required tools
-for tool in "${REQUIRED_TOOLS[@]}"; do
-  if ! command -v "${tool}" &>/dev/null; then
-    log ERROR "Required tool not found: ${tool}"
-    exit 1
-  fi
-  log INFO "  [ok] ${tool}"
-done
-
-# Check governance directory
-if [[ ! -d "${GOVERNANCE_DIR}" ]]; then
-  log ERROR "Governance directory not found: ${GOVERNANCE_DIR}"
-  exit 1
-fi
-log INFO "  [ok] Governance directory exists"
-
-# Check crew directory
-if [[ ! -d "${CREW_DIR}" ]]; then
-  log ERROR "Crew directory not found: ${CREW_DIR}"
-  exit 1
-fi
-log INFO "  [ok] Crew directory exists"
-
-# Check agent config
-AGENT_CONFIG="${CREW_DIR}/${AGENT}.CLAUDE.md"
-if [[ ! -f "${AGENT_CONFIG}" ]]; then
-  log WARN "Agent config not found: ${AGENT_CONFIG} — using shared crew rules only"
-fi
-
-log INFO "Preflight checks passed"
-
-# -----------------------------------------------------------------------------
-# Environment setup
-# -----------------------------------------------------------------------------
-
-log INFO "Configuring environment: ${ENV}"
-
-case "${ENV}" in
-  dev)
-    BASE_URL="${DEV_BASE_URL}"
-    # Add any dev-specific setup here
-    log INFO "  [dev] Base URL: ${BASE_URL}"
+case "${1:-core}" in
+  all)
+    echo "Launching ALL crew (${#ALL_CREW[@]} members)..."
+    for c in "${ALL_CREW[@]}"; do launch_agent "$c"; done
     ;;
-  prod)
-    BASE_URL="${PROD_BASE_URL}"
-    # Add any prod-specific setup here
-    log INFO "  [prod] Base URL: ${BASE_URL}"
+  core)
+    echo "Launching CORE crew (${#CORE_CREW[@]} members)..."
+    for c in "${CORE_CREW[@]}"; do launch_agent "$c"; done
+    ;;
+  stop)
+    echo "Stopping all crew sessions..."
+    for c in "${ALL_CREW[@]}"; do
+      tmux kill-session -t "crew_${c}" 2>/dev/null && echo "  [ok] crew_${c} stopped" || true
+    done
     ;;
   *)
-    log ERROR "Unknown environment: ${ENV}. Use 'dev' or 'prod'."
-    exit 1
+    echo "Launching crew: $*"
+    for c in "$@"; do
+      if [[ " ${ALL_CREW[*]} " =~ " $c " ]]; then
+        launch_agent "$c"
+      else
+        echo "  [skip] Unknown: $c (available: ${ALL_CREW[*]})"
+      fi
+    done
     ;;
 esac
 
-export BASE_URL
-export ORG_NAME
-export ENV
-
-# -----------------------------------------------------------------------------
-# Custom initialization steps
-# -----------------------------------------------------------------------------
-# Add your organization-specific initialization here.
-# Examples:
-#   - Load secrets from a vault
-#   - Authenticate to external services
-#   - Seed a database
-#   - Start background services
-
-log INFO "Running custom initialization..."
-
-# {CUSTOM_INIT_STEP_1}
-# Example: source "${ORG_ROOT}/.env.${ENV}"
-
-# {CUSTOM_INIT_STEP_2}
-# Example: ./scripts/seed-data.sh --env "${ENV}"
-
-# {CUSTOM_INIT_STEP_3}
-
-log INFO "Custom initialization complete"
-
-# -----------------------------------------------------------------------------
-# Launch
-# -----------------------------------------------------------------------------
-
-log INFO "Launching ${ORG_NAME} (env=${ENV}, agent=${AGENT})..."
-
-# Replace the line below with your actual launch command:
-# Examples:
-#   claude --model {MODEL} --system-prompt "${AGENT_CONFIG}"
-#   python main.py --agent "${AGENT}" --env "${ENV}"
-#   docker-compose up -d
-
-{LAUNCH_COMMAND}
-
-log INFO "Launch complete. Log: ${LOG_FILE}"
+echo ""
+echo "Active crew sessions:"
+tmux list-sessions 2>/dev/null | grep crew_ || echo "  (none)"
 
 # =============================================================================
 # TEMPLATE INSTRUCTIONS:
-# 1. Replace all {PLACEHOLDER} values with your actual configuration.
-# 2. Fill in REQUIRED_TOOLS with tools your environment actually needs.
-# 3. Replace {LAUNCH_COMMAND} with the command that starts your system.
-# 4. Add custom initialization steps relevant to your setup.
-# 5. Make executable: chmod +x launch.sh
+# 1. Replace {ABSOLUTE_PATH_TO_PROJECT_ROOT} with your org root path.
+# 2. Replace {CHANNEL_PLUGIN} with your channel plugin string, or leave empty.
+# 3. Replace {CORE_AGENT_NAMES} and {ALL_AGENT_NAMES} with agent names.
+# 4. Each agent needs _crew/{name}/CLAUDE.md for persona.
+# 5. For channel integration, add _crew/{name}/.env with the bot token.
+# 6. Make executable: chmod +x launch.sh
 # =============================================================================
