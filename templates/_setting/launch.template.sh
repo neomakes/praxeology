@@ -26,6 +26,10 @@ CHANNEL_PLUGIN="{CHANNEL_PLUGIN}"
 # Channel state base directory (per-agent state isolation)
 CHANNELS_BASE="${HOME}/.claude/channels"
 
+# Owner's Telegram user ID — used for auto-provisioning allowlist access.
+# Find yours: message @userinfobot on Telegram, or check an existing access.json.
+OWNER_ID="{OWNER_TELEGRAM_ID}"
+
 # Core crew — minimal set for daily operations
 CORE_CREW=({CORE_AGENT_NAMES})
 
@@ -57,6 +61,23 @@ launch_agent() {
   if [[ -n "${CHANNEL_PLUGIN}" && -f "$env_file" ]]; then
     mkdir -p "$state_dir"
     cp "$env_file" "$state_dir/.env"
+
+    # Auto-provision access.json with allowlist policy if not exists.
+    # KNOWN ISSUE: The /telegram:access skill hardcodes ~/.claude/channels/telegram/
+    # and ignores TELEGRAM_STATE_DIR. This auto-provisioning bypasses that limitation
+    # by writing access.json directly to the per-agent state directory.
+    if [[ ! -f "$state_dir/access.json" && -n "${OWNER_ID}" ]]; then
+      cat > "$state_dir/access.json" <<EOJSON
+{
+  "dmPolicy": "allowlist",
+  "allowFrom": ["${OWNER_ID}"],
+  "groups": {},
+  "pending": {}
+}
+EOJSON
+      chmod 600 "$state_dir/access.json"
+      echo "  [init] $name access.json provisioned (owner: ${OWNER_ID})"
+    fi
 
     tmux new-session -d -s "$session" \
       "cd $agent_dir && TELEGRAM_STATE_DIR=$state_dir claude --channels $CHANNEL_PLUGIN"

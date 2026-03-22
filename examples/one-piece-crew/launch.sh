@@ -12,6 +12,7 @@ ORG_ROOT="$(cd "$(dirname "$0")" && pwd)"
 CREW_DIR="${ORG_ROOT}/_crew"
 CHANNEL_PLUGIN=""
 CHANNELS_BASE="${HOME}/.claude/channels"
+OWNER_ID=""  # Your Telegram user ID (find via @userinfobot)
 
 CORE_CREW=(zoro nami robin)
 ALL_CREW=(zoro nami robin)
@@ -36,6 +37,21 @@ launch_agent() {
   if [[ -n "${CHANNEL_PLUGIN}" && -f "$env_file" ]]; then
     mkdir -p "$state_dir"
     cp "$env_file" "$state_dir/.env"
+
+    # Auto-provision access.json (bypasses /telegram:access hardcoded path issue)
+    if [[ ! -f "$state_dir/access.json" && -n "${OWNER_ID}" ]]; then
+      cat > "$state_dir/access.json" <<EOJSON
+{
+  "dmPolicy": "allowlist",
+  "allowFrom": ["${OWNER_ID}"],
+  "groups": {},
+  "pending": {}
+}
+EOJSON
+      chmod 600 "$state_dir/access.json"
+      echo "  [init] $name access.json provisioned (owner: ${OWNER_ID})"
+    fi
+
     tmux new-session -d -s "$session" \
       "cd $agent_dir && TELEGRAM_STATE_DIR=$state_dir claude --channels $CHANNEL_PLUGIN"
     echo "  [ok]   $session launched (channel: $name)"

@@ -224,6 +224,51 @@ Before considering your installation production-ready:
 
 ---
 
+## Telegram Multi-Bot Setup
+
+When running multiple agents with individual Telegram bots, each agent needs its own isolated channel state. The launch script handles this automatically via `TELEGRAM_STATE_DIR`, but there are important details to be aware of.
+
+### Setup procedure (per agent)
+
+1. **Create bot**: `@BotFather` → `/newbot` → note the token
+2. **Save token**: Write the token to `_crew/{agent}/.env`:
+   ```
+   TELEGRAM_BOT_TOKEN=your_token_here
+   ```
+3. **Set OWNER_ID** in `launch.sh`: Your Telegram user ID (find via `@userinfobot`)
+4. **Launch**: `bash launch.sh agent1 agent2 ...`
+
+The launch script auto-provisions `access.json` with allowlist policy, restricting each bot to the owner only.
+
+### Security
+
+- **Never read `.env` files** containing bot tokens — not even for debugging. Use `getMe` API to verify a bot works without exposing the token in logs.
+- **Rotate tokens immediately** if exposed. Use `@BotFather` → `/mybots` → select bot → `API Token` → `Revoke`.
+- **`.env` and `access.json`** must be in `.gitignore` — never commit secrets.
+
+### Known issue: `/telegram:access` hardcoded path
+
+The `/telegram:access` skill reads from `~/.claude/channels/telegram/access.json` regardless of `TELEGRAM_STATE_DIR`. This means it cannot manage per-agent access in multi-bot setups.
+
+**Workaround**: The launch script auto-provisions `access.json` directly in each agent's state directory, bypassing the skill entirely. To manually manage access after launch, edit the agent's access.json directly:
+
+```bash
+# View access state for a specific agent
+cat ~/.claude/channels/{agent}/access.json
+
+# Manually approve a user (replace SENDER_ID)
+python3 -c "
+import json, os
+path = os.path.expanduser('~/.claude/channels/{agent}/access.json')
+data = json.load(open(path))
+data['allowFrom'].append('SENDER_ID')
+data['allowFrom'] = list(set(data['allowFrom']))
+json.dump(data, open(path, 'w'), indent=2)
+"
+```
+
+---
+
 ## Common Setup Issues
 
 ### Agent is not loading governance documents
