@@ -240,6 +240,30 @@ When running multiple agents with individual Telegram bots, each agent needs its
 
 The launch script auto-provisions `access.json` with allowlist policy, restricting each bot to the owner only.
 
+### Group chat setup
+
+Multiple agents can participate in a shared Telegram group for collaborative conversations.
+
+1. **Create a Telegram group** and invite all participating bots
+2. **Get the group ID**: Send a message in the group, then check via bot API:
+   ```bash
+   curl -s "https://api.telegram.org/bot<TOKEN>/getUpdates" | python3 -m json.tool
+   ```
+   Look for `chat.id` in the response (negative number, e.g., `-5178557722`).
+3. **Configure in `launch.sh`**:
+   ```bash
+   GROUPS=("-5178557722:zoro,nami,usopp")
+   MENTION_PATTERNS[zoro]="조로,zoro"
+   MENTION_PATTERNS[nami]="나미,nami"
+   ```
+
+The launch script registers groups in each agent's `access.json` with:
+- `requireMention: false` — agents receive all group messages and respond when their expertise is relevant
+- `mentionPatterns` — agents always respond when their name (natural language) appears
+- `allowFrom: []` — both the owner and other bots can trigger responses, enabling agent-to-agent collaboration
+
+**Loop prevention** is critical in group chats. See [crew-system.md](./crew-system.md#group-chat-rules) for the required CLAUDE.md rules that prevent infinite response chains between agents.
+
 ### Security
 
 - **Never read `.env` files** containing bot tokens — not even for debugging. Use `getMe` API to verify a bot works without exposing the token in logs.
@@ -291,6 +315,19 @@ Add explicit authority statements to the agent's department CLAUDE.md:
 - You MAY submit Proposals to: procedure/, doctrine/, strategy/
 - Proposals go in: proposals/[tier]/[YYYY-MM-DD]-[title].md
 ```
+
+### Agent is stuck on security prompt (not responding)
+
+Claude Code has built-in security prompts for cross-directory `cd` and `git` operations. On first launch, each agent session will pause at a "Do you want to proceed?" prompt. **This cannot be bypassed via settings.**
+
+**Fix**: Attach to the tmux session and manually approve:
+```bash
+tmux attach -t crew_{agent}
+# Select option 2: "Yes, allow during this session"
+# Detach: Ctrl+B, D
+```
+
+This only happens once per session. If an agent suddenly stops responding in a group chat, check if it's stuck on a security prompt.
 
 ### Proposals are not being reviewed
 

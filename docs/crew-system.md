@@ -205,6 +205,55 @@ Research Department
 
 ---
 
+## Group Chat Rules
+
+When multiple agents share a Telegram group, loop prevention is essential. Without rules, Agent A's response triggers Agent B, which triggers Agent A — burning tokens in an infinite chain.
+
+### Required CLAUDE.md rules for group chat
+
+Add these rules to your shared crew CLAUDE.md (`_crew/CLAUDE.md`):
+
+```markdown
+## Group Chat Rules (Telegram)
+
+All group messages are received. Loop prevention is the top priority.
+
+### Response criteria
+1. Respond ONLY when your expertise is directly relevant.
+2. Owner messages: respond actively. Other agent messages: respond conservatively (only if your specialty applies).
+3. Keep responses short (1-3 sentences). For longer content: "Details via DM."
+4. No more than 2 agents respond to one message — only the most relevant agent.
+5. NEVER react/agree with another agent's response ("agreed", "good point", etc.).
+6. Always respond when your name is called (via mentionPatterns).
+
+### Mention rules
+1. Only @mention another agent when you have a specific request for them.
+2. Never mention for acknowledgment, thanks, or confirmation.
+3. Only perform inter-agent collaboration when instructed by the owner.
+
+### Response format
+(response content)
+(if needed) @other_agent_bot — specific request
+```
+
+### How it works technically
+
+| Setting | Value | Effect |
+|---------|-------|--------|
+| `requireMention` | `false` | All agents receive every group message |
+| `mentionPatterns` | `["name", "이름"]` | Agent always responds when name appears |
+| `allowFrom` | `[]` (empty) | Owner + other bots can all trigger responses |
+
+The AI agent behind each bot evaluates every message and decides whether to respond based on the CLAUDE.md rules. The `mentionPatterns` provide explicit invocation (natural language names), while the rules govern implicit responses (expertise-based).
+
+### Cost implications
+
+With `requireMention: false` and N agents, every group message is delivered to all N sessions. Each session consumes input tokens evaluating the message. For a 5-agent group, expect ~5x the token cost of a single-agent DM session for group activity. This is the trade-off for natural multi-agent conversation.
+
+**Mitigation**: Use model routing (haiku for low-stakes groups, sonnet for active collaboration) and keep group messages focused.
+
+---
+
 ## SOP Self-Evolution (Learn → Compress → Apply)
 
 The SOP Self-Evolution cycle is the mechanism by which agents improve their Playbooks over time without requiring manual intervention from principals. It is the primary feedback loop between operational experience and documented guidance.

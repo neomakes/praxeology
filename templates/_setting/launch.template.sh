@@ -30,6 +30,18 @@ CHANNELS_BASE="${HOME}/.claude/channels"
 # Find yours: message @userinfobot on Telegram, or check an existing access.json.
 OWNER_ID="{OWNER_TELEGRAM_ID}"
 
+# Telegram group IDs — agents will be registered to these groups.
+# Create groups in Telegram, add bots, then paste group IDs here.
+# Format: "GROUP_ID:agent1,agent2 GROUP_ID2:agent3,agent4"
+GROUPS=({GROUP_MAPPINGS})
+
+# Agent mention patterns — natural language triggers (regex).
+# Format: associative array of agent name → comma-separated patterns.
+# When a message contains a pattern, the matching agent responds even without @mention.
+declare -A MENTION_PATTERNS
+# Example: MENTION_PATTERNS[zoro]="조로,zoro"
+{MENTION_PATTERN_ENTRIES}
+
 # Core crew — minimal set for daily operations
 CORE_CREW=({CORE_AGENT_NAMES})
 
@@ -67,16 +79,41 @@ launch_agent() {
     # and ignores TELEGRAM_STATE_DIR. This auto-provisioning bypasses that limitation
     # by writing access.json directly to the per-agent state directory.
     if [[ ! -f "$state_dir/access.json" && -n "${OWNER_ID}" ]]; then
-      cat > "$state_dir/access.json" <<EOJSON
-{
-  "dmPolicy": "allowlist",
-  "allowFrom": ["${OWNER_ID}"],
-  "groups": {},
-  "pending": {}
+      # Build groups JSON for this agent
+      local groups_json="{}"
+      for mapping in "${GROUPS[@]}"; do
+        local gid="${mapping%%:*}"
+        local agents="${mapping#*:}"
+        if echo ",$agents," | grep -q ",$name,"; then
+          groups_json=$(echo "$groups_json" | python3 -c "
+import sys, json
+d = json.load(sys.stdin)
+d['$gid'] = {'requireMention': False, 'allowFrom': []}
+json.dump(d, sys.stdout)")
+        fi
+      done
+
+      # Build mentionPatterns JSON
+      local patterns_json="[]"
+      if [[ -n "${MENTION_PATTERNS[$name]+x}" ]]; then
+        patterns_json=$(echo "${MENTION_PATTERNS[$name]}" | python3 -c "
+import sys; print('[' + ','.join('\"' + p.strip() + '\"' for p in sys.stdin.read().split(',')) + ']')")
+      fi
+
+      python3 -c "
+import json
+data = {
+    'dmPolicy': 'allowlist',
+    'allowFrom': ['${OWNER_ID}'],
+    'groups': json.loads('$groups_json'),
+    'pending': {},
+    'mentionPatterns': json.loads('$patterns_json')
 }
-EOJSON
+with open('$state_dir/access.json', 'w') as f:
+    json.dump(data, f, indent=2)
+"
       chmod 600 "$state_dir/access.json"
-      echo "  [init] $name access.json provisioned (owner: ${OWNER_ID})"
+      echo "  [init] $name access.json provisioned (owner, groups, mentionPatterns)"
     fi
 
     tmux new-session -d -s "$session" \
@@ -129,7 +166,18 @@ tmux list-sessions 2>/dev/null | grep crew_ || echo "  (none)"
 # 1. Replace {ABSOLUTE_PATH_TO_PROJECT_ROOT} with your org root path.
 # 2. Replace {CHANNEL_PLUGIN} with your channel plugin string, or leave empty.
 # 3. Replace {CORE_AGENT_NAMES} and {ALL_AGENT_NAMES} with agent names.
-# 4. Each agent needs _crew/{name}/CLAUDE.md for persona.
-# 5. For channel integration, add _crew/{name}/.env with the bot token.
-# 6. Make executable: chmod +x launch.sh
+# 4. Replace {OWNER_TELEGRAM_ID} with your Telegram user ID.
+# 5. Replace {GROUP_MAPPINGS} with group-to-agent mappings.
+#    Example: "-100123:zoro,nami" "-100456:robin"
+# 6. Replace {MENTION_PATTERN_ENTRIES} with per-agent patterns.
+#    Example: MENTION_PATTERNS[zoro]="조로,zoro"
+# 7. Each agent needs _crew/{name}/CLAUDE.md for persona.
+# 8. For channel integration, add _crew/{name}/.env with the bot token.
+# 9. Make executable: chmod +x launch.sh
+#
+# KNOWN ISSUES:
+# - /telegram:access skill hardcodes ~/.claude/channels/telegram/ path.
+#   This script bypasses that by writing access.json directly.
+# - First session launch requires manual cd+git security prompt approval
+#   (Claude Code built-in security, cannot be bypassed via settings).
 # =============================================================================
