@@ -270,6 +270,24 @@ The launch script registers groups in each agent's `access.json` with:
 - **Rotate tokens immediately** if exposed. Use `@BotFather` → `/mybots` → select bot → `API Token` → `Revoke`.
 - **`.env` and `access.json`** must be in `.gitignore` — never commit secrets.
 
+### Known issue: Bot-to-bot messages are invisible (Telegram platform limitation)
+
+Telegram Bot API **does not deliver messages from one bot to another bot** in group chats. This is a hard platform restriction — not configurable via privacy mode, admin status, or any API parameter.
+
+> "Bots talking to each other could potentially get stuck in unwelcome loops. To avoid this, we decided that bots will not be able to see messages from other bots regardless of mode." — [Telegram Bot FAQ](https://core.telegram.org/bots/faq)
+
+**Impact**: In a multi-agent group chat, agents can see the owner's messages but cannot see each other's responses. Each agent operates in isolation within the group.
+
+**Workarounds**:
+
+| Approach | Description |
+|----------|-------------|
+| Owner relays | Owner manually summarizes or quotes one agent's response for another |
+| External message bus | Agents share messages via a backend service (database, REST API, file system) outside Telegram |
+| Web-based comm hub | Use a web application with group chat functionality as the agent-to-agent channel, keeping Telegram for owner↔agent only |
+
+**Recommended architecture**: Use Telegram for **owner ↔ agent** communication (DMs and group commands). Use an **external coordination layer** (web dashboard, shared database, or message queue) for **agent ↔ agent** collaboration. This cleanly separates the two communication patterns and avoids the platform limitation entirely.
+
 ### Known issue: `/telegram:access` hardcoded path
 
 The `/telegram:access` skill reads from `~/.claude/channels/telegram/access.json` regardless of `TELEGRAM_STATE_DIR`. This means it cannot manage per-agent access in multi-bot setups.
