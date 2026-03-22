@@ -367,3 +367,54 @@ High-tier documents change rarely and deliberately. Low-tier documents change fr
 
 **Principle 5: No governance without verification.**
 SafetyGate is not advisory. Review Cascade is not optional. Proposal is not free-form. Every mechanism has a defined structure because unstructured governance is not governance.
+
+---
+
+## Why Praxeology — Competitive Landscape
+
+Praxeology occupies a unique position in the multi-agent ecosystem. This section clarifies what it is, what it is not, and why existing frameworks do not address the same problem.
+
+### What exists today
+
+| Framework | What it does | Governance model |
+|-----------|-------------|-----------------|
+| **CrewAI** | Python task pipeline — sequential/hierarchical agent delegation | Hardcoded in code. Change requires redeploy. |
+| **AutoGen** | Turn-based agent conversation in Python runtime | Hardcoded in code. |
+| **Claw-Empire** | Visual office simulator, orchestrates CLI/API agents | None. Central coordinator dispatches tasks. |
+| **OpenClaw** | Channel↔model gateway (50+ channels, 300+ models) | None. System prompt only. |
+| **LangGraph** | State machine graph for agent workflows | Implicit in graph edges. |
+
+**Common pattern**: agents are programmed by developers. Rules live in code or prompts. Changing rules means changing code.
+
+### What Praxeology does differently
+
+**Documents govern agents. Agents evolve documents.**
+
+| Capability | Existing frameworks | Praxeology |
+|-----------|-------------------|------------|
+| Rule definition | Code/prompt (flat) | **4+1 tier documents** (Strategy > Doctrine > Procedure > Playbook > Work Plan) |
+| Rule enforcement | Prompt-dependent (ignorable) | **SafetyGate** (higher-tier violation = HALT) |
+| Rule change | Code edit → redeploy | **Amendment Proposal** → review → approve → version bump |
+| Agent participation | Passive executors | **Agents propose amendments** (reverse flow) |
+| Rule versioning | git log (indirect) | **Amendment History** (GitHub-style timeline + document versioning) |
+| Rule relationships | None | **Cross-references** with ontology graph |
+
+This is not a feature difference — it is a **paradigm difference**. Existing frameworks are command economies: the developer issues orders. Praxeology is a constitutional system: documents define the rules, agents operate within them, and agents can petition to change them through legitimate channels.
+
+### The agent-to-agent communication problem
+
+Every chat platform (Telegram, Discord, Slack) blocks bot-to-bot messaging at the platform level. Telegram's Bot API FAQ states: "Bots will not be able to see messages from other bots regardless of mode."
+
+Existing frameworks solve this by internalizing communication:
+- CrewAI/AutoGen: Python in-process memory
+- Claw-Empire: SQLite + central coordinator
+
+Praxeology's approach: **self-hosted communication layer** (Squad Chat pattern). Agent-to-agent messages flow through an internal database, not through external chat platforms. Chat platforms serve as the **principal ↔ agent** interface only.
+
+### Three unique frontiers
+
+1. **Document-based governance**: No other multi-agent framework implements tiered, versioned, amendment-driven behavioral standards with enforcement (SafetyGate) and reverse flow (agent proposals).
+
+2. **Agent-to-agent free dialogue**: Internal communication unconstrained by external platform limitations, with document context injected into every exchange.
+
+3. **Physical sensor → agent behavior**: Context-aware mode switching driven by real-world sensor data (e.g., device motion, environment). No other framework connects physical-world signals to agent governance.
