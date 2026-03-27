@@ -108,22 +108,29 @@ This makes agents **distinguishable, consistent, and bounded**. A QA agent sound
 
 ---
 
-<details>
-<summary><strong>The Theory — Why This Works (The Isomorphism)</strong></summary>
+## The Theory — Why This Works
 
 The same 4+1 tier structure appears across every domain of organized action:
 
-| Tier | National Law | Military | Corporate | Individual | AI Agent |
-|------|-------------|----------|-----------|------------|----------|
-| **1 Strategy** | Constitution | Campaign Objective | Mission & Vision | Personal Values | System Prompt / Prime Directive |
-| **2 Doctrine** | Statute Law | Rules of Engagement | Corporate Policy | Life Principles | Behavioral Guidelines |
-| **3 Procedure** | Regulations | Standard Operating Procedures | SOPs / Protocols | Habits & Routines | Task Instructions |
-| **4 Playbook** | Case Law / Precedent | Tactics & Drills | Best Practices | Learned Patterns | Few-shot Examples |
-| **Exec** | Executive Order | Mission Orders | Sprint / Work Plan | Daily To-Do | Active Context |
+| Tier | National Law | Military (C2) | Corporate | Individual | Deep Learning | Essence |
+|------|-------------|---------------|-----------|------------|---------------|---------|
+| **1 Strategy** | Constitution | National Defense Strategy | Articles of Incorporation | Values & Identity | Objective function *J*, Manifold | **Why** — fundamental purpose |
+| **2 Doctrine** | Statute Law | Operational Doctrine | Corporate Regulations | Personal Principles | Constraints *g(x) ≤ 0* | **What** — principles & boundaries |
+| **3 Procedure** | Decree / Rules | OPLAN / OPORD | Operating Guidelines | Goals & Routines | Policy *π*, Control input *u* | **How** — resource allocation |
+| **4 Playbook** | Administrative Rules | TTP (Tactics, Techniques, Procedures) | SOP / Best Practices | Habits & Mastery | Deterministic mapping *y = f(x)* | **Execute** — repeatable patterns |
+| **Exec** | Enforcement | FRAGO / C2 | Work Execution | Flow & Adaptation | Feedback loop *Δe*, Kalman filter | **Now** — real-time control |
 
-Governance is not domain-specific. The pattern is universal. A framework that works for a military unit works for a startup, a research lab, or an AI agent fleet.
+From a systems engineering perspective:
 
-</details>
+| Level | Law / Business / Military / Individual | Systems Engineering | Mathematics |
+|-------|---------------------------------------|--------------------|----|
+| **Top** | Constitution / Articles / Strategy / Values | **Invariants** | Objective function *J*, Manifold |
+| **Upper** | Law / Regulations / Doctrine / Principles | **Boundary Conditions** | Constraints *g(x) ≤ 0* |
+| **Middle** | Decree / Guidelines / OPLAN / Routines | **State Transition Function** | Policy *π*, Control input *u* |
+| **Lower** | Procedures / SOP / TTP / Habits | **Deterministic Algorithms** | I/O mapping *y = f(x)* |
+| **Exec** | Enforcement / Execution / C2 / Flow | **Feedback Loop** | Error correction *Δe*, Kalman filter |
+
+Governance is not domain-specific. The pattern is universal — it appears in legal systems, military doctrine, corporate governance, individual behavior, and even gradient descent. A framework that works for a military unit works for a startup, a neural network, or an AI agent fleet. Praxeology makes this universal structure executable.
 
 ---
 
