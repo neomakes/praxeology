@@ -1,5 +1,8 @@
 <p align="center">
-  <img src="assets/banner.svg" alt="Praxeology — The governance layer that keeps your AI agent team aligned, evolving, and accountable." width="100%">
+  <img src="assets/banner-3d-fr.gif" alt="Praxeology — De la stratégie à l'exécution, une balle dorée roule sur la variété de gouvernance 3D" width="100%">
+</p>
+<p align="center">
+  <a href="assets/banner-3d-fr.html"><em>Voir la bannière 3D interactive</em></a>
 </p>
 
 <p align="center">
