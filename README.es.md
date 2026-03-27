@@ -10,13 +10,13 @@
 </p>
 
 <p align="center">
-  <a href="README.md">English</a> ·
+  <a href="README.md"><strong>English</strong></a> ·
   <a href="README.ko.md">한국어</a> ·
   <a href="README.ja.md">日本語</a> ·
   <a href="README.zh.md">中文</a> ·
   <a href="README.fr.md">Français</a> ·
   <a href="README.de.md">Deutsch</a> ·
-  <a href="README.es.md"><strong>Español</strong></a>
+  <a href="README.es.md">Español</a>
 </p>
 
 <p align="center">
@@ -26,166 +26,163 @@
 
 ---
 
-## El problema
+## The Problem
 
-**La paralelización está resuelta.** Today's AI coding tools estas herramientas ya hacen que los agentes de IA individuales sean increíblemente productivos. Ejecutar 5 agentes en paralelo es un problema resuelto.
+**Parallelization is solved.** Today's AI coding tools already make individual agents incredibly productive. Running 5 agents in parallel is a solved problem.
 
-**La coordinación no lo está.** Cuando esos 5 agentes terminan su trabajo, ¿quién resuelve los conflictos? ¿Quién verifica la coherencia? ¿Quién evita que el Agente A sobreescriba las decisiones del Agente B? ¿Quién detiene la deriva de roles entre sesiones? Los frameworks multi-agente resuelven el *inicio* — Praxeology resuelve lo que viene después: **coordinación, seguimiento de estado, resolución de conflictos y alineación evolutiva.**
+**Coordination is not.** When those 5 agents finish their work, who resolves conflicts? Who verifies consistency? Who prevents Agent A from overwriting Agent B's decisions? Who stops role drift across sessions? Multi-agent frameworks solve the *start* — Praxeology solves what comes after: **coordination, state tracking, conflict resolution, and evolutionary alignment.**
 
-**Praxeology es la capa de gobernanza que faltaba.** Se sitúa por encima de tus herramientas de codificación, sin reemplazarlas — asegurando que tus agentes operen como una organización coherente en lugar de una colección de chatbots independientes.
-
----
-
-## Prueba en producción
-
-Esto no es teoría. [NeoMakes](https://neomakes.com) lo ejecuta cada día.
-
-> **1 humano + 9 agentes de IA · 38 reglas de gobernanza · 7 departamentos**
-> Tareas diarias → Revisiones semanales → Enmiendas mensuales
-> Los agentes detectan brechas, proponen correcciones, evolucionan sus propios SOPs.
-
-Cada agente tiene definidas **Speech Rules** (límites de oraciones, tono), **Anti-Patterns** (comportamientos prohibidos) y **Emotional Triggers** (cambios de respuesta según la situación) — asegurando un comportamiento consistente y distinguible entre los 9 agentes. NeoMakes es una instancia. La tuya se verá diferente.
+**Praxeology is the missing governance layer.** It sits above your coding tools, not replacing them — ensuring your agents operate as a coherent organization rather than a collection of independent chatbots.
 
 ---
 
-## Cómo funciona
+## Production Proof
 
-Una jerarquía de gobernanza de 4+1 niveles. Simple. Universal.
+This isn't theory. [NeoMakes](https://neomakes.com) runs this every day.
+
+> **1 human + 9 AI agents · 38 governance rules · 7 departments**
+> Daily todos → Weekly reviews → Monthly amendments
+> Agents detect gaps, propose fixes, evolve their own SOPs.
+
+Each agent has defined **Speech Rules** (sentence limits, tone), **Anti-Patterns** (forbidden behaviors), and **Emotional Triggers** (situation-dependent response changes) — ensuring consistent, distinguishable behavior across all 9 agents. NeoMakes is one instance. Yours will look different.
+
+---
+
+## How It Works
+
+A 4+1 tier governance hierarchy. Simple. Universal.
 
 ```
-Estrategia (WHY) → Doctrina (WHAT) → Procedimiento (HOW) → Playbook (PATTERNS) → Ejecución (NOW)
+Strategy (WHY) → Doctrine (WHAT) → Procedure (HOW) → Playbook (PATTERNS) → Execution (NOW)
 ```
 
-Los niveles superiores siempre prevalecen sobre los inferiores. Sin excepciones. Los agentes resuelven decisiones recorriendo la jerarquía hacia arriba — deteniéndose en el primer nivel que cubre la situación.
+Higher tiers always override lower ones. No exceptions. Agents resolve decisions by walking up the hierarchy — stopping at the first level that covers the situation.
 
 ---
 
-## Qué lo hace diferente
+## What Makes It Different
 
-No es una lista de características. Es un solucionador de problemas de coordinación.
+Not a feature list. A coordination problem solver.
 
-| Tu problema | La respuesta de Praxeology |
+| Your Problem | Praxeology's Answer |
 |---|---|
-| Los agentes se desvían de su rol entre sesiones | **ConstitutionalGuard** — Verificación de comportamiento de 4 capas |
-| No hay forma de restringir las acciones de los agentes de forma segura | **SafetyGate** — Los niveles superiores bloquean reglas críticas que los niveles inferiores no pueden sobreescribir |
-| Los agentes no pueden mejorar sus propios procesos | **SOP Evolution** — Bucle Learn-Compress-Apply. Descenso de gradiente para la gobernanza |
-| Los cambios en un lugar rompen otro | **Review Cascade** — Propagación bidireccional (hacia arriba y hacia abajo en la jerarquía) |
-| Los agentes no pueden señalar cuando las reglas son malas | **Proposal Flow** — Solicitudes de enmienda estructuradas de cualquier agente al fundador |
-| Sin memoria institucional entre sesiones | **Work Cycle** — Brechas diarias → propuestas semanales → enmiendas mensuales → revisiones trimestrales |
+| Agents drift from their role over sessions | **ConstitutionalGuard** — 4-layer behavioral verification |
+| No way to safely constrain agent actions | **SafetyGate** — Higher tiers lock critical rules that lower tiers cannot override |
+| Agents can't improve their own processes | **SOP Evolution** — Learn-Compress-Apply loop. Gradient descent for governance |
+| Changes in one place break another | **Review Cascade** — Bidirectional propagation (up and down the hierarchy) |
+| Agents can't flag when rules are bad | **Proposal Flow** — Structured amendment requests from any agent to the founder |
+| No institutional memory across sessions | **Work Cycle** — Daily gaps → weekly proposals → monthly amendments → quarterly reviews |
 
 ---
 
-## Inicio rápido
+## Quick Start
 
 ```bash
 git clone https://github.com/neomakes/praxeology.git my-org
 cd my-org
-bash setup.sh    # Asistente interactivo: nombre de organización, misión, departamentos, agentes
-bash launch.sh   # Tu sistema de gobernanza está en marcha
+bash setup.sh    # Interactive wizard: org name, mission, departments, agents
+bash launch.sh   # Your governance system is live
 ```
 
-> **¿Nuevo aquí?** Comienza con la [Guía de inicio rápido](docs/quickstart.md) y la [Guía de diseño de roles](docs/role-design.md).
+> **New?** Start with [Quick Start Guide](docs/quickstart.md) and [Role Design Guide](docs/role-design.md).
 
 ---
 
-## Sistema de diseño de agentes
+## Agent Design System
 
-Cada agente recibe un `CLAUDE.md` que define no solo *qué* hace, sino *cómo* se comporta:
+Every agent gets a `CLAUDE.md` that defines not just *what* it does, but *how* it behaves:
 
 ```
 Identity → Persona → Speech Rules → Anti-Patterns → Emotional Triggers → Values → Boundaries
 ```
 
-Esto hace que los agentes sean **distinguibles, consistentes y acotados**. Un agente de QA suena diferente a un executor. Un planificador nunca escribe código. Un revisor nunca aprueba su propio trabajo. Consulta la [Guía de diseño de roles](docs/role-design.md) para la plantilla completa y estrategias de escalado (de 3 a 15+ agentes).
+This makes agents **distinguishable, consistent, and bounded**. A QA agent sounds different from an executor. A planner never writes code. A reviewer never approves their own work. See [Role Design Guide](docs/role-design.md) for the full template and scaling strategies (3 to 15+ agents).
 
 ---
 
-## Ejemplos
+## Examples
 
-- [examples/solo-dev/](examples/solo-dev/) — Desarrollador independiente + 3 agentes (mínimo)
-- [examples/tech-startup/](examples/tech-startup/) — Empresa de software en etapa inicial
-- [examples/one-piece-crew/](examples/one-piece-crew/) — Tripulación ficticia con sistema de persona completo
-
----
-
-<details>
-<summary><strong>La teoría — Por qué funciona (El isomorfismo)</strong></summary>
-
-La misma estructura de 4+1 niveles aparece en todos los dominios de la acción organizada:
-
-| Nivel | Derecho nacional | Militar | Corporativo | Individual | Agente IA |
-|------|-------------|----------|-----------|------------|----------|
-| **1 Estrategia** | Constitución | Objetivo de campaña | Misión & Visión | Valores personales | System Prompt / Prime Directive |
-| **2 Doctrina** | Ley estatutaria | Reglas de enfrentamiento | Política corporativa | Principios de vida | Directrices de comportamiento |
-| **3 Procedimiento** | Reglamentos | Procedimientos operativos estándar | SOPs / Protocolos | Hábitos & Rutinas | Instrucciones de tareas |
-| **4 Playbook** | Derecho consuetudinario / Precedente | Tácticas & Ejercicios | Mejores prácticas | Patrones aprendidos | Ejemplos few-shot |
-| **Exec** | Orden ejecutiva | Órdenes de misión | Sprint / Plan de trabajo | Lista diaria | Contexto activo |
-
-La gobernanza no es específica de un dominio. El patrón es universal. Un framework que funciona para una unidad militar funciona para una startup, un laboratorio de investigación o una flota de agentes de IA.
-
-</details>
+- [examples/solo-dev/](examples/solo-dev/) — Solo developer + 3 agents (minimal)
+- [examples/tech-startup/](examples/tech-startup/) — Early-stage software company
+- [examples/one-piece-crew/](examples/one-piece-crew/) — Fictional crew with full persona system
 
 ---
 
-## Estructura de directorios
+## The Theory — Why This Works
+
+The same 4+1 tier structure appears across every domain of organized action:
+
+| Tier | National Law | Military (C2) | Corporate | Individual | Deep Learning | Essence |
+|------|-------------|---------------|-----------|------------|---------------|---------|
+| **1 Strategy** | Constitution | National Defense Strategy | Articles of Incorporation | Values & Identity | Objective function *J*, Manifold | **Why** — fundamental purpose |
+| **2 Doctrine** | Statute Law | Operational Doctrine | Corporate Regulations | Personal Principles | Constraints *g(x) ≤ 0* | **What** — principles & boundaries |
+| **3 Procedure** | Decree / Rules | OPLAN / OPORD | Operating Guidelines | Goals & Routines | Policy *π*, Control input *u* | **How** — resource allocation |
+| **4 Playbook** | Administrative Rules | TTP (Tactics, Techniques, Procedures) | SOP / Best Practices | Habits & Mastery | Deterministic mapping *y = f(x)* | **Execute** — repeatable patterns |
+| **Exec** | Enforcement | FRAGO / C2 | Work Execution | Flow & Adaptation | Feedback loop *Δe*, Kalman filter | **Now** — real-time control |
+
+Governance is not domain-specific. The pattern is universal. A framework that works for a military unit works for a startup or an AI agent fleet. For the full mathematical mapping (systems engineering, gradient descent), see [docs/architecture.md](docs/architecture.md).
+
+---
+
+## Directory Structure
 
 ```
 your-org/
-├── CLAUDE.md                  # Contexto raíz para agentes de IA (generado)
-├── launch.sh                  # Script de lanzamiento diario (generado)
-├── _standard/                 # Documentos de gobernanza
-│   ├── README.md              # Índice maestro de todos los artefactos de gobernanza
-│   ├── {department}/          # Una carpeta por departamento
-│   │   ├── STR-{NNN}.md      #   (ej. estrategia, operaciones, finanzas, ingeniería)
+├── CLAUDE.md                  # Root context for AI agents (generated)
+├── launch.sh                  # Daily launch script (generated)
+├── _standard/                 # Governance documents
+│   ├── README.md              # Master index of all governance artifacts
+│   ├── {department}/          # One folder per department
+│   │   ├── STR-{NNN}.md      #   (e.g., strategy, operations, finance, engineering)
 │   │   ├── DOC-{NNN}.md
 │   │   ├── PRC-{NNN}.md
 │   │   └── PLY-{NNN}.md
-├── _crew/                     # Definiciones de agentes / miembros del equipo
-│   ├── CLAUDE.md              # Reglas compartidas del equipo
-│   └── {agent}/               # Subdirectorio por agente
-│       ├── CLAUDE.md          # Contexto y persona del agente
-│       └── sop.md             # SOPs del agente
-├── _project/                  # Proyectos activos
-├── _setting/                  # Configuración operacional
-├── docs/                      # Documentación del framework
-├── templates/                 # Plantillas de documentos reutilizables
-└── examples/                  # Implementaciones de referencia
+├── _crew/                     # Agent / team member definitions
+│   ├── CLAUDE.md              # Shared crew rules
+│   └── {agent}/               # Per-agent subdirectory
+│       ├── CLAUDE.md          # Agent context and persona
+│       └── sop.md             # Agent SOPs
+├── _project/                  # Active projects
+├── _setting/                  # Operational settings
+├── docs/                      # Framework documentation
+├── templates/                 # Reusable document templates
+└── examples/                  # Reference implementations
 ```
 
 ---
 
-## Guías de integración
+## Integration Guides
 
-| Guía | Descripción |
+| Guide | Description |
 |-------|-------------|
-| [Integración Discord](docs/discord-integration.md) | Estructura de canales, menciones de bots, prevención de bucles |
-| [Integración Google Drive](docs/drive-integration.md) | Configuración de enlaces simbólicos, almacenamiento de regulaciones, espacios de trabajo |
-| [Panel Crew Manager](docs/crew-manager.md) | Panel web para monitoreo de sesiones |
-| [Configuración Claude Code](docs/claude-code-setup.md) | Jerarquía CLAUDE.md, servidores MCP, sesiones por agente |
-| [Work Cycle](docs/work-cycle.md) | Esquemas Todo/weekly, ciclo de reportes, flujo Standard Gap |
+| [Discord Integration](docs/discord-integration.md) | Channel structure, bot mentions, loop prevention |
+| [Google Drive Integration](docs/drive-integration.md) | Symlink setup, regulation storage, workspaces |
+| [Crew Manager Dashboard](docs/crew-manager.md) | Web dashboard for session monitoring |
+| [Claude Code Setup](docs/claude-code-setup.md) | CLAUDE.md hierarchy, MCP servers, per-agent sessions |
+| [Work Cycle](docs/work-cycle.md) | Todo/weekly schemas, reporting cycle, Standard Gap flow |
 
-## Documentación
+## Documentation
 
-| Documento | Descripción |
+| Document | Description |
 |----------|-------------|
-| [docs/architecture.md](docs/architecture.md) | Filosofía de diseño y mecanismos centrales |
-| [docs/getting-started.md](docs/getting-started.md) | Requisitos previos, instalación, primeros pasos |
-| [docs/standard-system.md](docs/standard-system.md) | El sistema documental de 4+1 niveles en profundidad |
-| [docs/crew-system.md](docs/crew-system.md) | Gestión de agentes, auto-evolución de SOPs |
-| [docs/tutorial.md](docs/tutorial.md) | Tutorial completo para construir un equipo de agentes gobernado |
+| [docs/architecture.md](docs/architecture.md) | Design philosophy and core mechanisms |
+| [docs/getting-started.md](docs/getting-started.md) | Prerequisites, installation, first steps |
+| [docs/standard-system.md](docs/standard-system.md) | The 4+1 tier document system in depth |
+| [docs/crew-system.md](docs/crew-system.md) | Agent management, SOP self-evolution |
+| [docs/tutorial.md](docs/tutorial.md) | Full walkthrough building a governed agent team |
 
 ---
 
-## Origen
+## Origin
 
-Construido por **[NeoMakes](https://neomakes.com)** — una empresa unipersonal que desarrolla IA en dispositivo para entornos extremos. El framework surgió de gobernar una flota de agentes de IA con el mismo rigor aplicado a las estructuras de mando militar.
+Built by **[NeoMakes](https://neomakes.com)** — a one-person company developing on-device AI for extreme environments. The framework emerged from governing a fleet of AI agents with the same rigor applied to military command structures.
 
-El nombre proviene de la praxeología, el estudio de la acción humana. La acción intencionada tiene estructura. Esa estructura es universal. Hazla explícita y podrás gobernar cualquier cosa.
+The name comes from praxeology, the study of human action. Purposeful action has structure. That structure is universal. Make it explicit, and you can govern anything.
 
 ---
 
-## Licencia
+## License
 
-Licencia MIT — ver [LICENSE](LICENSE).
+MIT License — see [LICENSE](LICENSE).
 
 Copyright (c) 2026 NeoMakes

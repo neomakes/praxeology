@@ -22,6 +22,16 @@ The same structural pattern appears across every domain where purposeful action 
 | 4 Playbook | Admin Rules | TTP | SOP | Habits | Playbook |
 | Exec | Enforcement | FRAGO/C2 | Operations | Flow | Work Plan |
 
+From a systems engineering perspective, each tier maps to a distinct mathematical construct:
+
+| Level | Law / Business / Military / Individual | Systems Engineering | Mathematics |
+|-------|---------------------------------------|--------------------|----|
+| **Top** | Constitution / Articles / Strategy / Values | **Invariants** | Objective function *J*, Manifold |
+| **Upper** | Law / Regulations / Doctrine / Principles | **Boundary Conditions** | Constraints *g(x) ≤ 0* |
+| **Middle** | Decree / Guidelines / OPLAN / Routines | **State Transition Function** | Policy *π*, Control input *u* |
+| **Lower** | Procedures / SOP / TTP / Habits | **Deterministic Algorithms** | I/O mapping *y = f(x)* |
+| **Exec** | Enforcement / Execution / C2 / Flow | **Feedback Loop** | Error correction *Δe*, Kalman filter |
+
 This isomorphism is not decorative. It means that governance intuitions developed in any one domain transfer directly. A Constitutional amendment requires supermajority consensus and years of deliberation — so does a Strategy revision. A FRAGO can be issued in minutes — so can a Work Plan update.
 
 The insight: **authority flows downward, information flows upward, and each tier governs the tier immediately below it.**

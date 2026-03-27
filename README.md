@@ -120,17 +120,7 @@ The same 4+1 tier structure appears across every domain of organized action:
 | **4 Playbook** | Administrative Rules | TTP (Tactics, Techniques, Procedures) | SOP / Best Practices | Habits & Mastery | Deterministic mapping *y = f(x)* | **Execute** — repeatable patterns |
 | **Exec** | Enforcement | FRAGO / C2 | Work Execution | Flow & Adaptation | Feedback loop *Δe*, Kalman filter | **Now** — real-time control |
 
-From a systems engineering perspective:
-
-| Level | Law / Business / Military / Individual | Systems Engineering | Mathematics |
-|-------|---------------------------------------|--------------------|----|
-| **Top** | Constitution / Articles / Strategy / Values | **Invariants** | Objective function *J*, Manifold |
-| **Upper** | Law / Regulations / Doctrine / Principles | **Boundary Conditions** | Constraints *g(x) ≤ 0* |
-| **Middle** | Decree / Guidelines / OPLAN / Routines | **State Transition Function** | Policy *π*, Control input *u* |
-| **Lower** | Procedures / SOP / TTP / Habits | **Deterministic Algorithms** | I/O mapping *y = f(x)* |
-| **Exec** | Enforcement / Execution / C2 / Flow | **Feedback Loop** | Error correction *Δe*, Kalman filter |
-
-Governance is not domain-specific. The pattern is universal — it appears in legal systems, military doctrine, corporate governance, individual behavior, and even gradient descent. A framework that works for a military unit works for a startup, a neural network, or an AI agent fleet. Praxeology makes this universal structure executable.
+Governance is not domain-specific. The pattern is universal. A framework that works for a military unit works for a startup or an AI agent fleet. For the full mathematical mapping (systems engineering, gradient descent), see [docs/architecture.md](docs/architecture.md).
 
 ---
 

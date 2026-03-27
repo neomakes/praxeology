@@ -10,10 +10,10 @@
 </p>
 
 <p align="center">
-  <a href="README.md">English</a> ·
+  <a href="README.md"><strong>English</strong></a> ·
   <a href="README.ko.md">한국어</a> ·
   <a href="README.ja.md">日本語</a> ·
-  <a href="README.zh.md"><strong>中文</strong></a> ·
+  <a href="README.zh.md">中文</a> ·
   <a href="README.fr.md">Français</a> ·
   <a href="README.de.md">Deutsch</a> ·
   <a href="README.es.md">Español</a>
@@ -26,166 +26,163 @@
 
 ---
 
-## 问题
+## The Problem
 
-**并行化已经解决了。** 当今的 AI 编程工具已经让单个智能体变得极具生产力。并行运行 5 个智能体是一个已解决的问题。
+**Parallelization is solved.** Today's AI coding tools already make individual agents incredibly productive. Running 5 agents in parallel is a solved problem.
 
-**协调却不是。** 当这 5 个智能体完成工作后，谁来解决冲突？谁来验证一致性？谁来阻止智能体 A 覆盖智能体 B 的决策？谁来防止跨会话的角色漂移？多智能体框架解决的是*开始*——Praxeology 解决的是之后的问题：**协调、状态追踪、冲突解决和演进对齐。**
+**Coordination is not.** When those 5 agents finish their work, who resolves conflicts? Who verifies consistency? Who prevents Agent A from overwriting Agent B's decisions? Who stops role drift across sessions? Multi-agent frameworks solve the *start* — Praxeology solves what comes after: **coordination, state tracking, conflict resolution, and evolutionary alignment.**
 
-**Praxeology 是缺失的治理层。** 它位于你的编码工具之上，而非取代它们——确保你的智能体作为一个有机整体运作，而不是一群独立聊天机器人的集合。
-
----
-
-## 生产环境验证
-
-这不是理论。[NeoMakes](https://neomakes.com) 每天都在运行它。
-
-> **1 人 + 9 个 AI 智能体 · 38 条治理规则 · 7 个部门**
-> 每日待办 → 每周回顾 → 每月修订
-> 智能体检测差距、提出修复方案、自主演进各自的 SOP。
-
-每个智能体都定义了 **Speech Rules**（句子限制、语调）、**Anti-Patterns**（禁止行为）和 **Emotional Triggers**（情境依赖的响应变化）——确保所有 9 个智能体行为一致且可区分。NeoMakes 只是一个实例，你的系统看起来会有所不同。
+**Praxeology is the missing governance layer.** It sits above your coding tools, not replacing them — ensuring your agents operate as a coherent organization rather than a collection of independent chatbots.
 
 ---
 
-## 工作原理
+## Production Proof
 
-4+1 层治理层级。简单。通用。
+This isn't theory. [NeoMakes](https://neomakes.com) runs this every day.
+
+> **1 human + 9 AI agents · 38 governance rules · 7 departments**
+> Daily todos → Weekly reviews → Monthly amendments
+> Agents detect gaps, propose fixes, evolve their own SOPs.
+
+Each agent has defined **Speech Rules** (sentence limits, tone), **Anti-Patterns** (forbidden behaviors), and **Emotional Triggers** (situation-dependent response changes) — ensuring consistent, distinguishable behavior across all 9 agents. NeoMakes is one instance. Yours will look different.
+
+---
+
+## How It Works
+
+A 4+1 tier governance hierarchy. Simple. Universal.
 
 ```
-战略 (WHY) → 教义 (WHAT) → 程序 (HOW) → 手册 (PATTERNS) → 执行 (NOW)
+Strategy (WHY) → Doctrine (WHAT) → Procedure (HOW) → Playbook (PATTERNS) → Execution (NOW)
 ```
 
-上层始终覆盖下层。无一例外。智能体通过向上遍历层级来解决决策——在第一个覆盖该情况的层级停止。
+Higher tiers always override lower ones. No exceptions. Agents resolve decisions by walking up the hierarchy — stopping at the first level that covers the situation.
 
 ---
 
-## 有何不同
+## What Makes It Different
 
-不是功能列表。是协调问题的解决者。
+Not a feature list. A coordination problem solver.
 
-| 你的问题 | Praxeology 的答案 |
+| Your Problem | Praxeology's Answer |
 |---|---|
-| 智能体在会话间偏离其角色 | **ConstitutionalGuard** — 4 层行为验证 |
-| 没有办法安全地约束智能体行为 | **SafetyGate** — 上层锁定下层无法覆盖的关键规则 |
-| 智能体无法改进自身流程 | **SOP Evolution** — Learn-Compress-Apply 循环。治理的梯度下降 |
-| 一处变更破坏另一处 | **Review Cascade** — 双向传播（层级上下） |
-| 智能体无法标记规则存在问题时 | **Proposal Flow** — 任何智能体向创始人发送的结构化修订请求 |
-| 会话间没有机构记忆 | **Work Cycle** — 每日差距 → 每周提案 → 每月修订 → 每季度回顾 |
+| Agents drift from their role over sessions | **ConstitutionalGuard** — 4-layer behavioral verification |
+| No way to safely constrain agent actions | **SafetyGate** — Higher tiers lock critical rules that lower tiers cannot override |
+| Agents can't improve their own processes | **SOP Evolution** — Learn-Compress-Apply loop. Gradient descent for governance |
+| Changes in one place break another | **Review Cascade** — Bidirectional propagation (up and down the hierarchy) |
+| Agents can't flag when rules are bad | **Proposal Flow** — Structured amendment requests from any agent to the founder |
+| No institutional memory across sessions | **Work Cycle** — Daily gaps → weekly proposals → monthly amendments → quarterly reviews |
 
 ---
 
-## 快速开始
+## Quick Start
 
 ```bash
 git clone https://github.com/neomakes/praxeology.git my-org
 cd my-org
-bash setup.sh    # 交互式向导：组织名称、使命、部门、智能体
-bash launch.sh   # 你的治理系统已上线
+bash setup.sh    # Interactive wizard: org name, mission, departments, agents
+bash launch.sh   # Your governance system is live
 ```
 
-> **新手？** 从[快速开始指南](docs/quickstart.md)和[角色设计指南](docs/role-design.md)开始。
+> **New?** Start with [Quick Start Guide](docs/quickstart.md) and [Role Design Guide](docs/role-design.md).
 
 ---
 
-## 智能体设计系统
+## Agent Design System
 
-每个智能体都会获得一个 `CLAUDE.md`，不仅定义它*做什么*，还定义它*如何*行为：
+Every agent gets a `CLAUDE.md` that defines not just *what* it does, but *how* it behaves:
 
 ```
 Identity → Persona → Speech Rules → Anti-Patterns → Emotional Triggers → Values → Boundaries
 ```
 
-这使智能体**可区分、一致且有边界**。QA 智能体听起来与执行者不同。规划者从不写代码。审查者从不审批自己的工作。完整模板和扩展策略（3 到 15+ 个智能体）请参见[角色设计指南](docs/role-design.md)。
+This makes agents **distinguishable, consistent, and bounded**. A QA agent sounds different from an executor. A planner never writes code. A reviewer never approves their own work. See [Role Design Guide](docs/role-design.md) for the full template and scaling strategies (3 to 15+ agents).
 
 ---
 
-## 示例
+## Examples
 
-- [examples/solo-dev/](examples/solo-dev/) — 独立开发者 + 3 个智能体（最小配置）
-- [examples/tech-startup/](examples/tech-startup/) — 早期阶段软件公司
-- [examples/one-piece-crew/](examples/one-piece-crew/) — 具有完整角色系统的虚构团队
-
----
-
-<details>
-<summary><strong>理论 — 为何有效（同构性）</strong></summary>
-
-相同的 4+1 层结构出现在有组织行动的每个领域：
-
-| 层级 | 国家法律 | 军事 | 企业 | 个人 | AI 智能体 |
-|------|-------------|----------|-----------|------------|----------|
-| **1 战略** | 宪法 | 战役目标 | 使命与愿景 | 个人价值观 | System Prompt / Prime Directive |
-| **2 教义** | 成文法 | 交战规则 | 企业政策 | 人生原则 | 行为指南 |
-| **3 程序** | 法规 | 标准作战程序 | SOP / 协议 | 习惯与例程 | 任务指令 |
-| **4 手册** | 判例法 / 先例 | 战术与演练 | 最佳实践 | 习得模式 | Few-shot 示例 |
-| **执行** | 行政令 | 任务命令 | Sprint / 工作计划 | 每日待办 | 活跃上下文 |
-
-治理不是特定领域的。这个模式是普遍的。适用于军事单位的框架同样适用于初创公司、研究实验室或 AI 智能体群。
-
-</details>
+- [examples/solo-dev/](examples/solo-dev/) — Solo developer + 3 agents (minimal)
+- [examples/tech-startup/](examples/tech-startup/) — Early-stage software company
+- [examples/one-piece-crew/](examples/one-piece-crew/) — Fictional crew with full persona system
 
 ---
 
-## 目录结构
+## The Theory — Why This Works
+
+The same 4+1 tier structure appears across every domain of organized action:
+
+| Tier | National Law | Military (C2) | Corporate | Individual | Deep Learning | Essence |
+|------|-------------|---------------|-----------|------------|---------------|---------|
+| **1 Strategy** | Constitution | National Defense Strategy | Articles of Incorporation | Values & Identity | Objective function *J*, Manifold | **Why** — fundamental purpose |
+| **2 Doctrine** | Statute Law | Operational Doctrine | Corporate Regulations | Personal Principles | Constraints *g(x) ≤ 0* | **What** — principles & boundaries |
+| **3 Procedure** | Decree / Rules | OPLAN / OPORD | Operating Guidelines | Goals & Routines | Policy *π*, Control input *u* | **How** — resource allocation |
+| **4 Playbook** | Administrative Rules | TTP (Tactics, Techniques, Procedures) | SOP / Best Practices | Habits & Mastery | Deterministic mapping *y = f(x)* | **Execute** — repeatable patterns |
+| **Exec** | Enforcement | FRAGO / C2 | Work Execution | Flow & Adaptation | Feedback loop *Δe*, Kalman filter | **Now** — real-time control |
+
+Governance is not domain-specific. The pattern is universal. A framework that works for a military unit works for a startup or an AI agent fleet. For the full mathematical mapping (systems engineering, gradient descent), see [docs/architecture.md](docs/architecture.md).
+
+---
+
+## Directory Structure
 
 ```
 your-org/
-├── CLAUDE.md                  # AI 智能体的根上下文（生成的）
-├── launch.sh                  # 每日启动脚本（生成的）
-├── _standard/                 # 治理文档
-│   ├── README.md              # 所有治理产出物的主索引
-│   ├── {department}/          # 每个部门一个文件夹
-│   │   ├── STR-{NNN}.md      #   （例如：战略、运营、财务、工程）
+├── CLAUDE.md                  # Root context for AI agents (generated)
+├── launch.sh                  # Daily launch script (generated)
+├── _standard/                 # Governance documents
+│   ├── README.md              # Master index of all governance artifacts
+│   ├── {department}/          # One folder per department
+│   │   ├── STR-{NNN}.md      #   (e.g., strategy, operations, finance, engineering)
 │   │   ├── DOC-{NNN}.md
 │   │   ├── PRC-{NNN}.md
 │   │   └── PLY-{NNN}.md
-├── _crew/                     # 智能体 / 团队成员定义
-│   ├── CLAUDE.md              # 共享团队规则
-│   └── {agent}/               # 每个智能体的子目录
-│       ├── CLAUDE.md          # 智能体上下文和角色
-│       └── sop.md             # 智能体 SOP
-├── _project/                  # 活跃项目
-├── _setting/                  # 运营设置
-├── docs/                      # 框架文档
-├── templates/                 # 可复用文档模板
-└── examples/                  # 参考实现
+├── _crew/                     # Agent / team member definitions
+│   ├── CLAUDE.md              # Shared crew rules
+│   └── {agent}/               # Per-agent subdirectory
+│       ├── CLAUDE.md          # Agent context and persona
+│       └── sop.md             # Agent SOPs
+├── _project/                  # Active projects
+├── _setting/                  # Operational settings
+├── docs/                      # Framework documentation
+├── templates/                 # Reusable document templates
+└── examples/                  # Reference implementations
 ```
 
 ---
 
-## 集成指南
+## Integration Guides
 
-| 指南 | 说明 |
+| Guide | Description |
 |-------|-------------|
-| [Discord 集成](docs/discord-integration.md) | 频道结构、机器人提及、循环防止 |
-| [Google Drive 集成](docs/drive-integration.md) | 符号链接设置、规范存储、工作区 |
-| [Crew Manager 仪表板](docs/crew-manager.md) | 用于会话监控的 Web 仪表板 |
-| [Claude Code 设置](docs/claude-code-setup.md) | CLAUDE.md 层级、MCP 服务器、每智能体会话 |
-| [Work Cycle](docs/work-cycle.md) | Todo/weekly 架构、报告周期、Standard Gap 流程 |
+| [Discord Integration](docs/discord-integration.md) | Channel structure, bot mentions, loop prevention |
+| [Google Drive Integration](docs/drive-integration.md) | Symlink setup, regulation storage, workspaces |
+| [Crew Manager Dashboard](docs/crew-manager.md) | Web dashboard for session monitoring |
+| [Claude Code Setup](docs/claude-code-setup.md) | CLAUDE.md hierarchy, MCP servers, per-agent sessions |
+| [Work Cycle](docs/work-cycle.md) | Todo/weekly schemas, reporting cycle, Standard Gap flow |
 
-## 文档
+## Documentation
 
-| 文档 | 说明 |
+| Document | Description |
 |----------|-------------|
-| [docs/architecture.md](docs/architecture.md) | 设计理念和核心机制 |
-| [docs/getting-started.md](docs/getting-started.md) | 前提条件、安装、第一步 |
-| [docs/standard-system.md](docs/standard-system.md) | 4+1 层文档系统深度解析 |
-| [docs/crew-system.md](docs/crew-system.md) | 智能体管理、SOP 自我演进 |
-| [docs/tutorial.md](docs/tutorial.md) | 构建治理智能体团队的完整教程 |
+| [docs/architecture.md](docs/architecture.md) | Design philosophy and core mechanisms |
+| [docs/getting-started.md](docs/getting-started.md) | Prerequisites, installation, first steps |
+| [docs/standard-system.md](docs/standard-system.md) | The 4+1 tier document system in depth |
+| [docs/crew-system.md](docs/crew-system.md) | Agent management, SOP self-evolution |
+| [docs/tutorial.md](docs/tutorial.md) | Full walkthrough building a governed agent team |
 
 ---
 
-## 起源
+## Origin
 
-由 **[NeoMakes](https://neomakes.com)** 构建——一家开发极端环境设备端 AI 的单人公司。该框架源于以军事指挥结构相同的严格性治理 AI 智能体群的实践。
+Built by **[NeoMakes](https://neomakes.com)** — a one-person company developing on-device AI for extreme environments. The framework emerged from governing a fleet of AI agents with the same rigor applied to military command structures.
 
-名称来自 praxeology（行为学），即人类行为的研究。有目的的行动具有结构。该结构是普遍的。将其明确化，你就可以治理任何事物。
+The name comes from praxeology, the study of human action. Purposeful action has structure. That structure is universal. Make it explicit, and you can govern anything.
 
 ---
 
-## 许可证
+## License
 
-MIT 许可证 — 参见 [LICENSE](LICENSE)。
+MIT License — see [LICENSE](LICENSE).
 
 Copyright (c) 2026 NeoMakes

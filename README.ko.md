@@ -10,8 +10,8 @@
 </p>
 
 <p align="center">
-  <a href="README.md">English</a> ·
-  <a href="README.ko.md"><strong>한국어</strong></a> ·
+  <a href="README.md"><strong>English</strong></a> ·
+  <a href="README.ko.md">한국어</a> ·
   <a href="README.ja.md">日本語</a> ·
   <a href="README.zh.md">中文</a> ·
   <a href="README.fr.md">Français</a> ·
@@ -26,166 +26,163 @@
 
 ---
 
-## 문제
+## The Problem
 
-**병렬화는 해결됐다.** Today's AI coding tools 이 도구들은 이미 개별 AI 에이전트를 믿기 어려울 만큼 생산적으로 만든다. 5개 에이전트를 병렬로 실행하는 것은 해결된 문제다.
+**Parallelization is solved.** Today's AI coding tools already make individual agents incredibly productive. Running 5 agents in parallel is a solved problem.
 
-**조율은 아니다.** 그 5개의 에이전트가 작업을 마쳤을 때, 누가 충돌을 해결하는가? 누가 일관성을 검증하는가? 누가 에이전트 A가 에이전트 B의 결정을 덮어쓰는 것을 막는가? 누가 세션 간 역할 이탈을 막는가? 멀티에이전트 프레임워크는 *시작*을 해결한다 — Praxeology는 그 이후를 해결한다: **조율, 상태 추적, 충돌 해소, 진화적 정렬.**
+**Coordination is not.** When those 5 agents finish their work, who resolves conflicts? Who verifies consistency? Who prevents Agent A from overwriting Agent B's decisions? Who stops role drift across sessions? Multi-agent frameworks solve the *start* — Praxeology solves what comes after: **coordination, state tracking, conflict resolution, and evolutionary alignment.**
 
-**Praxeology는 빠진 거버넌스 레이어다.** 코딩 도구 위에 위치하며, 대체하는 것이 아니라 — 에이전트들이 독립된 챗봇의 집합이 아닌 일관된 조직으로 운영되도록 보장한다.
-
----
-
-## 프로덕션 증거
-
-이론이 아니다. [NeoMakes](https://neomakes.com)는 이것을 매일 운영한다.
-
-> **1인 + 9 AI 에이전트 · 38개 거버넌스 규칙 · 7개 부서**
-> 일일 할일 → 주간 리뷰 → 월간 개정
-> 에이전트들이 갭을 감지하고, 수정안을 제안하며, 자체 SOP를 진화시킨다.
-
-각 에이전트에는 **Speech Rules**(문장 제한, 어조), **Anti-Patterns**(금지 행동), **Emotional Triggers**(상황별 응답 변화)가 정의되어 있어 — 9개 에이전트 전반에 걸쳐 일관되고 구별 가능한 행동을 보장한다. NeoMakes는 하나의 사례다. 당신의 것은 다르게 보일 것이다.
+**Praxeology is the missing governance layer.** It sits above your coding tools, not replacing them — ensuring your agents operate as a coherent organization rather than a collection of independent chatbots.
 
 ---
 
-## 작동 방식
+## Production Proof
 
-4+1 계층 거버넌스 구조. 단순하다. 범용적이다.
+This isn't theory. [NeoMakes](https://neomakes.com) runs this every day.
+
+> **1 human + 9 AI agents · 38 governance rules · 7 departments**
+> Daily todos → Weekly reviews → Monthly amendments
+> Agents detect gaps, propose fixes, evolve their own SOPs.
+
+Each agent has defined **Speech Rules** (sentence limits, tone), **Anti-Patterns** (forbidden behaviors), and **Emotional Triggers** (situation-dependent response changes) — ensuring consistent, distinguishable behavior across all 9 agents. NeoMakes is one instance. Yours will look different.
+
+---
+
+## How It Works
+
+A 4+1 tier governance hierarchy. Simple. Universal.
 
 ```
-전략 (WHY) → 독트린 (WHAT) → 절차 (HOW) → 플레이북 (PATTERNS) → 실행 (NOW)
+Strategy (WHY) → Doctrine (WHAT) → Procedure (HOW) → Playbook (PATTERNS) → Execution (NOW)
 ```
 
-상위 계층은 항상 하위 계층을 재정의한다. 예외 없다. 에이전트는 상황을 커버하는 첫 번째 레벨에서 멈추며 계층을 올라가면서 결정을 해소한다.
+Higher tiers always override lower ones. No exceptions. Agents resolve decisions by walking up the hierarchy — stopping at the first level that covers the situation.
 
 ---
 
-## 무엇이 다른가
+## What Makes It Different
 
-기능 목록이 아니다. 조율 문제 해결사다.
+Not a feature list. A coordination problem solver.
 
-| 당신의 문제 | Praxeology의 답변 |
+| Your Problem | Praxeology's Answer |
 |---|---|
-| 에이전트가 세션 간 역할에서 벗어난다 | **ConstitutionalGuard** — 4계층 행동 검증 |
-| 에이전트 행동을 안전하게 제한할 방법이 없다 | **SafetyGate** — 상위 계층이 하위 계층이 재정의할 수 없는 중요 규칙을 잠근다 |
-| 에이전트가 자체 프로세스를 개선할 수 없다 | **SOP Evolution** — Learn-Compress-Apply 루프. 거버넌스를 위한 경사 하강법 |
-| 한 곳의 변경이 다른 곳을 망친다 | **Review Cascade** — 양방향 전파(계층 위아래로) |
-| 에이전트가 규칙이 잘못됐을 때 표시할 수 없다 | **Proposal Flow** — 모든 에이전트에서 창업자에게 구조화된 개정 요청 |
-| 세션 간 기관 기억이 없다 | **Work Cycle** — 일일 갭 → 주간 제안 → 월간 개정 → 분기 리뷰 |
+| Agents drift from their role over sessions | **ConstitutionalGuard** — 4-layer behavioral verification |
+| No way to safely constrain agent actions | **SafetyGate** — Higher tiers lock critical rules that lower tiers cannot override |
+| Agents can't improve their own processes | **SOP Evolution** — Learn-Compress-Apply loop. Gradient descent for governance |
+| Changes in one place break another | **Review Cascade** — Bidirectional propagation (up and down the hierarchy) |
+| Agents can't flag when rules are bad | **Proposal Flow** — Structured amendment requests from any agent to the founder |
+| No institutional memory across sessions | **Work Cycle** — Daily gaps → weekly proposals → monthly amendments → quarterly reviews |
 
 ---
 
-## 빠른 시작
+## Quick Start
 
 ```bash
 git clone https://github.com/neomakes/praxeology.git my-org
 cd my-org
-bash setup.sh    # 대화형 마법사: 조직명, 미션, 부서, 에이전트
-bash launch.sh   # 거버넌스 시스템 가동
+bash setup.sh    # Interactive wizard: org name, mission, departments, agents
+bash launch.sh   # Your governance system is live
 ```
 
-> **처음이라면?** [빠른 시작 가이드](docs/quickstart.md)와 [역할 설계 가이드](docs/role-design.md)부터 시작하세요.
+> **New?** Start with [Quick Start Guide](docs/quickstart.md) and [Role Design Guide](docs/role-design.md).
 
 ---
 
-## 에이전트 설계 시스템
+## Agent Design System
 
-모든 에이전트는 *무엇*을 하는지뿐만 아니라 *어떻게* 행동하는지를 정의하는 `CLAUDE.md`를 받는다:
+Every agent gets a `CLAUDE.md` that defines not just *what* it does, but *how* it behaves:
 
 ```
 Identity → Persona → Speech Rules → Anti-Patterns → Emotional Triggers → Values → Boundaries
 ```
 
-이것은 에이전트를 **구별 가능하고, 일관적이며, 경계가 있게** 만든다. QA 에이전트는 실행자와 다르게 들린다. 플래너는 절대 코드를 작성하지 않는다. 리뷰어는 자신의 작업을 절대 승인하지 않는다. 전체 템플릿과 확장 전략(3명에서 15명 이상의 에이전트)은 [역할 설계 가이드](docs/role-design.md)를 참조하라.
+This makes agents **distinguishable, consistent, and bounded**. A QA agent sounds different from an executor. A planner never writes code. A reviewer never approves their own work. See [Role Design Guide](docs/role-design.md) for the full template and scaling strategies (3 to 15+ agents).
 
 ---
 
-## 예제
+## Examples
 
-- [examples/solo-dev/](examples/solo-dev/) — 솔로 개발자 + 3개 에이전트 (최소 구성)
-- [examples/tech-startup/](examples/tech-startup/) — 초기 단계 소프트웨어 회사
-- [examples/one-piece-crew/](examples/one-piece-crew/) — 완전한 페르소나 시스템을 갖춘 가상 크루
-
----
-
-<details>
-<summary><strong>이론 — 왜 이것이 작동하는가 (동형성)</strong></summary>
-
-동일한 4+1 계층 구조가 조직적 행동의 모든 영역에 걸쳐 나타난다:
-
-| 계층 | 국가 법률 | 군사 | 기업 | 개인 | AI 에이전트 |
-|------|-------------|----------|-----------|------------|----------|
-| **1 전략** | 헌법 | 작전 목표 | 미션 & 비전 | 개인 가치관 | System Prompt / Prime Directive |
-| **2 독트린** | 성문법 | 교전 규칙 | 기업 정책 | 삶의 원칙 | 행동 지침 |
-| **3 절차** | 규정 | 표준 운영 절차 | SOP / 프로토콜 | 습관 & 루틴 | 태스크 지침 |
-| **4 플레이북** | 판례법 / 선례 | 전술 & 훈련 | 모범 사례 | 학습된 패턴 | Few-shot 예제 |
-| **실행** | 행정 명령 | 임무 명령 | 스프린트 / 작업 계획 | 일일 할일 | 활성 컨텍스트 |
-
-거버넌스는 도메인 특화적이지 않다. 패턴은 보편적이다. 군사 부대에 작동하는 프레임워크는 스타트업, 연구소, AI 에이전트 플릿에도 작동한다.
-
-</details>
+- [examples/solo-dev/](examples/solo-dev/) — Solo developer + 3 agents (minimal)
+- [examples/tech-startup/](examples/tech-startup/) — Early-stage software company
+- [examples/one-piece-crew/](examples/one-piece-crew/) — Fictional crew with full persona system
 
 ---
 
-## 디렉토리 구조
+## The Theory — Why This Works
+
+The same 4+1 tier structure appears across every domain of organized action:
+
+| Tier | National Law | Military (C2) | Corporate | Individual | Deep Learning | Essence |
+|------|-------------|---------------|-----------|------------|---------------|---------|
+| **1 Strategy** | Constitution | National Defense Strategy | Articles of Incorporation | Values & Identity | Objective function *J*, Manifold | **Why** — fundamental purpose |
+| **2 Doctrine** | Statute Law | Operational Doctrine | Corporate Regulations | Personal Principles | Constraints *g(x) ≤ 0* | **What** — principles & boundaries |
+| **3 Procedure** | Decree / Rules | OPLAN / OPORD | Operating Guidelines | Goals & Routines | Policy *π*, Control input *u* | **How** — resource allocation |
+| **4 Playbook** | Administrative Rules | TTP (Tactics, Techniques, Procedures) | SOP / Best Practices | Habits & Mastery | Deterministic mapping *y = f(x)* | **Execute** — repeatable patterns |
+| **Exec** | Enforcement | FRAGO / C2 | Work Execution | Flow & Adaptation | Feedback loop *Δe*, Kalman filter | **Now** — real-time control |
+
+Governance is not domain-specific. The pattern is universal. A framework that works for a military unit works for a startup or an AI agent fleet. For the full mathematical mapping (systems engineering, gradient descent), see [docs/architecture.md](docs/architecture.md).
+
+---
+
+## Directory Structure
 
 ```
 your-org/
-├── CLAUDE.md                  # AI 에이전트용 루트 컨텍스트 (생성됨)
-├── launch.sh                  # 일일 실행 스크립트 (생성됨)
-├── _standard/                 # 거버넌스 문서
-│   ├── README.md              # 모든 거버넌스 산출물의 마스터 인덱스
-│   ├── {department}/          # 부서당 하나의 폴더
-│   │   ├── STR-{NNN}.md      #   (예: 전략, 운영, 재무, 엔지니어링)
+├── CLAUDE.md                  # Root context for AI agents (generated)
+├── launch.sh                  # Daily launch script (generated)
+├── _standard/                 # Governance documents
+│   ├── README.md              # Master index of all governance artifacts
+│   ├── {department}/          # One folder per department
+│   │   ├── STR-{NNN}.md      #   (e.g., strategy, operations, finance, engineering)
 │   │   ├── DOC-{NNN}.md
 │   │   ├── PRC-{NNN}.md
 │   │   └── PLY-{NNN}.md
-├── _crew/                     # 에이전트 / 팀원 정의
-│   ├── CLAUDE.md              # 공유 크루 규칙
-│   └── {agent}/               # 에이전트별 서브디렉토리
-│       ├── CLAUDE.md          # 에이전트 컨텍스트 및 페르소나
-│       └── sop.md             # 에이전트 SOP
-├── _project/                  # 활성 프로젝트
-├── _setting/                  # 운영 설정
-├── docs/                      # 프레임워크 문서
-├── templates/                 # 재사용 가능한 문서 템플릿
-└── examples/                  # 참조 구현
+├── _crew/                     # Agent / team member definitions
+│   ├── CLAUDE.md              # Shared crew rules
+│   └── {agent}/               # Per-agent subdirectory
+│       ├── CLAUDE.md          # Agent context and persona
+│       └── sop.md             # Agent SOPs
+├── _project/                  # Active projects
+├── _setting/                  # Operational settings
+├── docs/                      # Framework documentation
+├── templates/                 # Reusable document templates
+└── examples/                  # Reference implementations
 ```
 
 ---
 
-## 통합 가이드
+## Integration Guides
 
-| 가이드 | 설명 |
+| Guide | Description |
 |-------|-------------|
-| [Discord 통합](docs/discord-integration.md) | 채널 구조, 봇 멘션, 루프 방지 |
-| [Google Drive 통합](docs/drive-integration.md) | 심볼릭 링크 설정, 규정 저장, 작업 공간 |
-| [Crew Manager 대시보드](docs/crew-manager.md) | 세션 모니터링용 웹 대시보드 |
-| [Claude Code 설정](docs/claude-code-setup.md) | CLAUDE.md 계층, MCP 서버, 에이전트별 세션 |
-| [Work Cycle](docs/work-cycle.md) | Todo/weekly 스키마, 보고 사이클, Standard Gap 흐름 |
+| [Discord Integration](docs/discord-integration.md) | Channel structure, bot mentions, loop prevention |
+| [Google Drive Integration](docs/drive-integration.md) | Symlink setup, regulation storage, workspaces |
+| [Crew Manager Dashboard](docs/crew-manager.md) | Web dashboard for session monitoring |
+| [Claude Code Setup](docs/claude-code-setup.md) | CLAUDE.md hierarchy, MCP servers, per-agent sessions |
+| [Work Cycle](docs/work-cycle.md) | Todo/weekly schemas, reporting cycle, Standard Gap flow |
 
-## 문서
+## Documentation
 
-| 문서 | 설명 |
+| Document | Description |
 |----------|-------------|
-| [docs/architecture.md](docs/architecture.md) | 설계 철학 및 핵심 메커니즘 |
-| [docs/getting-started.md](docs/getting-started.md) | 사전 요구사항, 설치, 첫 단계 |
-| [docs/standard-system.md](docs/standard-system.md) | 4+1 계층 문서 시스템 심화 |
-| [docs/crew-system.md](docs/crew-system.md) | 에이전트 관리, SOP 자기 진화 |
-| [docs/tutorial.md](docs/tutorial.md) | 거버넌스 에이전트 팀 구축 전체 안내 |
+| [docs/architecture.md](docs/architecture.md) | Design philosophy and core mechanisms |
+| [docs/getting-started.md](docs/getting-started.md) | Prerequisites, installation, first steps |
+| [docs/standard-system.md](docs/standard-system.md) | The 4+1 tier document system in depth |
+| [docs/crew-system.md](docs/crew-system.md) | Agent management, SOP self-evolution |
+| [docs/tutorial.md](docs/tutorial.md) | Full walkthrough building a governed agent team |
 
 ---
 
-## 기원
+## Origin
 
-**[NeoMakes](https://neomakes.com)**가 만들었다 — 극한 환경을 위한 온디바이스 AI를 개발하는 1인 회사. 이 프레임워크는 군사 지휘 구조에 적용되는 것과 동일한 엄격함으로 AI 에이전트 플릿을 통치하면서 탄생했다.
+Built by **[NeoMakes](https://neomakes.com)** — a one-person company developing on-device AI for extreme environments. The framework emerged from governing a fleet of AI agents with the same rigor applied to military command structures.
 
-이름은 인간 행동 연구인 실천학(praxeology)에서 왔다. 목적 있는 행동에는 구조가 있다. 그 구조는 보편적이다. 명시적으로 만들면, 무엇이든 통치할 수 있다.
+The name comes from praxeology, the study of human action. Purposeful action has structure. That structure is universal. Make it explicit, and you can govern anything.
 
 ---
 
-## 라이선스
+## License
 
-MIT 라이선스 — [LICENSE](LICENSE) 참조.
+MIT License — see [LICENSE](LICENSE).
 
 Copyright (c) 2026 NeoMakes

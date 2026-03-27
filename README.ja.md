@@ -10,9 +10,9 @@
 </p>
 
 <p align="center">
-  <a href="README.md">English</a> ·
+  <a href="README.md"><strong>English</strong></a> ·
   <a href="README.ko.md">한국어</a> ·
-  <a href="README.ja.md"><strong>日本語</strong></a> ·
+  <a href="README.ja.md">日本語</a> ·
   <a href="README.zh.md">中文</a> ·
   <a href="README.fr.md">Français</a> ·
   <a href="README.de.md">Deutsch</a> ·
@@ -26,166 +26,163 @@
 
 ---
 
-## 問題
+## The Problem
 
-**並列化は解決済みだ。**  これらのツールはすでに個々のAIエージェントを驚くほど生産的にしている。5つのエージェントを並列で実行することは解決済みの問題だ。
+**Parallelization is solved.** Today's AI coding tools already make individual agents incredibly productive. Running 5 agents in parallel is a solved problem.
 
-**調整は違う。** その5つのエージェントが作業を終えたとき、誰が競合を解決するのか？誰が一貫性を検証するのか？誰がエージェントAがエージェントBの決定を上書きするのを防ぐのか？誰がセッション間でのロールドリフトを止めるのか？マルチエージェントフレームワークは*開始*を解決する — Praxeologyはその後を解決する: **調整、状態追跡、競合解決、進化的整合。**
+**Coordination is not.** When those 5 agents finish their work, who resolves conflicts? Who verifies consistency? Who prevents Agent A from overwriting Agent B's decisions? Who stops role drift across sessions? Multi-agent frameworks solve the *start* — Praxeology solves what comes after: **coordination, state tracking, conflict resolution, and evolutionary alignment.**
 
-**Praxeologyは欠けていたガバナンスレイヤーだ。** コーディングツールの上に位置し、それらを置き換えるのではなく — エージェントが独立したチャットボットの集合ではなく、一貫した組織として運営されることを保証する。
-
----
-
-## 本番環境での実証
-
-これは理論ではない。[NeoMakes](https://neomakes.com)はこれを毎日運用している。
-
-> **1人 + 9つのAIエージェント · 38のガバナンスルール · 7つの部門**
-> 日次タスク → 週次レビュー → 月次改訂
-> エージェントがギャップを検出し、修正案を提案し、自らのSOPを進化させる。
-
-各エージェントには **Speech Rules**（文章数制限、トーン）、**Anti-Patterns**（禁止行動）、**Emotional Triggers**（状況依存の応答変化）が定義されており — 9つのエージェント全体で一貫性のある識別可能な行動を保証する。NeoMakesは一例だ。あなたのものは異なる形になるだろう。
+**Praxeology is the missing governance layer.** It sits above your coding tools, not replacing them — ensuring your agents operate as a coherent organization rather than a collection of independent chatbots.
 
 ---
 
-## 仕組み
+## Production Proof
 
-4+1階層ガバナンス構造。シンプル。普遍的。
+This isn't theory. [NeoMakes](https://neomakes.com) runs this every day.
+
+> **1 human + 9 AI agents · 38 governance rules · 7 departments**
+> Daily todos → Weekly reviews → Monthly amendments
+> Agents detect gaps, propose fixes, evolve their own SOPs.
+
+Each agent has defined **Speech Rules** (sentence limits, tone), **Anti-Patterns** (forbidden behaviors), and **Emotional Triggers** (situation-dependent response changes) — ensuring consistent, distinguishable behavior across all 9 agents. NeoMakes is one instance. Yours will look different.
+
+---
+
+## How It Works
+
+A 4+1 tier governance hierarchy. Simple. Universal.
 
 ```
-戦略 (WHY) → ドクトリン (WHAT) → 手順 (HOW) → プレイブック (PATTERNS) → 実行 (NOW)
+Strategy (WHY) → Doctrine (WHAT) → Procedure (HOW) → Playbook (PATTERNS) → Execution (NOW)
 ```
 
-上位階層は常に下位階層を上書きする。例外なし。エージェントは状況をカバーする最初のレベルで停止しながら、階層を上って意思決定を解決する。
+Higher tiers always override lower ones. No exceptions. Agents resolve decisions by walking up the hierarchy — stopping at the first level that covers the situation.
 
 ---
 
-## 何が違うのか
+## What Makes It Different
 
-機能リストではない。調整問題の解決者だ。
+Not a feature list. A coordination problem solver.
 
-| あなたの問題 | Praxeologyの答え |
+| Your Problem | Praxeology's Answer |
 |---|---|
-| エージェントがセッション間でロールからドリフトする | **ConstitutionalGuard** — 4層行動検証 |
-| エージェントの行動を安全に制約する方法がない | **SafetyGate** — 上位階層が下位階層では上書きできない重要ルールをロックする |
-| エージェントが自らのプロセスを改善できない | **SOP Evolution** — Learn-Compress-Applyループ。ガバナンスのための勾配降下法 |
-| ある場所の変更が別の場所を壊す | **Review Cascade** — 双方向伝播（階層の上下方向） |
-| エージェントがルールが悪いときにフラグを立てられない | **Proposal Flow** — 任意のエージェントからファウンダーへの構造化された改訂リクエスト |
-| セッション間で組織的記憶がない | **Work Cycle** — 日次ギャップ → 週次提案 → 月次改訂 → 四半期レビュー |
+| Agents drift from their role over sessions | **ConstitutionalGuard** — 4-layer behavioral verification |
+| No way to safely constrain agent actions | **SafetyGate** — Higher tiers lock critical rules that lower tiers cannot override |
+| Agents can't improve their own processes | **SOP Evolution** — Learn-Compress-Apply loop. Gradient descent for governance |
+| Changes in one place break another | **Review Cascade** — Bidirectional propagation (up and down the hierarchy) |
+| Agents can't flag when rules are bad | **Proposal Flow** — Structured amendment requests from any agent to the founder |
+| No institutional memory across sessions | **Work Cycle** — Daily gaps → weekly proposals → monthly amendments → quarterly reviews |
 
 ---
 
-## クイックスタート
+## Quick Start
 
 ```bash
 git clone https://github.com/neomakes/praxeology.git my-org
 cd my-org
-bash setup.sh    # 対話型ウィザード: 組織名、ミッション、部門、エージェント
-bash launch.sh   # ガバナンスシステムが稼働
+bash setup.sh    # Interactive wizard: org name, mission, departments, agents
+bash launch.sh   # Your governance system is live
 ```
 
-> **初めての方は？** [クイックスタートガイド](docs/quickstart.md)と[ロール設計ガイド](docs/role-design.md)から始めてください。
+> **New?** Start with [Quick Start Guide](docs/quickstart.md) and [Role Design Guide](docs/role-design.md).
 
 ---
 
-## エージェント設計システム
+## Agent Design System
 
-すべてのエージェントは、*何を*するかだけでなく、*どのように*振る舞うかを定義する `CLAUDE.md` を受け取る:
+Every agent gets a `CLAUDE.md` that defines not just *what* it does, but *how* it behaves:
 
 ```
 Identity → Persona → Speech Rules → Anti-Patterns → Emotional Triggers → Values → Boundaries
 ```
 
-これによりエージェントは**識別可能で、一貫性があり、境界が明確**になる。QAエージェントはエグゼキューターとは異なる話し方をする。プランナーは決してコードを書かない。レビュアーは自分の作業を決して承認しない。完全なテンプレートとスケーリング戦略（3〜15名以上のエージェント）については[ロール設計ガイド](docs/role-design.md)を参照。
+This makes agents **distinguishable, consistent, and bounded**. A QA agent sounds different from an executor. A planner never writes code. A reviewer never approves their own work. See [Role Design Guide](docs/role-design.md) for the full template and scaling strategies (3 to 15+ agents).
 
 ---
 
-## サンプル
+## Examples
 
-- [examples/solo-dev/](examples/solo-dev/) — ソロ開発者 + 3エージェント（最小構成）
-- [examples/tech-startup/](examples/tech-startup/) — 初期段階のソフトウェア会社
-- [examples/one-piece-crew/](examples/one-piece-crew/) — 完全なペルソナシステムを持つ架空のクルー
-
----
-
-<details>
-<summary><strong>理論 — なぜこれが機能するのか（同型性）</strong></summary>
-
-同じ4+1階層構造は、組織的行動のあらゆる領域に現れる:
-
-| 階層 | 国家法 | 軍事 | 企業 | 個人 | AIエージェント |
-|------|-------------|----------|-----------|------------|----------|
-| **1 戦略** | 憲法 | 作戦目標 | ミッション & ビジョン | 個人の価値観 | System Prompt / Prime Directive |
-| **2 ドクトリン** | 成文法 | 交戦規則 | 企業ポリシー | 人生の原則 | 行動ガイドライン |
-| **3 手順** | 規則 | 標準作戦手順 | SOP / プロトコル | 習慣 & ルーティン | タスク指示 |
-| **4 プレイブック** | 判例法 / 先例 | 戦術 & 訓練 | ベストプラクティス | 学習パターン | Few-shot例 |
-| **実行** | 行政命令 | 任務命令 | スプリント / 作業計画 | 日次タスク | アクティブコンテキスト |
-
-ガバナンスはドメイン固有ではない。パターンは普遍的だ。軍事部隊に機能するフレームワークは、スタートアップ、研究ラボ、AIエージェントフリートにも機能する。
-
-</details>
+- [examples/solo-dev/](examples/solo-dev/) — Solo developer + 3 agents (minimal)
+- [examples/tech-startup/](examples/tech-startup/) — Early-stage software company
+- [examples/one-piece-crew/](examples/one-piece-crew/) — Fictional crew with full persona system
 
 ---
 
-## ディレクトリ構造
+## The Theory — Why This Works
+
+The same 4+1 tier structure appears across every domain of organized action:
+
+| Tier | National Law | Military (C2) | Corporate | Individual | Deep Learning | Essence |
+|------|-------------|---------------|-----------|------------|---------------|---------|
+| **1 Strategy** | Constitution | National Defense Strategy | Articles of Incorporation | Values & Identity | Objective function *J*, Manifold | **Why** — fundamental purpose |
+| **2 Doctrine** | Statute Law | Operational Doctrine | Corporate Regulations | Personal Principles | Constraints *g(x) ≤ 0* | **What** — principles & boundaries |
+| **3 Procedure** | Decree / Rules | OPLAN / OPORD | Operating Guidelines | Goals & Routines | Policy *π*, Control input *u* | **How** — resource allocation |
+| **4 Playbook** | Administrative Rules | TTP (Tactics, Techniques, Procedures) | SOP / Best Practices | Habits & Mastery | Deterministic mapping *y = f(x)* | **Execute** — repeatable patterns |
+| **Exec** | Enforcement | FRAGO / C2 | Work Execution | Flow & Adaptation | Feedback loop *Δe*, Kalman filter | **Now** — real-time control |
+
+Governance is not domain-specific. The pattern is universal. A framework that works for a military unit works for a startup or an AI agent fleet. For the full mathematical mapping (systems engineering, gradient descent), see [docs/architecture.md](docs/architecture.md).
+
+---
+
+## Directory Structure
 
 ```
 your-org/
-├── CLAUDE.md                  # AIエージェント用ルートコンテキスト（生成済み）
-├── launch.sh                  # 日次起動スクリプト（生成済み）
-├── _standard/                 # ガバナンス文書
-│   ├── README.md              # 全ガバナンス成果物のマスターインデックス
-│   ├── {department}/          # 部門ごとのフォルダ
-│   │   ├── STR-{NNN}.md      #   （例: 戦略、運営、財務、エンジニアリング）
+├── CLAUDE.md                  # Root context for AI agents (generated)
+├── launch.sh                  # Daily launch script (generated)
+├── _standard/                 # Governance documents
+│   ├── README.md              # Master index of all governance artifacts
+│   ├── {department}/          # One folder per department
+│   │   ├── STR-{NNN}.md      #   (e.g., strategy, operations, finance, engineering)
 │   │   ├── DOC-{NNN}.md
 │   │   ├── PRC-{NNN}.md
 │   │   └── PLY-{NNN}.md
-├── _crew/                     # エージェント / チームメンバー定義
-│   ├── CLAUDE.md              # 共有クルールール
-│   └── {agent}/               # エージェントごとのサブディレクトリ
-│       ├── CLAUDE.md          # エージェントコンテキストとペルソナ
-│       └── sop.md             # エージェントSOP
-├── _project/                  # アクティブプロジェクト
-├── _setting/                  # 運用設定
-├── docs/                      # フレームワーク文書
-├── templates/                 # 再利用可能な文書テンプレート
-└── examples/                  # 参照実装
+├── _crew/                     # Agent / team member definitions
+│   ├── CLAUDE.md              # Shared crew rules
+│   └── {agent}/               # Per-agent subdirectory
+│       ├── CLAUDE.md          # Agent context and persona
+│       └── sop.md             # Agent SOPs
+├── _project/                  # Active projects
+├── _setting/                  # Operational settings
+├── docs/                      # Framework documentation
+├── templates/                 # Reusable document templates
+└── examples/                  # Reference implementations
 ```
 
 ---
 
-## 統合ガイド
+## Integration Guides
 
-| ガイド | 説明 |
+| Guide | Description |
 |-------|-------------|
-| [Discord統合](docs/discord-integration.md) | チャンネル構造、ボットメンション、ループ防止 |
-| [Google Drive統合](docs/drive-integration.md) | シンボリックリンク設定、規制ストレージ、ワークスペース |
-| [Crew Managerダッシュボード](docs/crew-manager.md) | セッション監視用Webダッシュボード |
-| [Claude Codeセットアップ](docs/claude-code-setup.md) | CLAUDE.md階層、MCPサーバー、エージェント別セッション |
-| [Work Cycle](docs/work-cycle.md) | Todo/weeklyスキーマ、レポートサイクル、Standard Gapフロー |
+| [Discord Integration](docs/discord-integration.md) | Channel structure, bot mentions, loop prevention |
+| [Google Drive Integration](docs/drive-integration.md) | Symlink setup, regulation storage, workspaces |
+| [Crew Manager Dashboard](docs/crew-manager.md) | Web dashboard for session monitoring |
+| [Claude Code Setup](docs/claude-code-setup.md) | CLAUDE.md hierarchy, MCP servers, per-agent sessions |
+| [Work Cycle](docs/work-cycle.md) | Todo/weekly schemas, reporting cycle, Standard Gap flow |
 
-## ドキュメント
+## Documentation
 
-| 文書 | 説明 |
+| Document | Description |
 |----------|-------------|
-| [docs/architecture.md](docs/architecture.md) | 設計哲学とコアメカニズム |
-| [docs/getting-started.md](docs/getting-started.md) | 前提条件、インストール、最初のステップ |
-| [docs/standard-system.md](docs/standard-system.md) | 4+1階層文書システムの詳細 |
-| [docs/crew-system.md](docs/crew-system.md) | エージェント管理、SOP自己進化 |
-| [docs/tutorial.md](docs/tutorial.md) | ガバナンスエージェントチーム構築の完全チュートリアル |
+| [docs/architecture.md](docs/architecture.md) | Design philosophy and core mechanisms |
+| [docs/getting-started.md](docs/getting-started.md) | Prerequisites, installation, first steps |
+| [docs/standard-system.md](docs/standard-system.md) | The 4+1 tier document system in depth |
+| [docs/crew-system.md](docs/crew-system.md) | Agent management, SOP self-evolution |
+| [docs/tutorial.md](docs/tutorial.md) | Full walkthrough building a governed agent team |
 
 ---
 
-## 起源
+## Origin
 
-**[NeoMakes](https://neomakes.com)**が構築した — 極限環境向けのオンデバイスAIを開発する一人会社。このフレームワークは、軍事指揮構造に適用されるのと同じ厳格さでAIエージェントフリートを統治することから生まれた。
+Built by **[NeoMakes](https://neomakes.com)** — a one-person company developing on-device AI for extreme environments. The framework emerged from governing a fleet of AI agents with the same rigor applied to military command structures.
 
-名前は人間の行動の研究であるpraxeology（実践学）に由来する。目的ある行動には構造がある。その構造は普遍的だ。明示的にすれば、何でも統治できる。
+The name comes from praxeology, the study of human action. Purposeful action has structure. That structure is universal. Make it explicit, and you can govern anything.
 
 ---
 
-## ライセンス
+## License
 
-MITライセンス — [LICENSE](LICENSE)を参照。
+MIT License — see [LICENSE](LICENSE).
 
 Copyright (c) 2026 NeoMakes
