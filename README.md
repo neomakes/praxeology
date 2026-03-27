@@ -28,7 +28,7 @@
 
 ## The Problem
 
-**Parallelization is solved.** Claude Code, Codex, gstack, oh-my-claudecode — these tools already make individual AI agents incredibly productive. Running 5 agents in parallel is a solved problem.
+**Parallelization is solved.** Today's AI coding tools already make individual agents incredibly productive. Running 5 agents in parallel is a solved problem.
 
 **Coordination is not.** When those 5 agents finish their work, who resolves conflicts? Who verifies consistency? Who prevents Agent A from overwriting Agent B's decisions? Who stops role drift across sessions? Multi-agent frameworks solve the *start* — Praxeology solves what comes after: **coordination, state tracking, conflict resolution, and evolutionary alignment.**
 

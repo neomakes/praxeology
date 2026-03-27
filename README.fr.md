@@ -28,7 +28,7 @@
 
 ## Le problème
 
-**La parallélisation est résolue.** Claude Code, Codex, gstack, oh-my-claudecode — ces outils rendent déjà les agents IA individuels incroyablement productifs. Faire tourner 5 agents en parallèle est un problème résolu.
+**La parallélisation est résolue.** Today's AI coding tools ces outils rendent déjà les agents IA individuels incroyablement productifs. Faire tourner 5 agents en parallèle est un problème résolu.
 
 **La coordination, non.** Quand ces 5 agents ont terminé leur travail, qui résout les conflits ? Qui vérifie la cohérence ? Qui empêche l'agent A d'écraser les décisions de l'agent B ? Qui arrête la dérive de rôle entre les sessions ? Les frameworks multi-agents résolvent le *démarrage* — Praxeology résout ce qui vient après : **la coordination, le suivi d'état, la résolution de conflits et l'alignement évolutif.**
 
