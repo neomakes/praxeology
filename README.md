@@ -11,6 +11,24 @@
 
 ---
 
+## 🌐 Languages
+
+[English](README.md) · [한국어](README.ko.md) · [日本語](README.ja.md) · [中文](README.zh.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Español](README.es.md)
+
+Also available: [QUICKSTART](QUICKSTART.md) ([한국어](QUICKSTART.ko.md) · [日本語](QUICKSTART.ja.md) · [中文](QUICKSTART.zh.md)) · [ROLE-DESIGN](ROLE-DESIGN.md) ([한국어](ROLE-DESIGN.ko.md) · [日本語](ROLE-DESIGN.ja.md) · [中文](ROLE-DESIGN.zh.md))
+
+---
+
+## Why Praxeology?
+
+Tools like [gstack](https://github.com/gstack-io/gstack) and [oh-my-claudecode](https://github.com/anthropics/claude-code) are excellent at making individual AI agents productive — browsing, coding, testing, deploying. But when you scale from **one agent** to **many agents working together**, a new problem emerges: **governance**.
+
+Without governance, agents duplicate work, contradict each other, overstep boundaries, and drift from their intended roles over time. Prompt engineering alone doesn't solve this — you need structure that persists across sessions, evolves through use, and mirrors how the most effective human organizations have governed action for centuries.
+
+Praxeology provides that structure. It's not a replacement for your coding tools — it's the **constitutional layer** that sits above them, ensuring your agents operate as a coherent organization rather than a collection of independent chatbots.
+
+---
+
 ## What Is This?
 
 **Praxeology** is a human–AI collaborative operating system built on a universal 4+1 tier governance hierarchy. Humans set the strategy and principles; agentic AI executes within those bounds, learns from experience, and proposes improvements back. It captures the observation that all purposeful action — from nations to agentic AI — follows the same structural pattern.
@@ -63,6 +81,8 @@ bash launch.sh
 ```
 
 Your governance system is live. Open `CLAUDE.md` at the root to see the generated context for AI agents.
+
+> **New to Praxeology?** Start with [QUICKSTART.md](QUICKSTART.md) for a 3-step guide, and [ROLE-DESIGN.md](ROLE-DESIGN.md) for designing your agents.
 
 ---
 
@@ -151,8 +171,37 @@ Each AI agent gets a `_crew/{agent}/CLAUDE.md` defining its role, authority leve
 
 ## Examples
 
+- [examples/solo-dev/](examples/solo-dev/) — Solo developer + 3 agents (minimal setup)
 - [examples/tech-startup/](examples/tech-startup/) — Early-stage software company
-- [examples/one-piece-crew/](examples/one-piece-crew/) — Fictional crew (demonstration)
+- [examples/one-piece-crew/](examples/one-piece-crew/) — Fictional crew with full persona system (demonstration)
+
+---
+
+## Production Use — NeoMakes (One Instance)
+
+Praxeology is not theoretical. It runs a real company every day. NeoMakes is one instance of this framework — yours will look different.
+
+**[NeoMakes, Inc.](https://neomakes.com)** operates as a 1-person company with 9 AI agents governed by Praxeology:
+
+| Metric | Value |
+|--------|-------|
+| Agents | 9 (organized across 7 C-level departments) |
+| Enacted regulations | 38 (STR/DOC/PRC/PLY across all departments) |
+| Daily operations | Todo tracking, daily reports, weekly planning, monthly reviews |
+| Integrations | Claude Code + Discord (4 channels) + Google Drive + Notion + Calendar |
+| Self-evolution | Agents detect Standard Gaps daily → Proposals weekly → Amendments monthly |
+
+The agents have defined personas with **Speech Rules** (sentence limits, tone), **Anti-Patterns** (forbidden behaviors), and **Emotional Triggers** (situation-dependent response changes) — ensuring consistent, distinguishable behavior across all 9 agents.
+
+### Integration Guides
+
+| Guide | Description |
+|-------|-------------|
+| [Discord Integration](docs/discord-integration.md) | Channel structure, bot mentions, loop prevention, bot-to-bot communication |
+| [Google Drive Integration](docs/drive-integration.md) | Symlink setup, regulation storage, room-based workspaces |
+| [Crew Manager Dashboard](docs/crew-manager.md) | Web dashboard for session monitoring, todo management, permission approval |
+| [Claude Code Setup](docs/claude-code-setup.md) | CLAUDE.md hierarchy, MCP servers, per-agent session configuration |
+| [Work Cycle](docs/work-cycle.md) | weekly.json/todo.json schemas, reporting cycle, Standard Gap reverse flow |
 
 ---
 
