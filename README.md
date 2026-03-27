@@ -9,13 +9,20 @@
   <img src="https://img.shields.io/badge/built%20by-NeoMakes-black.svg" alt="NeoMakes">
 </p>
 
----
+<p align="center">
+  <a href="README.md"><strong>English</strong></a> ·
+  <a href="README.ko.md">한국어</a> ·
+  <a href="README.ja.md">日本語</a> ·
+  <a href="README.zh.md">中文</a> ·
+  <a href="README.fr.md">Français</a> ·
+  <a href="README.de.md">Deutsch</a> ·
+  <a href="README.es.md">Español</a>
+</p>
 
-## 🌐 Languages
-
-[English](README.md) · [한국어](README.ko.md) · [日本語](README.ja.md) · [中文](README.zh.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Español](README.es.md)
-
-Also available: [QUICKSTART](QUICKSTART.md) ([한국어](QUICKSTART.ko.md) · [日本語](QUICKSTART.ja.md) · [中文](QUICKSTART.zh.md)) · [ROLE-DESIGN](ROLE-DESIGN.md) ([한국어](ROLE-DESIGN.ko.md) · [日本語](ROLE-DESIGN.ja.md) · [中文](ROLE-DESIGN.zh.md))
+<p align="center">
+  <a href="QUICKSTART.md">Quick Start</a> (<a href="QUICKSTART.ko.md">한국어</a> · <a href="QUICKSTART.ja.md">日本語</a> · <a href="QUICKSTART.zh.md">中文</a>) ·
+  <a href="ROLE-DESIGN.md">Role Design</a> (<a href="ROLE-DESIGN.ko.md">한국어</a> · <a href="ROLE-DESIGN.ja.md">日本語</a> · <a href="ROLE-DESIGN.zh.md">中文</a>)
+</p>
 
 ---
 
