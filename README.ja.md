@@ -95,7 +95,7 @@ bash launch.sh
 | **SOP Evolution** | Procedure と Playbook は Review Cascade を経て昇格することで進化する |
 | **Review Cascade** | 変更は上方へ伝播する：Playbook → Procedure → Doctrine → Strategy の一貫性チェック |
 | **Reverse Flow** | Strategy の変更は下方へカスケードされる：下位階層はすべてレビュー対象としてフラグが立つ |
-| **Department Codes** | 7つの標準部門（1xx–7xx）と C-level + G-Staff のアサイン |
+| **Department Codes** | 数値コード体系を持つ部門（NeoMakes インスタンスでは 1xx–7xx）とロール配置 |
 
 ---
 
@@ -107,17 +107,11 @@ your-org/
 ├── launch.sh                  # 日次起動スクリプト（生成済み）
 ├── _standard/                 # ガバナンスドキュメント
 │   ├── README.md              # すべてのガバナンス成果物のマスターインデックス
-│   ├── ceo/                   # CEO — 戦略・ビジョン（1xx）
-│   │   ├── strategy.md        # WHY: ミッション、価値観、長期ビジョン
-│   │   ├── doctrine.md        # WHAT: 統治原則
-│   │   ├── procedure.md       # HOW: 経営プロセス
-│   │   └── playbook.md        # PATTERNS: 繰り返す意思決定パターン
-│   ├── coo/                   # COO — 運営・実行（2xx）
-│   ├── cfo/                   # CFO — 財務・リソース（3xx）
-│   ├── cto/                   # CTO — テクノロジー・R&D（4xx）
-│   ├── cdo/                   # CDO — 外交・ネットワーク（5xx）
-│   ├── chro/                  # CHRO — HR・ウェルビーイング（6xx）
-│   └── ciso/                  # CISO — インテリジェンス・セキュリティ（7xx）
+│   ├── {department}/          # 部門ごとのフォルダ（例: strategy, operations, finance, ...）
+│   │   ├── STR-{NNN}.md      #   NeoMakes インスタンス: ceo, coo, cfo, cto, cdo, chro, ciso
+│   │   ├── DOC-{NNN}.md
+│   │   ├── PRC-{NNN}.md
+│   │   └── PLY-{NNN}.md
 ├── _crew/                     # エージェント / チームメンバー定義
 │   ├── CLAUDE.md              # 共有クルールール
 │   └── {agent}/               # エージェントごとのサブディレクトリ
@@ -141,7 +135,7 @@ your-org/
 
 ### 企業
 
-部門を C スイートの役割にマッピングする。CEO/COO/CFO/CTO/CDO/CHRO/CISO 各部門を使用する。各部門が自身のガバナンススタックを所有する。CEO Strategy ドキュメントが組織の憲法となる。
+部門を組織の役割にマッピングする。各部門が自身のガバナンススタックを所有する。最上位の Strategy ドキュメントが組織の憲法となる。（NeoMakes インスタンスは CEO/COO/CFO/CTO/CDO/CHRO/CISO 部門を使用しているが、あなたのものはどんな名称でも構わない。）
 
 ### 研究所
 

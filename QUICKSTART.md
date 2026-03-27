@@ -6,7 +6,7 @@ Build your own self-evolving AI agent governance system in 3 steps.
 
 ## Step 1: Define Your Mission (STR)
 
-Write your organization's WHY in `_standard/ceo/STR-101.md`.
+Write your organization's WHY in `_standard/{department}/STR-101.md`.
 
 A template is provided at `templates/_standard/`. Fill in:
 
@@ -50,10 +50,10 @@ Or create the four core documents manually:
 
 | Document | Path | Purpose |
 |---|---|---|
-| DOC-101 | `_standard/ceo/DOC-101.md` | Governance guard — what agents can and cannot override |
-| DOC-102 | `_standard/ceo/DOC-102.md` | Safety — approval requirements for destructive or irreversible actions |
-| PRC-201 | `_standard/coo/PRC-201.md` | Session management — how sessions start, run, and end |
-| PLY-203 | `_standard/coo/PLY-203.md` | Self-evolution — how agents detect gaps and propose improvements |
+| DOC-101 | `_standard/{department}/DOC-101.md` | Governance guard — what agents can and cannot override |
+| DOC-102 | `_standard/{department}/DOC-102.md` | Safety — approval requirements for destructive or irreversible actions |
+| PRC-201 | `_standard/{department}/PRC-201.md` | Session management — how sessions start, run, and end |
+| PLY-203 | `_standard/{department}/PLY-203.md` | Self-evolution — how agents detect gaps and propose improvements |
 
 Templates for all four are in `templates/_standard/`.
 

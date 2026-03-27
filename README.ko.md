@@ -95,7 +95,7 @@ bash launch.sh
 | **SOP Evolution** | Procedure와 Playbook이 Review Cascade를 통해 승격 전에 진화한다 |
 | **Review Cascade** | 변경사항이 상향 전파된다: Playbook → Procedure → Doctrine → Strategy 일관성 검토 |
 | **Reverse Flow** | Strategy 변경이 하향 전파된다: 모든 하위 계층이 검토 대상으로 표시된다 |
-| **Department Codes** | C-level + G-Staff 배정이 있는 7개 표준 부서 (1xx–7xx) |
+| **Department Codes** | 숫자 코드 체계를 가진 부서 (NeoMakes 인스턴스 기준 1xx–7xx) 및 역할 배정 |
 
 ---
 
@@ -107,17 +107,11 @@ your-org/
 ├── launch.sh                  # 일일 시작 스크립트 (생성됨)
 ├── _standard/                 # 거버넌스 문서
 │   ├── README.md              # 모든 거버넌스 산출물의 마스터 인덱스
-│   ├── ceo/                   # CEO — Strategy & Vision (1xx)
-│   │   ├── strategy.md        # WHY: 미션, 가치관, 장기 비전
-│   │   ├── doctrine.md        # WHAT: 운영 원칙
-│   │   ├── procedure.md       # HOW: 경영 프로세스
-│   │   └── playbook.md        # PATTERNS: 반복되는 의사결정 패턴
-│   ├── coo/                   # COO — Operations & Execution (2xx)
-│   ├── cfo/                   # CFO — Finance & Resources (3xx)
-│   ├── cto/                   # CTO — Technology & R&D (4xx)
-│   ├── cdo/                   # CDO — Diplomacy & Network (5xx)
-│   ├── chro/                  # CHRO — HR & Wellbeing (6xx)
-│   └── ciso/                  # CISO — Intelligence & Security (7xx)
+│   ├── {department}/          # 부서별 폴더 (예: strategy, operations, finance, ...)
+│   │   ├── STR-{NNN}.md      #   NeoMakes 인스턴스: ceo, coo, cfo, cto, cdo, chro, ciso
+│   │   ├── DOC-{NNN}.md
+│   │   ├── PRC-{NNN}.md
+│   │   └── PLY-{NNN}.md
 ├── _crew/                     # 에이전트 / 팀원 정의
 │   ├── CLAUDE.md              # 공유 크루 규칙
 │   └── {agent}/               # 에이전트별 서브디렉토리
@@ -141,7 +135,7 @@ your-org/
 
 ### 기업
 
-부서를 C-suite 역할에 매핑한다. CEO/COO/CFO/CTO/CDO/CHRO/CISO 부서를 사용한다. 각 부서가 자체 거버넌스 스택을 소유한다. CEO Strategy 문서가 조직의 헌법이다.
+부서를 조직 역할에 매핑한다. 각 부서가 자체 거버넌스 스택을 소유한다. 최상위 Strategy 문서가 조직의 헌법이다. (NeoMakes 인스턴스는 CEO/COO/CFO/CTO/CDO/CHRO/CISO 부서를 사용하지만, 어떤 구성도 가능하다.)
 
 ### 연구소
 

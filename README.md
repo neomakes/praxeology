@@ -102,7 +102,7 @@ Your governance system is live. Open `CLAUDE.md` at the root to see the generate
 | **SOP Evolution** | Procedures and Playbooks evolve through the Review Cascade before promotion |
 | **Review Cascade** | Changes propagate upward: Playbook → Procedure → Doctrine → Strategy for consistency checks |
 | **Reverse Flow** | Strategy changes cascade downward: all lower tiers are flagged for review |
-| **Department Codes** | 7 standard departments (1xx–7xx) with C-level + G-Staff assignments |
+| **Department Codes** | Departments with numeric code series (e.g., 1xx–7xx in the NeoMakes instance) with role + staff assignments |
 
 ---
 
@@ -114,17 +114,11 @@ your-org/
 ├── launch.sh                  # Daily launch script (generated)
 ├── _standard/                 # Governance documents
 │   ├── README.md              # Master index of all governance artifacts
-│   ├── ceo/                   # CEO — Strategy & Vision (1xx)
-│   │   ├── strategy.md        # WHY: Mission, values, long-term vision
-│   │   ├── doctrine.md        # WHAT: Governing principles
-│   │   ├── procedure.md       # HOW: Executive processes
-│   │   └── playbook.md        # PATTERNS: Recurring decision patterns
-│   ├── coo/                   # COO — Operations & Execution (2xx)
-│   ├── cfo/                   # CFO — Finance & Resources (3xx)
-│   ├── cto/                   # CTO — Technology & R&D (4xx)
-│   ├── cdo/                   # CDO — Diplomacy & Network (5xx)
-│   ├── chro/                  # CHRO — HR & Wellbeing (6xx)
-│   └── ciso/                  # CISO — Intelligence & Security (7xx)
+│   ├── {department}/          # One folder per department (e.g., strategy, operations, finance, ...)
+│   │   ├── STR-{NNN}.md      #   NeoMakes instance uses: ceo, coo, cfo, cto, cdo, chro, ciso
+│   │   ├── DOC-{NNN}.md
+│   │   ├── PRC-{NNN}.md
+│   │   └── PLY-{NNN}.md
 ├── _crew/                     # Agent / team member definitions
 │   ├── CLAUDE.md              # Shared crew rules
 │   └── {agent}/               # Per-agent subdirectory
@@ -148,7 +142,7 @@ your-org/
 
 ### Corporate
 
-Map departments to C-suite roles. Use CEO/COO/CFO/CTO/CDO/CHRO/CISO departments. Each department owns its governance stack. The CEO Strategy document is the organization's constitution.
+Map departments to organizational roles. Each department owns its governance stack. The top-level Strategy document is the organization's constitution. (The NeoMakes instance uses CEO/COO/CFO/CTO/CDO/CHRO/CISO departments — yours can be anything.)
 
 ### Research Lab
 

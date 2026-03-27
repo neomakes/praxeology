@@ -68,13 +68,8 @@ All Praxeology-managed content lives under `_drive/My Drive/system/`. Projects a
 _drive/My Drive/
 ├── system/
 │   ├── praxeology/          ← regulation files, one folder per department
-│   │   ├── ceo/
-│   │   ├── coo/
-│   │   ├── cfo/
-│   │   ├── cto/
-│   │   ├── cdo/
-│   │   ├── chro/
-│   │   └── ciso/
+│   │   ├── {department}/    ← e.g., ceo, coo, cfo, cto, cdo, chro, ciso in the NeoMakes instance
+│   │   └── ...
 │   ├── crew/                ← per-agent sync directories
 │   │   ├── zoro/
 │   │   ├── nami/
@@ -104,33 +99,15 @@ Each department folder contains regulation files organized by tier. The naming c
 
 ```
 system/praxeology/
-├── ceo/
-│   ├── STR-101.md           ← Strategy
-│   ├── DOC-101.md           ← Doctrine
-│   ├── DOC-102.md
-│   ├── PRC-101.md           ← Procedure
-│   └── PLY-101.md           ← Playbook
-├── coo/
-│   ├── STR-201.md
-│   ├── DOC-201.md
-│   ├── PRC-201.md
-│   ├── PRC-202.md
-│   ├── PLY-201.md
-│   ├── PLY-202.md
-│   └── PLY-203.md
-├── cfo/
-│   ├── STR-301.md
-│   ├── DOC-301.md
-│   └── PLY-301.md
-├── cto/
-│   └── ...                  ← 4xx series
-├── cdo/
-│   └── ...                  ← 5xx series
-├── chro/
-│   └── ...                  ← 6xx series
-└── ciso/
-    └── ...                  ← 7xx series
+├── {department}/            ← one folder per department (your names)
+│   ├── STR-{NNN}.md         ← Strategy
+│   ├── DOC-{NNN}.md         ← Doctrine
+│   ├── PRC-{NNN}.md         ← Procedure
+│   └── PLY-{NNN}.md         ← Playbook
+└── ...
 ```
+
+The NeoMakes instance uses `ceo/`, `coo/`, `cfo/`, `cto/`, `cdo/`, `chro/`, `ciso/` — yours can be anything.
 
 **Tier prefixes and numbering**:
 
@@ -141,14 +118,14 @@ system/praxeology/
 | PRC    | Procedure | Proposal → Principal     |
 | PLY    | Playbook  | Proposal → Department    |
 
-**Numbering series**: `{department-code}{01–99}`. CEO = 1xx, COO = 2xx, CFO = 3xx, CTO = 4xx, CDO = 5xx, CHRO = 6xx, CISO = 7xx.
+**Numbering series**: `{department-code}{01–99}`. Assign a code range per department (e.g., in the NeoMakes instance: CEO = 1xx, COO = 2xx, CFO = 3xx, CTO = 4xx, CDO = 5xx, CHRO = 6xx, CISO = 7xx).
 
 Agents read regulation files by path. Example reference in `CLAUDE.md`:
 
 ```markdown
 ## Standard References
-- Primary: `_drive/My Drive/system/praxeology/coo/` (2xx procedures)
-- Safety: `_drive/My Drive/system/praxeology/ceo/DOC-102.md`
+- Primary: `_drive/My Drive/system/praxeology/{department}/` (operations procedures)
+- Safety: `_drive/My Drive/system/praxeology/{department}/DOC-102.md`
 ```
 
 ---
@@ -284,7 +261,7 @@ ls _drive/
 ls "_drive/My Drive/system/praxeology/"
 
 # Regulation file readable
-cat "_drive/My Drive/system/praxeology/coo/DOC-201.md"
+cat "_drive/My Drive/system/praxeology/{department}/DOC-{NNN}.md"
 
 # Agent crew directory exists
 ls "_drive/My Drive/system/crew/zoro/"

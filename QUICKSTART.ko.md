@@ -6,7 +6,7 @@
 
 ## 1단계: 미션 정의 (STR)
 
-`_standard/ceo/STR-101.md`에 조직의 WHY를 작성한다.
+`_standard/{department}/STR-101.md`에 조직의 WHY를 작성한다.
 
 템플릿은 `templates/_standard/`에 있다. 다음 항목을 채운다:
 
@@ -50,10 +50,10 @@ bash setup.sh
 
 | 문서 | 경로 | 목적 |
 |------|------|------|
-| DOC-101 | `_standard/ceo/DOC-101.md` | 거버넌스 가드 — 에이전트가 재정의할 수 있는 것과 없는 것 |
-| DOC-102 | `_standard/ceo/DOC-102.md` | 안전 — 파괴적이거나 되돌릴 수 없는 행동에 대한 승인 요구사항 |
-| PRC-201 | `_standard/coo/PRC-201.md` | 세션 관리 — 세션의 시작, 진행, 종료 방법 |
-| PLY-203 | `_standard/coo/PLY-203.md` | 자기 진화 — 에이전트가 Gap을 감지하고 개선안을 제안하는 방법 |
+| DOC-101 | `_standard/{department}/DOC-101.md` | 거버넌스 가드 — 에이전트가 재정의할 수 있는 것과 없는 것 |
+| DOC-102 | `_standard/{department}/DOC-102.md` | 안전 — 파괴적이거나 되돌릴 수 없는 행동에 대한 승인 요구사항 |
+| PRC-201 | `_standard/{department}/PRC-201.md` | 세션 관리 — 세션의 시작, 진행, 종료 방법 |
+| PLY-203 | `_standard/{department}/PLY-203.md` | 자기 진화 — 에이전트가 Gap을 감지하고 개선안을 제안하는 방법 |
 
 4개 모두의 템플릿은 `templates/_standard/`에 있다.
 

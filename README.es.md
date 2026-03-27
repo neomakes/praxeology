@@ -95,7 +95,7 @@ Su sistema de gobernanza está activo. Abra `CLAUDE.md` en la raíz para ver el 
 | **SOP Evolution** | Los Procedures y Playbooks evolucionan a través de la Review Cascade antes de ser promovidos |
 | **Review Cascade** | Los cambios se propagan hacia arriba: Playbook → Procedure → Doctrine → Strategy para verificaciones de coherencia |
 | **Reverse Flow** | Los cambios de Strategy se propagan hacia abajo: todos los niveles inferiores se marcan para revisión |
-| **Department Codes** | 7 departamentos estándar (1xx–7xx) con asignaciones C-level + G-Staff |
+| **Department Codes** | Departamentos con series de códigos numéricos (p. ej., 1xx–7xx en la instancia NeoMakes) con asignaciones de roles y personal |
 
 ---
 
@@ -107,17 +107,11 @@ your-org/
 ├── launch.sh                  # Script de lanzamiento diario (generado)
 ├── _standard/                 # Documentos de gobernanza
 │   ├── README.md              # Índice principal de todos los artefactos de gobernanza
-│   ├── ceo/                   # CEO — Strategy & Vision (1xx)
-│   │   ├── strategy.md        # POR QUÉ: Misión, valores, visión a largo plazo
-│   │   ├── doctrine.md        # QUÉ: Principios rectores
-│   │   ├── procedure.md       # CÓMO: Procesos ejecutivos
-│   │   └── playbook.md        # PATRONES: Patrones de decisión recurrentes
-│   ├── coo/                   # COO — Operations & Execution (2xx)
-│   ├── cfo/                   # CFO — Finance & Resources (3xx)
-│   ├── cto/                   # CTO — Technology & R&D (4xx)
-│   ├── cdo/                   # CDO — Diplomacy & Network (5xx)
-│   ├── chro/                  # CHRO — HR & Wellbeing (6xx)
-│   └── ciso/                  # CISO — Intelligence & Security (7xx)
+│   ├── {department}/          # Una carpeta por departamento (p. ej., strategy, operations, finance, ...)
+│   │   ├── STR-{NNN}.md      #   La instancia NeoMakes usa: ceo, coo, cfo, cto, cdo, chro, ciso
+│   │   ├── DOC-{NNN}.md      #   El tuyo puede ser cualquier nombre
+│   │   ├── PRC-{NNN}.md
+│   │   └── PLY-{NNN}.md
 ├── _crew/                     # Definiciones de agentes / miembros del equipo
 │   ├── CLAUDE.md              # Reglas compartidas del equipo
 │   └── {agent}/               # Subdirectorio por agente
@@ -141,7 +135,7 @@ your-org/
 
 ### Corporativo
 
-Asigne departamentos a roles C-suite. Utilice los departamentos CEO/COO/CFO/CTO/CDO/CHRO/CISO. Cada departamento posee su pila de gobernanza. El documento CEO Strategy es la constitución de la organización.
+Asigne departamentos a roles organizativos. Cada departamento posee su pila de gobernanza. El documento Strategy de nivel superior es la constitución de la organización. (La instancia NeoMakes usa los departamentos CEO/COO/CFO/CTO/CDO/CHRO/CISO — el tuyo puede ser cualquier cosa.)
 
 ### Laboratorio de investigación
 

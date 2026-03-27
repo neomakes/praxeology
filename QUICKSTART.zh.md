@@ -6,7 +6,7 @@
 
 ## 第 1 步：定义你的使命（STR）
 
-在 `_standard/ceo/STR-101.md` 中写下你的组织的"为何存在"。
+在 `_standard/{department}/STR-101.md` 中写下你的组织的"为何存在"。
 
 模板位于 `templates/_standard/`。填写以下内容：
 
@@ -50,10 +50,10 @@ bash setup.sh
 
 | 文档 | 路径 | 用途 |
 |------|------|------|
-| DOC-101 | `_standard/ceo/DOC-101.md` | 治理守卫 — agent 可以和不可以覆盖的内容 |
-| DOC-102 | `_standard/ceo/DOC-102.md` | 安全 — 破坏性或不可逆操作的审批要求 |
-| PRC-201 | `_standard/coo/PRC-201.md` | Session 管理 — session 如何开始、运行和结束 |
-| PLY-203 | `_standard/coo/PLY-203.md` | 自演化 — agent 如何检测 gap 并提出改进建议 |
+| DOC-101 | `_standard/{department}/DOC-101.md` | 治理守卫 — agent 可以和不可以覆盖的内容 |
+| DOC-102 | `_standard/{department}/DOC-102.md` | 安全 — 破坏性或不可逆操作的审批要求 |
+| PRC-201 | `_standard/{department}/PRC-201.md` | Session 管理 — session 如何开始、运行和结束 |
+| PLY-203 | `_standard/{department}/PLY-203.md` | 自演化 — agent 如何检测 gap 并提出改进建议 |
 
 全部四份文件的模板位于 `templates/_standard/`。
 

@@ -6,7 +6,7 @@
 
 ## Step 1: ミッションを定義する（STR）
 
-組織の「なぜ」を `_standard/ceo/STR-101.md` に記述する。
+組織の「なぜ」を `_standard/{department}/STR-101.md` に記述する。
 
 テンプレートは `templates/_standard/` にある。以下を記入する：
 
@@ -50,10 +50,10 @@ bash setup.sh
 
 | ドキュメント | パス | 目的 |
 |---|---|---|
-| DOC-101 | `_standard/ceo/DOC-101.md` | ガバナンスガード——エージェントが上書きできるものとできないもの |
-| DOC-102 | `_standard/ceo/DOC-102.md` | 安全——破壊的または不可逆なアクションに対する承認要件 |
-| PRC-201 | `_standard/coo/PRC-201.md` | セッション管理——セッションの開始・実行・終了の方法 |
-| PLY-203 | `_standard/coo/PLY-203.md` | 自己進化——エージェントがギャップを検出し改善を提案する方法 |
+| DOC-101 | `_standard/{department}/DOC-101.md` | ガバナンスガード——エージェントが上書きできるものとできないもの |
+| DOC-102 | `_standard/{department}/DOC-102.md` | 安全——破壊的または不可逆なアクションに対する承認要件 |
+| PRC-201 | `_standard/{department}/PRC-201.md` | セッション管理——セッションの開始・実行・終了の方法 |
+| PLY-203 | `_standard/{department}/PLY-203.md` | 自己進化——エージェントがギャップを検出し改善を提案する方法 |
 
 4つすべてのテンプレートは `templates/_standard/` にある。
 

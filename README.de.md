@@ -95,7 +95,7 @@ Ihr Governance-System ist live. Öffnen Sie `CLAUDE.md` im Stammverzeichnis, um 
 | **SOP Evolution** | Procedures und Playbooks entwickeln sich durch die Review Cascade vor der Beförderung weiter |
 | **Review Cascade** | Änderungen propagieren aufwärts: Playbook → Procedure → Doctrine → Strategy für Konsistenzprüfungen |
 | **Reverse Flow** | Strategy-Änderungen kaskadieren abwärts: alle niedrigeren Stufen werden zur Überprüfung markiert |
-| **Department Codes** | 7 Standardabteilungen (1xx–7xx) mit C-Level + G-Staff-Zuweisungen |
+| **Department Codes** | Abteilungen mit numerischen Codeserien (z. B. 1xx–7xx in der NeoMakes-Instanz) mit Rollen- und Mitarbeiterzuweisungen |
 
 ---
 
@@ -107,17 +107,11 @@ your-org/
 ├── launch.sh                  # Tägliches Startskript (generiert)
 ├── _standard/                 # Governance-Dokumente
 │   ├── README.md              # Hauptindex aller Governance-Artefakte
-│   ├── ceo/                   # CEO — Strategy & Vision (1xx)
-│   │   ├── strategy.md        # WARUM: Mission, Werte, langfristige Vision
-│   │   ├── doctrine.md        # WAS: Leitprinzipien
-│   │   ├── procedure.md       # WIE: Exekutivprozesse
-│   │   └── playbook.md        # MUSTER: Wiederkehrende Entscheidungsmuster
-│   ├── coo/                   # COO — Operations & Execution (2xx)
-│   ├── cfo/                   # CFO — Finance & Resources (3xx)
-│   ├── cto/                   # CTO — Technology & R&D (4xx)
-│   ├── cdo/                   # CDO — Diplomacy & Network (5xx)
-│   ├── chro/                  # CHRO — HR & Wellbeing (6xx)
-│   └── ciso/                  # CISO — Intelligence & Security (7xx)
+│   ├── {department}/          # Ein Ordner pro Abteilung (z. B. strategy, operations, finance, ...)
+│   │   ├── STR-{NNN}.md      #   Die NeoMakes-Instanz verwendet: ceo, coo, cfo, cto, cdo, chro, ciso
+│   │   ├── DOC-{NNN}.md      #   Ihres kann beliebig benannt werden
+│   │   ├── PRC-{NNN}.md
+│   │   └── PLY-{NNN}.md
 ├── _crew/                     # Agent- / Teammitglied-Definitionen
 │   ├── CLAUDE.md              # Gemeinsame Team-Regeln
 │   └── {agent}/               # Unterverzeichnis pro Agent
@@ -141,7 +135,7 @@ your-org/
 
 ### Unternehmen
 
-Ordnen Sie Abteilungen den C-Suite-Rollen zu. Verwenden Sie die Abteilungen CEO/COO/CFO/CTO/CDO/CHRO/CISO. Jede Abteilung besitzt ihren eigenen Governance-Stack. Das CEO-Strategy-Dokument ist die Unternehmensverfassung.
+Ordnen Sie Abteilungen den Organisationsrollen zu. Jede Abteilung besitzt ihren eigenen Governance-Stack. Das Strategy-Dokument der obersten Ebene ist die Unternehmensverfassung. (Die NeoMakes-Instanz verwendet die Abteilungen CEO/COO/CFO/CTO/CDO/CHRO/CISO — Ihres kann beliebig sein.)
 
 ### Forschungslabor
 

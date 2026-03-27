@@ -95,7 +95,7 @@ bash launch.sh
 | **SOP Evolution** | Procedure 和 Playbook 在提升前通过 Review Cascade 演化 |
 | **Review Cascade** | 变更向上传播：Playbook → Procedure → Doctrine → Strategy 进行一致性检查 |
 | **Reverse Flow** | Strategy 变更向下级联：所有低层级文档被标记以供审查 |
-| **Department Codes** | 7 个标准部门（1xx–7xx），配有 C-level + G-Staff 分配 |
+| **Department Codes** | 带有数字代码系列的部门（例如 NeoMakes 实例中的 1xx–7xx），含角色与人员分配 |
 
 ---
 
@@ -107,17 +107,11 @@ your-org/
 ├── launch.sh                  # 每日启动脚本（生成）
 ├── _standard/                 # 治理文件
 │   ├── README.md              # 所有治理文件的主索引
-│   ├── ceo/                   # CEO — 战略与愿景（1xx）
-│   │   ├── strategy.md        # WHY：使命、价值观、长期愿景
-│   │   ├── doctrine.md        # WHAT：治理原则
-│   │   ├── procedure.md       # HOW：执行流程
-│   │   └── playbook.md        # PATTERNS：反复出现的决策模式
-│   ├── coo/                   # COO — 运营与执行（2xx）
-│   ├── cfo/                   # CFO — 财务与资源（3xx）
-│   ├── cto/                   # CTO — 技术与研发（4xx）
-│   ├── cdo/                   # CDO — 外交与网络（5xx）
-│   ├── chro/                  # CHRO — 人力资源与福祉（6xx）
-│   └── ciso/                  # CISO — 情报与安全（7xx）
+│   ├── {department}/          # 每个部门一个文件夹（例如 strategy, operations, finance, ...）
+│   │   ├── STR-{NNN}.md      #   NeoMakes 实例使用：ceo, coo, cfo, cto, cdo, chro, ciso
+│   │   ├── DOC-{NNN}.md      #   你的可以是任何名称
+│   │   ├── PRC-{NNN}.md
+│   │   └── PLY-{NNN}.md
 ├── _crew/                     # Agent / 团队成员定义
 │   ├── CLAUDE.md              # 共享成员规则
 │   └── {agent}/               # 每个 agent 的子目录
@@ -141,7 +135,7 @@ your-org/
 
 ### 企业
 
-将部门映射到 C-suite 角色。使用 CEO/COO/CFO/CTO/CDO/CHRO/CISO 部门。每个部门拥有自己的治理栈。CEO Strategy 文件是组织的宪法。
+将部门映射到组织角色。每个部门拥有自己的治理栈。顶层 Strategy 文件是组织的宪法。（NeoMakes 实例使用 CEO/COO/CFO/CTO/CDO/CHRO/CISO 部门——你的可以是任何名称。）
 
 ### 研究实验室
 
