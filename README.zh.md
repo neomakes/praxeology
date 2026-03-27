@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/banner.svg" alt="praxeology — Human–AI Collaborative Governance for Purposeful Action" width="100%">
+  <img src="assets/banner.svg" alt="Praxeology — The governance layer that keeps your AI agent team aligned, evolving, and accountable." width="100%">
 </p>
 
 <p align="center">
@@ -9,93 +9,121 @@
   <img src="https://img.shields.io/badge/built%20by-NeoMakes-black.svg" alt="NeoMakes">
 </p>
 
----
+<p align="center">
+  <a href="README.md">English</a> ·
+  <a href="README.ko.md">한국어</a> ·
+  <a href="README.ja.md">日本語</a> ·
+  <a href="README.zh.md"><strong>中文</strong></a> ·
+  <a href="README.fr.md">Français</a> ·
+  <a href="README.de.md">Deutsch</a> ·
+  <a href="README.es.md">Español</a>
+</p>
 
-## 🌐 语言
-
-[English](README.md) · [한국어](README.ko.md) · [日本語](README.ja.md) · **中文** · [Français](README.fr.md) · [Deutsch](README.de.md) · [Español](README.es.md)
-
-也提供：[QUICKSTART](docs/quickstart.md) ([한국어](docs/quickstart.ko.md) · [日本語](docs/quickstart.ja.md) · [中文](docs/quickstart.zh.md) · [FR](docs/quickstart.fr.md) · [DE](docs/quickstart.de.md) · [ES](docs/quickstart.es.md)) · [ROLE-DESIGN](docs/role-design.md) ([한국어](docs/role-design.ko.md) · [日本語](docs/role-design.ja.md) · [中文](docs/role-design.zh.md) · [FR](docs/role-design.fr.md) · [DE](docs/role-design.de.md) · [ES](docs/role-design.es.md))
-
----
-
-## 为什么选择 Praxeology？
-
-[gstack](https://github.com/gstack-io/gstack) 和 [oh-my-claudecode](https://github.com/anthropics/claude-code) 等工具非常擅长提升单个 AI agent 的生产力——浏览、编码、测试、部署。但当你从**一个 agent** 扩展到**多个 agent 协同工作**时，一个新问题出现了：**治理**。
-
-没有治理，agent 会重复工作、相互矛盾、越权行事，并随着时间推移偏离各自的预定角色。单靠 prompt engineering 无法解决这个问题——你需要一种能够跨 session 持续存在、随使用而演化、并反映人类最有效组织数百年来治理行动方式的结构。
-
-Praxeology 提供了这种结构。它不是你编码工具的替代品——它是凌驾于它们之上的**宪法层**，确保你的 agent 作为一个有凝聚力的组织运作，而不仅仅是一批独立的聊天机器人。
+<p align="center">
+  <a href="docs/quickstart.md">Quick Start</a> (<a href="docs/quickstart.ko.md">한국어</a> · <a href="docs/quickstart.ja.md">日本語</a> · <a href="docs/quickstart.zh.md">中文</a> · <a href="docs/quickstart.fr.md">FR</a> · <a href="docs/quickstart.de.md">DE</a> · <a href="docs/quickstart.es.md">ES</a>) ·
+  <a href="docs/role-design.md">Role Design</a> (<a href="docs/role-design.ko.md">한국어</a> · <a href="docs/role-design.ja.md">日本語</a> · <a href="docs/role-design.zh.md">中文</a> · <a href="docs/role-design.fr.md">FR</a> · <a href="docs/role-design.de.md">DE</a> · <a href="docs/role-design.es.md">ES</a>)
+</p>
 
 ---
 
-## 这是什么？
+## 问题
 
-**Praxeology** 是一个基于通用 4+1 层治理层级的人机协作操作系统。人类制定战略和原则；agentic AI 在这些边界内执行，从经验中学习，并反向提出改进建议。它捕捉到这样一个洞察：所有有目的的行动——从国家到 agentic AI——都遵循相同的结构模式。
+**并行化已经解决了。** Claude Code、Codex、gstack、oh-my-claudecode——这些工具已经让单个 AI 智能体变得极具生产力。并行运行 5 个智能体是一个已解决的问题。
+
+**协调却不是。** 当这 5 个智能体完成工作后，谁来解决冲突？谁来验证一致性？谁来阻止智能体 A 覆盖智能体 B 的决策？谁来防止跨会话的角色漂移？多智能体框架解决的是*开始*——Praxeology 解决的是之后的问题：**协调、状态追踪、冲突解决和演进对齐。**
+
+**Praxeology 是缺失的治理层。** 它位于你的编码工具之上，而非取代它们——确保你的智能体作为一个有机整体运作，而不是一群独立聊天机器人的集合。
+
+---
+
+## 生产环境验证
+
+这不是理论。[NeoMakes](https://neomakes.com) 每天都在运行它。
+
+> **1 人 + 9 个 AI 智能体 · 38 条治理规则 · 7 个部门**
+> 每日待办 → 每周回顾 → 每月修订
+> 智能体检测差距、提出修复方案、自主演进各自的 SOP。
+
+每个智能体都定义了 **Speech Rules**（句子限制、语调）、**Anti-Patterns**（禁止行为）和 **Emotional Triggers**（情境依赖的响应变化）——确保所有 9 个智能体行为一致且可区分。NeoMakes 只是一个实例，你的系统看起来会有所不同。
+
+---
+
+## 工作原理
+
+4+1 层治理层级。简单。通用。
 
 ```
-Strategy（为何） → Doctrine（做什么） → Procedure（如何做） → Playbook（模式） → Execution（现在）
+战略 (WHY) → 教义 (WHAT) → 程序 (HOW) → 手册 (PATTERNS) → 执行 (NOW)
 ```
 
-高层级文件始终优先于低层级文件。没有例外。
+上层始终覆盖下层。无一例外。智能体通过向上遍历层级来解决决策——在第一个覆盖该情况的层级停止。
 
 ---
 
-## 同构性
+## 有何不同
 
-相同的 4+1 层结构出现在有组织行动的每个领域：
+不是功能列表。是协调问题的解决者。
 
-| 层级 | 国家法律 | 军事 | 企业 | 个人 | AI Agent |
-|------|---------|------|------|------|----------|
-| **1 Strategy（战略）** | 宪法 | 战役目标 | 使命与愿景 | 个人价值观 | System Prompt / Prime Directive |
-| **2 Doctrine（准则）** | 成文法 | 交战规则 | 公司政策 | 人生原则 | 行为指南 |
-| **3 Procedure（程序）** | 法规 | 标准操作程序 | SOPs / 规程 | 习惯与常规 | 任务指令 |
-| **4 Playbook（手册）** | 判例法 | 战术与演练 | 最佳实践 | 习得模式 | Few-shot 示例 |
-| **执行工作计划** | 行政命令 | 任务命令 | Sprint / 工作计划 | 每日待办 | Active Context |
-
-这种同构性是核心论点：治理不是领域特定的。这一模式是普遍的。适用于军事单位的框架同样适用于初创公司、研究实验室或 AI agent 集群。
+| 你的问题 | Praxeology 的答案 |
+|---|---|
+| 智能体在会话间偏离其角色 | **ConstitutionalGuard** — 4 层行为验证 |
+| 没有办法安全地约束智能体行为 | **SafetyGate** — 上层锁定下层无法覆盖的关键规则 |
+| 智能体无法改进自身流程 | **SOP Evolution** — Learn-Compress-Apply 循环。治理的梯度下降 |
+| 一处变更破坏另一处 | **Review Cascade** — 双向传播（层级上下） |
+| 智能体无法标记规则存在问题时 | **Proposal Flow** — 任何智能体向创始人发送的结构化修订请求 |
+| 会话间没有机构记忆 | **Work Cycle** — 每日差距 → 每周提案 → 每月修订 → 每季度回顾 |
 
 ---
 
 ## 快速开始
 
-**第 1 步 — 克隆**
-
 ```bash
 git clone https://github.com/neomakes/praxeology.git my-org
 cd my-org
+bash setup.sh    # 交互式向导：组织名称、使命、部门、智能体
+bash launch.sh   # 你的治理系统已上线
 ```
 
-**第 2 步 — 运行安装**
-
-```bash
-bash setup.sh
-```
-
-交互式向导会询问你的组织名称、使命、部门、agent 和项目，并生成完整的目录结构及所有初始化文档。
-
-**第 3 步 — 启动**
-
-```bash
-bash launch.sh
-```
-
-你的治理系统已上线。打开根目录的 `CLAUDE.md`，查看为 AI agent 生成的上下文。
-
-> **初次接触 Praxeology？** 从 [docs/quickstart.md](docs/quickstart.md) 开始，获取 3 步指南；通过 [docs/role-design.md](docs/role-design.md) 设计你的 agent。
+> **新手？** 从[快速开始指南](docs/quickstart.md)和[角色设计指南](docs/role-design.md)开始。
 
 ---
 
-## 核心特性
+## 智能体设计系统
 
-| 特性 | 说明 |
-|------|------|
-| **SafetyGate** | 高层级文件可声明硬性限制，任何低层级文件均不可覆盖 |
-| **Proposal Flow** | 任何 agent 或团队成员均可通过结构化 Proposal 格式提出修正案 |
-| **SOP Evolution** | Procedure 和 Playbook 在提升前通过 Review Cascade 演化 |
-| **Review Cascade** | 变更向上传播：Playbook → Procedure → Doctrine → Strategy 进行一致性检查 |
-| **Reverse Flow** | Strategy 变更向下级联：所有低层级文档被标记以供审查 |
-| **Department Codes** | 带有数字代码系列的部门（例如 NeoMakes 实例中的 1xx–7xx），含角色与人员分配 |
+每个智能体都会获得一个 `CLAUDE.md`，不仅定义它*做什么*，还定义它*如何*行为：
+
+```
+Identity → Persona → Speech Rules → Anti-Patterns → Emotional Triggers → Values → Boundaries
+```
+
+这使智能体**可区分、一致且有边界**。QA 智能体听起来与执行者不同。规划者从不写代码。审查者从不审批自己的工作。完整模板和扩展策略（3 到 15+ 个智能体）请参见[角色设计指南](docs/role-design.md)。
+
+---
+
+## 示例
+
+- [examples/solo-dev/](examples/solo-dev/) — 独立开发者 + 3 个智能体（最小配置）
+- [examples/tech-startup/](examples/tech-startup/) — 早期阶段软件公司
+- [examples/one-piece-crew/](examples/one-piece-crew/) — 具有完整角色系统的虚构团队
+
+---
+
+<details>
+<summary><strong>理论 — 为何有效（同构性）</strong></summary>
+
+相同的 4+1 层结构出现在有组织行动的每个领域：
+
+| 层级 | 国家法律 | 军事 | 企业 | 个人 | AI 智能体 |
+|------|-------------|----------|-----------|------------|----------|
+| **1 战略** | 宪法 | 战役目标 | 使命与愿景 | 个人价值观 | System Prompt / Prime Directive |
+| **2 教义** | 成文法 | 交战规则 | 企业政策 | 人生原则 | 行为指南 |
+| **3 程序** | 法规 | 标准作战程序 | SOP / 协议 | 习惯与例程 | 任务指令 |
+| **4 手册** | 判例法 / 先例 | 战术与演练 | 最佳实践 | 习得模式 | Few-shot 示例 |
+| **执行** | 行政令 | 任务命令 | Sprint / 工作计划 | 每日待办 | 活跃上下文 |
+
+治理不是特定领域的。这个模式是普遍的。适用于军事单位的框架同样适用于初创公司、研究实验室或 AI 智能体群。
+
+</details>
 
 ---
 
@@ -103,27 +131,22 @@ bash launch.sh
 
 ```
 your-org/
-├── CLAUDE.md                  # AI agent 的根上下文（生成）
-├── launch.sh                  # 每日启动脚本（生成）
-├── _standard/                 # 治理文件
-│   ├── README.md              # 所有治理文件的主索引
-│   ├── {department}/          # 每个部门一个文件夹（例如 strategy, operations, finance, ...）
-│   │   ├── STR-{NNN}.md      #   NeoMakes 实例使用：ceo, coo, cfo, cto, cdo, chro, ciso
-│   │   ├── DOC-{NNN}.md      #   你的可以是任何名称
+├── CLAUDE.md                  # AI 智能体的根上下文（生成的）
+├── launch.sh                  # 每日启动脚本（生成的）
+├── _standard/                 # 治理文档
+│   ├── README.md              # 所有治理产出物的主索引
+│   ├── {department}/          # 每个部门一个文件夹
+│   │   ├── STR-{NNN}.md      #   （例如：战略、运营、财务、工程）
+│   │   ├── DOC-{NNN}.md
 │   │   ├── PRC-{NNN}.md
 │   │   └── PLY-{NNN}.md
-├── _crew/                     # Agent / 团队成员定义
-│   ├── CLAUDE.md              # 共享成员规则
-│   └── {agent}/               # 每个 agent 的子目录
-│       ├── CLAUDE.md          # Agent 上下文与人格
-│       └── sop.md             # Agent SOPs
+├── _crew/                     # 智能体 / 团队成员定义
+│   ├── CLAUDE.md              # 共享团队规则
+│   └── {agent}/               # 每个智能体的子目录
+│       ├── CLAUDE.md          # 智能体上下文和角色
+│       └── sop.md             # 智能体 SOP
 ├── _project/                  # 活跃项目
-│   ├── .praxe/                # 项目卡（治理元数据）
-│   │   └── {project}.md       # 状态、优先级、成员分配、里程碑
-│   └── {project}/             # 每个项目目录（代码）
 ├── _setting/                  # 运营设置
-│   ├── permissions.md         # 访问控制矩阵
-│   └── integrations.md        # 外部服务配置
 ├── docs/                      # 框架文档
 ├── templates/                 # 可复用文档模板
 └── examples/                  # 参考实现
@@ -131,84 +154,38 @@ your-org/
 
 ---
 
-## 领域应用
-
-### 企业
-
-将部门映射到组织角色。每个部门拥有自己的治理栈。顶层 Strategy 文件是组织的宪法。（NeoMakes 实例使用 CEO/COO/CFO/CTO/CDO/CHRO/CISO 部门——你的可以是任何名称。）
-
-### 研究实验室
-
-将角色映射到 PI（首席研究员）、实验室主任、财务负责人、系统负责人、合作关系、人力资源和安全。使用相同的层级结构。Strategy 文件记录实验室的研究使命和伦理约束。完整的研究实验室演练参见 [docs/tutorial.md](docs/tutorial.md)。
-
-### 个人生产力
-
-单人实现。CEO = 你自己。Strategy = 你的人生使命。Doctrine = 你的不可谈判原则。Procedure = 你的每周仪式。Playbook = 你积累的最佳实践。Work Plan = 你的每日清单。
-
-### AI Agent 团队
-
-每个 AI agent 都有一个 `_crew/{agent}/CLAUDE.md`，定义其角色、权限级别和操作约束。根 `CLAUDE.md` 是团队的共同宪法。高层级文件在执行前被预置到 agent 上下文中。
-
----
-
-## 框架文档
-
-| 文档 | 说明 |
-|------|------|
-| [docs/architecture.md](docs/architecture.md) | 设计哲学、核心机制与通用治理模式 |
-| [docs/getting-started.md](docs/getting-started.md) | 前提条件、安装与初始步骤 |
-| [docs/standard-system.md](docs/standard-system.md) | 深入解析 4+1 层文档系统 |
-| [docs/crew-system.md](docs/crew-system.md) | Agent 管理、SOP 自演化与 review cascade |
-| [docs/tutorial.md](docs/tutorial.md) | 构建受治理 AI agent 团队的完整演练 |
-
----
-
-## 示例
-
-- [examples/solo-dev/](examples/solo-dev/) — 独立开发者 + 3 个 agent（最小化配置）
-- [examples/tech-startup/](examples/tech-startup/) — 早期软件公司
-- [examples/one-piece-crew/](examples/one-piece-crew/) — 带有完整人格系统的虚构团队（演示用）
-
----
-
-## 生产环境使用 — NeoMakes（一个实例）
-
-Praxeology 不是理论。它每天在运营一家真实的公司。NeoMakes 是该框架的一个实例——你的实例会有所不同。
-
-**[NeoMakes, Inc.](https://neomakes.com)** 作为一家 1 人公司，由 9 个受 Praxeology 治理的 AI agent 运营：
-
-| 指标 | 数值 |
-|------|------|
-| Agent 数量 | 9 个（分布在 7 个 C-level 部门） |
-| 已颁布法规 | 38 条（覆盖所有部门的 STR/DOC/PRC/PLY） |
-| 日常运营 | 待办跟踪、每日报告、每周规划、每月回顾 |
-| 集成 | Claude Code + Discord（4 个频道）+ Google Drive + Notion + Calendar |
-| 自演化 | Agent 每日检测 Standard Gap → 每周提出 Proposal → 每月提交修正案 |
-
-这些 agent 拥有定义好的人格，包括**Speech Rules**（句数上限、语气）、**Anti-Patterns**（禁止行为）和**Emotional Triggers**（情境响应变化）——确保 9 个 agent 之间行为一致且可区分。
-
-### 集成指南
+## 集成指南
 
 | 指南 | 说明 |
-|------|------|
-| [Discord Integration](docs/discord-integration.md) | 频道结构、bot 提及、循环防止、bot 间通信 |
-| [Google Drive Integration](docs/drive-integration.md) | 符号链接设置、法规存储、基于 room 的工作空间 |
-| [Crew Manager Dashboard](docs/crew-manager.md) | 用于 session 监控、待办管理、权限审批的 Web 仪表盘 |
-| [Claude Code Setup](docs/claude-code-setup.md) | CLAUDE.md 层级、MCP server、每个 agent 的 session 配置 |
-| [Work Cycle](docs/work-cycle.md) | weekly.json/todo.json schema、报告周期、Standard Gap 反向流 |
+|-------|-------------|
+| [Discord 集成](docs/discord-integration.md) | 频道结构、机器人提及、循环防止 |
+| [Google Drive 集成](docs/drive-integration.md) | 符号链接设置、规范存储、工作区 |
+| [Crew Manager 仪表板](docs/crew-manager.md) | 用于会话监控的 Web 仪表板 |
+| [Claude Code 设置](docs/claude-code-setup.md) | CLAUDE.md 层级、MCP 服务器、每智能体会话 |
+| [Work Cycle](docs/work-cycle.md) | Todo/weekly 架构、报告周期、Standard Gap 流程 |
+
+## 文档
+
+| 文档 | 说明 |
+|----------|-------------|
+| [docs/architecture.md](docs/architecture.md) | 设计理念和核心机制 |
+| [docs/getting-started.md](docs/getting-started.md) | 前提条件、安装、第一步 |
+| [docs/standard-system.md](docs/standard-system.md) | 4+1 层文档系统深度解析 |
+| [docs/crew-system.md](docs/crew-system.md) | 智能体管理、SOP 自我演进 |
+| [docs/tutorial.md](docs/tutorial.md) | 构建治理智能体团队的完整教程 |
 
 ---
 
 ## 起源
 
-Praxeology 由 **[NeoMakes](https://neomakes.com)** 构建——一家专注于极端环境下人机交互基础技术研发的 1 人公司。该框架源于对以与人类组织同等严谨程度治理不断扩大的 AI agent 集群的需求。
+由 **[NeoMakes](https://neomakes.com)** 构建——一家开发极端环境设备端 AI 的单人公司。该框架源于以军事指挥结构相同的严格性治理 AI 智能体群的实践。
 
-这个名字来自于 praxeology（行动学）——研究人类行动的学科。洞察在于：有目的的行动具有结构。这种结构是普遍的。将其明确化，你就可以治理任何事物。
+名称来自 praxeology（行为学），即人类行为的研究。有目的的行动具有结构。该结构是普遍的。将其明确化，你就可以治理任何事物。
 
 ---
 
 ## 许可证
 
-MIT License — 参见 [LICENSE](LICENSE)。
+MIT 许可证 — 参见 [LICENSE](LICENSE)。
 
 Copyright (c) 2026 NeoMakes

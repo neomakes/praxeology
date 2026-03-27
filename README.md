@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/banner.svg" alt="praxeology — Human–AI Collaborative Governance for Purposeful Action" width="100%">
+  <img src="assets/banner.svg" alt="Praxeology — The governance layer that keeps your AI agent team aligned, evolving, and accountable." width="100%">
 </p>
 
 <p align="center">
@@ -20,35 +20,96 @@
 </p>
 
 <p align="center">
-  <a href="docs/quickstart.md">Quick Start</a> (<a href="docs/quickstart.ko.md">한국어</a> · <a href="docs/quickstart.ja.md">日本語</a> · <a href="docs/quickstart.zh.md">中文</a>) ·
-  <a href="docs/role-design.md">Role Design</a> (<a href="docs/role-design.ko.md">한국어</a> · <a href="docs/role-design.ja.md">日本語</a> · <a href="docs/role-design.zh.md">中文</a>)
+  <a href="docs/quickstart.md">Quick Start</a> (<a href="docs/quickstart.ko.md">한국어</a> · <a href="docs/quickstart.ja.md">日本語</a> · <a href="docs/quickstart.zh.md">中文</a> · <a href="docs/quickstart.fr.md">FR</a> · <a href="docs/quickstart.de.md">DE</a> · <a href="docs/quickstart.es.md">ES</a>) ·
+  <a href="docs/role-design.md">Role Design</a> (<a href="docs/role-design.ko.md">한국어</a> · <a href="docs/role-design.ja.md">日本語</a> · <a href="docs/role-design.zh.md">中文</a> · <a href="docs/role-design.fr.md">FR</a> · <a href="docs/role-design.de.md">DE</a> · <a href="docs/role-design.es.md">ES</a>)
 </p>
 
 ---
 
-## Why Praxeology?
+## The Problem
 
-Tools like [gstack](https://github.com/gstack-io/gstack) and [oh-my-claudecode](https://github.com/anthropics/claude-code) are excellent at making individual AI agents productive — browsing, coding, testing, deploying. But when you scale from **one agent** to **many agents working together**, a new problem emerges: **governance**.
+**Parallelization is solved.** Claude Code, Codex, gstack, oh-my-claudecode — these tools already make individual AI agents incredibly productive. Running 5 agents in parallel is a solved problem.
 
-Without governance, agents duplicate work, contradict each other, overstep boundaries, and drift from their intended roles over time. Prompt engineering alone doesn't solve this — you need structure that persists across sessions, evolves through use, and mirrors how the most effective human organizations have governed action for centuries.
+**Coordination is not.** When those 5 agents finish their work, who resolves conflicts? Who verifies consistency? Who prevents Agent A from overwriting Agent B's decisions? Who stops role drift across sessions? Multi-agent frameworks solve the *start* — Praxeology solves what comes after: **coordination, state tracking, conflict resolution, and evolutionary alignment.**
 
-Praxeology provides that structure. It's not a replacement for your coding tools — it's the **constitutional layer** that sits above them, ensuring your agents operate as a coherent organization rather than a collection of independent chatbots.
+**Praxeology is the missing governance layer.** It sits above your coding tools, not replacing them — ensuring your agents operate as a coherent organization rather than a collection of independent chatbots.
 
 ---
 
-## What Is This?
+## Production Proof
 
-**Praxeology** is a human–AI collaborative operating system built on a universal 4+1 tier governance hierarchy. Humans set the strategy and principles; agentic AI executes within those bounds, learns from experience, and proposes improvements back. It captures the observation that all purposeful action — from nations to agentic AI — follows the same structural pattern.
+This isn't theory. [NeoMakes](https://neomakes.com) runs this every day.
+
+> **1 human + 9 AI agents · 38 governance rules · 7 departments**
+> Daily todos → Weekly reviews → Monthly amendments
+> Agents detect gaps, propose fixes, evolve their own SOPs.
+
+Each agent has defined **Speech Rules** (sentence limits, tone), **Anti-Patterns** (forbidden behaviors), and **Emotional Triggers** (situation-dependent response changes) — ensuring consistent, distinguishable behavior across all 9 agents. NeoMakes is one instance. Yours will look different.
+
+---
+
+## How It Works
+
+A 4+1 tier governance hierarchy. Simple. Universal.
 
 ```
 Strategy (WHY) → Doctrine (WHAT) → Procedure (HOW) → Playbook (PATTERNS) → Execution (NOW)
 ```
 
-Higher tiers always override lower ones. No exceptions.
+Higher tiers always override lower ones. No exceptions. Agents resolve decisions by walking up the hierarchy — stopping at the first level that covers the situation.
 
 ---
 
-## The Isomorphism
+## What Makes It Different
+
+Not a feature list. A coordination problem solver.
+
+| Your Problem | Praxeology's Answer |
+|---|---|
+| Agents drift from their role over sessions | **ConstitutionalGuard** — 4-layer behavioral verification |
+| No way to safely constrain agent actions | **SafetyGate** — Higher tiers lock critical rules that lower tiers cannot override |
+| Agents can't improve their own processes | **SOP Evolution** — Learn-Compress-Apply loop. Gradient descent for governance |
+| Changes in one place break another | **Review Cascade** — Bidirectional propagation (up and down the hierarchy) |
+| Agents can't flag when rules are bad | **Proposal Flow** — Structured amendment requests from any agent to the founder |
+| No institutional memory across sessions | **Work Cycle** — Daily gaps → weekly proposals → monthly amendments → quarterly reviews |
+
+---
+
+## Quick Start
+
+```bash
+git clone https://github.com/neomakes/praxeology.git my-org
+cd my-org
+bash setup.sh    # Interactive wizard: org name, mission, departments, agents
+bash launch.sh   # Your governance system is live
+```
+
+> **New?** Start with [Quick Start Guide](docs/quickstart.md) and [Role Design Guide](docs/role-design.md).
+
+---
+
+## Agent Design System
+
+Every agent gets a `CLAUDE.md` that defines not just *what* it does, but *how* it behaves:
+
+```
+Identity → Persona → Speech Rules → Anti-Patterns → Emotional Triggers → Values → Boundaries
+```
+
+This makes agents **distinguishable, consistent, and bounded**. A QA agent sounds different from an executor. A planner never writes code. A reviewer never approves their own work. See [Role Design Guide](docs/role-design.md) for the full template and scaling strategies (3 to 15+ agents).
+
+---
+
+## Examples
+
+- [examples/solo-dev/](examples/solo-dev/) — Solo developer + 3 agents (minimal)
+- [examples/tech-startup/](examples/tech-startup/) — Early-stage software company
+- [examples/one-piece-crew/](examples/one-piece-crew/) — Fictional crew with full persona system
+
+---
+
+<details>
+<summary><strong>The Theory — Why This Works (The Isomorphism)</strong></summary>
 
 The same 4+1 tier structure appears across every domain of organized action:
 
@@ -58,51 +119,11 @@ The same 4+1 tier structure appears across every domain of organized action:
 | **2 Doctrine** | Statute Law | Rules of Engagement | Corporate Policy | Life Principles | Behavioral Guidelines |
 | **3 Procedure** | Regulations | Standard Operating Procedures | SOPs / Protocols | Habits & Routines | Task Instructions |
 | **4 Playbook** | Case Law / Precedent | Tactics & Drills | Best Practices | Learned Patterns | Few-shot Examples |
-| **Exec Work Plan** | Executive Order | Mission Orders | Sprint / Work Plan | Daily To-Do | Active Context |
+| **Exec** | Executive Order | Mission Orders | Sprint / Work Plan | Daily To-Do | Active Context |
 
-This isomorphism is the core thesis: governance is not domain-specific. The pattern is universal. A framework that works for a military unit works for a startup, a research lab, or an AI agent fleet.
+Governance is not domain-specific. The pattern is universal. A framework that works for a military unit works for a startup, a research lab, or an AI agent fleet.
 
----
-
-## Quick Start
-
-**Step 1 — Clone**
-
-```bash
-git clone https://github.com/neomakes/praxeology.git my-org
-cd my-org
-```
-
-**Step 2 — Run setup**
-
-```bash
-bash setup.sh
-```
-
-The interactive wizard asks for your organization name, mission, departments, agents, and projects. It generates the full directory structure and all bootstrap documents.
-
-**Step 3 — Launch**
-
-```bash
-bash launch.sh
-```
-
-Your governance system is live. Open `CLAUDE.md` at the root to see the generated context for AI agents.
-
-> **New to Praxeology?** Start with [docs/quickstart.md](docs/quickstart.md) for a 3-step guide, and [docs/role-design.md](docs/role-design.md) for designing your agents.
-
----
-
-## Key Features
-
-| Feature | Description |
-|---------|-------------|
-| **SafetyGate** | Higher-tier documents can declare hard limits that no lower-tier document can override |
-| **Proposal Flow** | Any agent or team member can propose an amendment via the structured Proposal format |
-| **SOP Evolution** | Procedures and Playbooks evolve through the Review Cascade before promotion |
-| **Review Cascade** | Changes propagate upward: Playbook → Procedure → Doctrine → Strategy for consistency checks |
-| **Reverse Flow** | Strategy changes cascade downward: all lower tiers are flagged for review |
-| **Department Codes** | Departments with numeric code series (e.g., 1xx–7xx in the NeoMakes instance) with role + staff assignments |
+</details>
 
 ---
 
@@ -114,8 +135,8 @@ your-org/
 ├── launch.sh                  # Daily launch script (generated)
 ├── _standard/                 # Governance documents
 │   ├── README.md              # Master index of all governance artifacts
-│   ├── {department}/          # One folder per department (e.g., strategy, operations, finance, ...)
-│   │   ├── STR-{NNN}.md      #   NeoMakes instance uses: ceo, coo, cfo, cto, cdo, chro, ciso
+│   ├── {department}/          # One folder per department
+│   │   ├── STR-{NNN}.md      #   (e.g., strategy, operations, finance, engineering)
 │   │   ├── DOC-{NNN}.md
 │   │   ├── PRC-{NNN}.md
 │   │   └── PLY-{NNN}.md
@@ -125,12 +146,7 @@ your-org/
 │       ├── CLAUDE.md          # Agent context and persona
 │       └── sop.md             # Agent SOPs
 ├── _project/                  # Active projects
-│   ├── .praxe/                # Project cards (governance metadata)
-│   │   └── {project}.md       # Status, priority, crew assignment, milestones
-│   └── {project}/             # Each project directory (code)
 ├── _setting/                  # Operational settings
-│   ├── permissions.md         # Access control matrix
-│   └── integrations.md        # External service config
 ├── docs/                      # Framework documentation
 ├── templates/                 # Reusable document templates
 └── examples/                  # Reference implementations
@@ -138,79 +154,33 @@ your-org/
 
 ---
 
-## Domain Applications
-
-### Corporate
-
-Map departments to organizational roles. Each department owns its governance stack. The top-level Strategy document is the organization's constitution. (The NeoMakes instance uses CEO/COO/CFO/CTO/CDO/CHRO/CISO departments — yours can be anything.)
-
-### Research Lab
-
-Map roles to PI, Lab Manager, Finance Lead, Systems Lead, Partnerships, HR, and Security. Use the same tier structure. The Strategy document captures the lab's research mission and ethical constraints. See [docs/tutorial.md](docs/tutorial.md) for a full research lab walkthrough.
-
-### Personal Productivity
-
-A single-person implementation. CEO = you. Strategy = your life mission. Doctrine = your non-negotiables. Procedure = your weekly rituals. Playbook = your accumulated best practices. Work Plan = your daily list.
-
-### AI Agent Team
-
-Each AI agent gets a `_crew/{agent}/CLAUDE.md` defining its role, authority level, and operating constraints. The root `CLAUDE.md` is the team's shared constitution. Higher-tier documents are prepended to agent contexts before execution.
-
----
-
-## Framework Documentation
-
-| Document | Description |
-|----------|-------------|
-| [docs/architecture.md](docs/architecture.md) | Design philosophy, core mechanisms, and the universal governance pattern |
-| [docs/getting-started.md](docs/getting-started.md) | Prerequisites, installation, and first steps |
-| [docs/standard-system.md](docs/standard-system.md) | The 4+1 tier document system in depth |
-| [docs/crew-system.md](docs/crew-system.md) | Agent management, SOP self-evolution, and review cascade |
-| [docs/tutorial.md](docs/tutorial.md) | Full walkthrough building a governed AI agent team |
-
----
-
-## Examples
-
-- [examples/solo-dev/](examples/solo-dev/) — Solo developer + 3 agents (minimal setup)
-- [examples/tech-startup/](examples/tech-startup/) — Early-stage software company
-- [examples/one-piece-crew/](examples/one-piece-crew/) — Fictional crew with full persona system (demonstration)
-
----
-
-## Production Use — NeoMakes (One Instance)
-
-Praxeology is not theoretical. It runs a real company every day. NeoMakes is one instance of this framework — yours will look different.
-
-**[NeoMakes, Inc.](https://neomakes.com)** operates as a 1-person company with 9 AI agents governed by Praxeology:
-
-| Metric | Value |
-|--------|-------|
-| Agents | 9 (organized across 7 C-level departments) |
-| Enacted regulations | 38 (STR/DOC/PRC/PLY across all departments) |
-| Daily operations | Todo tracking, daily reports, weekly planning, monthly reviews |
-| Integrations | Claude Code + Discord (4 channels) + Google Drive + Notion + Calendar |
-| Self-evolution | Agents detect Standard Gaps daily → Proposals weekly → Amendments monthly |
-
-The agents have defined personas with **Speech Rules** (sentence limits, tone), **Anti-Patterns** (forbidden behaviors), and **Emotional Triggers** (situation-dependent response changes) — ensuring consistent, distinguishable behavior across all 9 agents.
-
-### Integration Guides
+## Integration Guides
 
 | Guide | Description |
 |-------|-------------|
-| [Discord Integration](docs/discord-integration.md) | Channel structure, bot mentions, loop prevention, bot-to-bot communication |
-| [Google Drive Integration](docs/drive-integration.md) | Symlink setup, regulation storage, room-based workspaces |
-| [Crew Manager Dashboard](docs/crew-manager.md) | Web dashboard for session monitoring, todo management, permission approval |
-| [Claude Code Setup](docs/claude-code-setup.md) | CLAUDE.md hierarchy, MCP servers, per-agent session configuration |
-| [Work Cycle](docs/work-cycle.md) | weekly.json/todo.json schemas, reporting cycle, Standard Gap reverse flow |
+| [Discord Integration](docs/discord-integration.md) | Channel structure, bot mentions, loop prevention |
+| [Google Drive Integration](docs/drive-integration.md) | Symlink setup, regulation storage, workspaces |
+| [Crew Manager Dashboard](docs/crew-manager.md) | Web dashboard for session monitoring |
+| [Claude Code Setup](docs/claude-code-setup.md) | CLAUDE.md hierarchy, MCP servers, per-agent sessions |
+| [Work Cycle](docs/work-cycle.md) | Todo/weekly schemas, reporting cycle, Standard Gap flow |
+
+## Documentation
+
+| Document | Description |
+|----------|-------------|
+| [docs/architecture.md](docs/architecture.md) | Design philosophy and core mechanisms |
+| [docs/getting-started.md](docs/getting-started.md) | Prerequisites, installation, first steps |
+| [docs/standard-system.md](docs/standard-system.md) | The 4+1 tier document system in depth |
+| [docs/crew-system.md](docs/crew-system.md) | Agent management, SOP self-evolution |
+| [docs/tutorial.md](docs/tutorial.md) | Full walkthrough building a governed agent team |
 
 ---
 
 ## Origin
 
-Praxeology was built by **[NeoMakes](https://neomakes.com)** — a one-person company developing foundational human-AI interaction technology for extreme environments. The framework emerged from the need to govern a growing fleet of AI agents with the same rigor applied to human organizations.
+Built by **[NeoMakes](https://neomakes.com)** — a one-person company developing on-device AI for extreme environments. The framework emerged from governing a fleet of AI agents with the same rigor applied to military command structures.
 
-The name comes from praxeology, the study of human action. The insight: purposeful action has structure. That structure is universal. Make it explicit, and you can govern anything.
+The name comes from praxeology, the study of human action. Purposeful action has structure. That structure is universal. Make it explicit, and you can govern anything.
 
 ---
 
