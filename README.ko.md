@@ -15,7 +15,7 @@
 
 [English](README.md) · **한국어** · [日本語](README.ja.md) · [中文](README.zh.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Español](README.es.md)
 
-다른 문서: [QUICKSTART](QUICKSTART.md) ([한국어](QUICKSTART.ko.md) · [日本語](QUICKSTART.ja.md) · [中文](QUICKSTART.zh.md)) · [ROLE-DESIGN](ROLE-DESIGN.md) ([한국어](ROLE-DESIGN.ko.md) · [日本語](ROLE-DESIGN.ja.md) · [中文](ROLE-DESIGN.zh.md))
+다른 문서: [QUICKSTART](docs/quickstart.md) ([한국어](docs/quickstart.ko.md) · [日本語](docs/quickstart.ja.md) · [中文](docs/quickstart.zh.md)) · [ROLE-DESIGN](docs/role-design.md) ([한국어](docs/role-design.ko.md) · [日本語](docs/role-design.ja.md) · [中文](docs/role-design.zh.md))
 
 ---
 
@@ -82,7 +82,7 @@ bash launch.sh
 
 거버넌스 시스템이 활성화된다. 루트의 `CLAUDE.md`를 열어 AI 에이전트용으로 생성된 컨텍스트를 확인한다.
 
-> **Praxeology가 처음이라면?** [QUICKSTART.md](QUICKSTART.md)의 3단계 가이드와 에이전트 설계를 위한 [ROLE-DESIGN.md](ROLE-DESIGN.md)를 먼저 읽는다.
+> **Praxeology가 처음이라면?** [docs/quickstart.md](docs/quickstart.md)의 3단계 가이드와 에이전트 설계를 위한 [docs/role-design.md](docs/role-design.md)를 먼저 읽는다.
 
 ---
 

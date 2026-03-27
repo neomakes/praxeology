@@ -34,7 +34,7 @@ For each agent, create `_crew/{name}/CLAUDE.md` with these sections:
 
 Then create `_crew/CLAUDE.md` with rules that apply to all agents equally: shared communication standards, escalation protocol, cross-agent mention rules, and reporting cadence.
 
-See `ROLE-DESIGN.md` for detailed guidance and worked examples.
+See `role-design.md` for detailed guidance and worked examples.
 
 ---
 

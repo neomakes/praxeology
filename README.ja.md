@@ -15,7 +15,7 @@
 
 [English](README.md) · [한국어](README.ko.md) · **日本語** · [中文](README.zh.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Español](README.es.md)
 
-他のドキュメント: [QUICKSTART](QUICKSTART.md) ([한국어](QUICKSTART.ko.md) · [日本語](QUICKSTART.ja.md) · [中文](QUICKSTART.zh.md)) · [ROLE-DESIGN](ROLE-DESIGN.md) ([한국어](ROLE-DESIGN.ko.md) · [日本語](ROLE-DESIGN.ja.md) · [中文](ROLE-DESIGN.zh.md))
+他のドキュメント: [QUICKSTART](docs/quickstart.md) ([한국어](docs/quickstart.ko.md) · [日本語](docs/quickstart.ja.md) · [中文](docs/quickstart.zh.md)) · [ROLE-DESIGN](docs/role-design.md) ([한국어](docs/role-design.ko.md) · [日本語](docs/role-design.ja.md) · [中文](docs/role-design.zh.md))
 
 ---
 
@@ -82,7 +82,7 @@ bash launch.sh
 
 ガバナンスシステムが稼働する。ルートの `CLAUDE.md` を開いて、AIエージェント向けに生成されたコンテキストを確認する。
 
-> **Praxeology が初めての方は？** [QUICKSTART.md](QUICKSTART.md) の3ステップガイドから始め、エージェント設計については [ROLE-DESIGN.md](ROLE-DESIGN.md) を参照してほしい。
+> **Praxeology が初めての方は？** [docs/quickstart.md](docs/quickstart.md) の3ステップガイドから始め、エージェント設計については [docs/role-design.md](docs/role-design.md) を参照してほしい。
 
 ---
 

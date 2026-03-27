@@ -15,7 +15,7 @@
 
 [English](README.md) · [한국어](README.ko.md) · [日本語](README.ja.md) · [中文](README.zh.md) · **Français** · [Deutsch](README.de.md) · [Español](README.es.md)
 
-Également disponible : [QUICKSTART](QUICKSTART.md) ([한국어](QUICKSTART.ko.md) · [日本語](QUICKSTART.ja.md) · [中文](QUICKSTART.zh.md)) · [ROLE-DESIGN](ROLE-DESIGN.md) ([한국어](ROLE-DESIGN.ko.md) · [日本語](ROLE-DESIGN.ja.md) · [中文](ROLE-DESIGN.zh.md))
+Également disponible : [QUICKSTART](docs/quickstart.md) ([한국어](docs/quickstart.ko.md) · [日本語](docs/quickstart.ja.md) · [中文](docs/quickstart.zh.md)) · [ROLE-DESIGN](docs/role-design.md) ([한국어](docs/role-design.ko.md) · [日本語](docs/role-design.ja.md) · [中文](docs/role-design.zh.md))
 
 ---
 
@@ -82,7 +82,7 @@ bash launch.sh
 
 Votre système de gouvernance est opérationnel. Ouvrez `CLAUDE.md` à la racine pour voir le contexte généré pour les agents IA.
 
-> **Nouveau sur Praxeology ?** Commencez par [QUICKSTART.md](QUICKSTART.md) pour un guide en 3 étapes, et [ROLE-DESIGN.md](ROLE-DESIGN.md) pour concevoir vos agents.
+> **Nouveau sur Praxeology ?** Commencez par [docs/quickstart.md](docs/quickstart.md) pour un guide en 3 étapes, et [docs/role-design.md](docs/role-design.md) pour concevoir vos agents.
 
 ---
 

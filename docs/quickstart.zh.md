@@ -34,7 +34,7 @@
 
 然后创建 `_crew/CLAUDE.md`，写入对所有 agent 同等适用的规则：共享通信标准、上报协议、跨 agent 提及规则和报告节奏。
 
-详细指导和实例参见 `ROLE-DESIGN.md`。
+详细指导和实例参见 `role-design.md`。
 
 ---
 

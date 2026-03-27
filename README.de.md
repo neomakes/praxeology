@@ -15,7 +15,7 @@
 
 [English](README.md) · [한국어](README.ko.md) · [日本語](README.ja.md) · [中文](README.zh.md) · [Français](README.fr.md) · **Deutsch** · [Español](README.es.md)
 
-Auch verfügbar: [QUICKSTART](QUICKSTART.md) ([한국어](QUICKSTART.ko.md) · [日本語](QUICKSTART.ja.md) · [中文](QUICKSTART.zh.md)) · [ROLE-DESIGN](ROLE-DESIGN.md) ([한국어](ROLE-DESIGN.ko.md) · [日本語](ROLE-DESIGN.ja.md) · [中文](ROLE-DESIGN.zh.md))
+Auch verfügbar: [QUICKSTART](docs/quickstart.md) ([한국어](docs/quickstart.ko.md) · [日本語](docs/quickstart.ja.md) · [中文](docs/quickstart.zh.md)) · [ROLE-DESIGN](docs/role-design.md) ([한국어](docs/role-design.ko.md) · [日本語](docs/role-design.ja.md) · [中文](docs/role-design.zh.md))
 
 ---
 
@@ -82,7 +82,7 @@ bash launch.sh
 
 Ihr Governance-System ist live. Öffnen Sie `CLAUDE.md` im Stammverzeichnis, um den generierten Kontext für KI-Agenten zu sehen.
 
-> **Neu bei Praxeology?** Beginnen Sie mit [QUICKSTART.md](QUICKSTART.md) für eine 3-Schritte-Anleitung und [ROLE-DESIGN.md](ROLE-DESIGN.md) zum Entwerfen Ihrer Agenten.
+> **Neu bei Praxeology?** Beginnen Sie mit [docs/quickstart.md](docs/quickstart.md) für eine 3-Schritte-Anleitung und [docs/role-design.md](docs/role-design.md) zum Entwerfen Ihrer Agenten.
 
 ---
 

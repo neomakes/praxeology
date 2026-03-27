@@ -20,8 +20,8 @@
 </p>
 
 <p align="center">
-  <a href="QUICKSTART.md">Quick Start</a> (<a href="QUICKSTART.ko.md">한국어</a> · <a href="QUICKSTART.ja.md">日本語</a> · <a href="QUICKSTART.zh.md">中文</a>) ·
-  <a href="ROLE-DESIGN.md">Role Design</a> (<a href="ROLE-DESIGN.ko.md">한국어</a> · <a href="ROLE-DESIGN.ja.md">日本語</a> · <a href="ROLE-DESIGN.zh.md">中文</a>)
+  <a href="docs/quickstart.md">Quick Start</a> (<a href="docs/quickstart.ko.md">한국어</a> · <a href="docs/quickstart.ja.md">日本語</a> · <a href="docs/quickstart.zh.md">中文</a>) ·
+  <a href="docs/role-design.md">Role Design</a> (<a href="docs/role-design.ko.md">한국어</a> · <a href="docs/role-design.ja.md">日本語</a> · <a href="docs/role-design.zh.md">中文</a>)
 </p>
 
 ---
@@ -89,7 +89,7 @@ bash launch.sh
 
 Your governance system is live. Open `CLAUDE.md` at the root to see the generated context for AI agents.
 
-> **New to Praxeology?** Start with [QUICKSTART.md](QUICKSTART.md) for a 3-step guide, and [ROLE-DESIGN.md](ROLE-DESIGN.md) for designing your agents.
+> **New to Praxeology?** Start with [docs/quickstart.md](docs/quickstart.md) for a 3-step guide, and [docs/role-design.md](docs/role-design.md) for designing your agents.
 
 ---
 

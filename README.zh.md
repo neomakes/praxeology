@@ -15,7 +15,7 @@
 
 [English](README.md) · [한국어](README.ko.md) · [日本語](README.ja.md) · **中文** · [Français](README.fr.md) · [Deutsch](README.de.md) · [Español](README.es.md)
 
-也提供：[QUICKSTART](QUICKSTART.md) ([한국어](QUICKSTART.ko.md) · [日本語](QUICKSTART.ja.md) · [中文](QUICKSTART.zh.md)) · [ROLE-DESIGN](ROLE-DESIGN.md) ([한국어](ROLE-DESIGN.ko.md) · [日本語](ROLE-DESIGN.ja.md) · [中文](ROLE-DESIGN.zh.md))
+也提供：[QUICKSTART](docs/quickstart.md) ([한국어](docs/quickstart.ko.md) · [日本語](docs/quickstart.ja.md) · [中文](docs/quickstart.zh.md)) · [ROLE-DESIGN](docs/role-design.md) ([한국어](docs/role-design.ko.md) · [日本語](docs/role-design.ja.md) · [中文](docs/role-design.zh.md))
 
 ---
 
@@ -82,7 +82,7 @@ bash launch.sh
 
 你的治理系统已上线。打开根目录的 `CLAUDE.md`，查看为 AI agent 生成的上下文。
 
-> **初次接触 Praxeology？** 从 [QUICKSTART.md](QUICKSTART.md) 开始，获取 3 步指南；通过 [ROLE-DESIGN.md](ROLE-DESIGN.md) 设计你的 agent。
+> **初次接触 Praxeology？** 从 [docs/quickstart.md](docs/quickstart.md) 开始，获取 3 步指南；通过 [docs/role-design.md](docs/role-design.md) 设计你的 agent。
 
 ---
 
