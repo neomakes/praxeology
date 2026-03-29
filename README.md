@@ -1,9 +1,6 @@
 <p align="center">
   <img src="assets/banner-3d.gif" alt="Praxeology — 3D governance manifold where a golden ball rolls across tiers from Strategy to Execution" width="100%">
 </p>
-<p align="center">
-  <a href="assets/banner-3d.html"><em>View Interactive 3D Banner</em></a>
-</p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/License-AGPL--3.0-blue.svg" alt="AGPL-3.0 License">
