@@ -34,12 +34,17 @@ class DaemonManager:
 
         # Check if already running
         if pid_file.exists():
-            pid = int(pid_file.read_text().strip())
             try:
-                os.kill(pid, 0)
-                return {"status": "already_running", "pid": pid, "name": name}
-            except ProcessLookupError:
-                pid_file.unlink()  # Stale PID
+                pid = int(pid_file.read_text().strip())
+            except (ValueError, PermissionError, OSError):
+                pid_file.unlink(missing_ok=True)
+                pid = None
+            if pid is not None:
+                try:
+                    os.kill(pid, 0)
+                    return {"status": "already_running", "pid": pid, "name": name}
+                except ProcessLookupError:
+                    pid_file.unlink(missing_ok=True)
 
         python = python or sys.executable
 

@@ -25,6 +25,7 @@ class Heartbeat:
         self.db_path = db_path
         self.interval = interval
         self._running = False
+        self._stop_event = threading.Event()
         self._thread: threading.Thread | None = None
 
     def start(self) -> None:
@@ -41,7 +42,7 @@ class Heartbeat:
             result = self.lightweight_check()
             if result["needs_attention"]:
                 self.heavyweight_trigger(result["reasons"])
-            time.sleep(self.interval)
+            self._stop_event.wait(timeout=self.interval)
 
     def lightweight_check(self) -> dict:
         """Rule-based check. No LLM. Cost = 0.
@@ -164,6 +165,7 @@ def run_daemon(db_path: str = None, interval: int = 300):
     import signal
     def handle_sigterm(signum, frame):
         hb._running = False
+        hb._stop_event.set()
     signal.signal(signal.SIGTERM, handle_sigterm)
 
     hb._running = True
