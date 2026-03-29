@@ -129,14 +129,16 @@ _AGENT_CLAUDE_MD = """\
 - Escalates to captain when: [list escalation conditions]
 """
 
-_MCP_JSON = {
-    "mcpServers": {
-        "praxeology": {
-            "command": "python3",
-            "args": ["-m", "praxeology_mcp"],
+def _build_mcp_json(project_dir: Path) -> dict:
+    venv_python = str(project_dir / ".venv" / "bin" / "python3")
+    return {
+        "mcpServers": {
+            "praxeology": {
+                "command": venv_python,
+                "args": ["-m", "praxeology_mcp"],
+            }
         }
     }
-}
 
 
 # ---------------------------------------------------------------------------
@@ -182,7 +184,7 @@ def cmd_init(args: argparse.Namespace) -> None:
     # 5. .mcp.json
     mcp_json_path = cwd / ".mcp.json"
     mcp_json_path.write_text(
-        json.dumps(_MCP_JSON, indent=2) + "\n", encoding="utf-8"
+        json.dumps(_build_mcp_json(cwd), indent=2) + "\n", encoding="utf-8"
     )
     created.append(str(mcp_json_path))
 

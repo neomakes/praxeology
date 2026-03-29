@@ -22,10 +22,7 @@ echo ""
 find_python() {
     for cmd in python3.12 python3.11 python3.10 python3; do
         if command -v "$cmd" &>/dev/null; then
-            version=$("$cmd" -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')")
-            major=$("$cmd" -c "import sys; print(sys.version_info.major)")
-            minor=$("$cmd" -c "import sys; print(sys.version_info.minor)")
-            if [ "$major" -ge 3 ] && [ "$minor" -ge 10 ]; then
+            if "$cmd" -c "import sys; sys.exit(0 if sys.version_info >= (3, 10) else 1)" 2>/dev/null; then
                 echo "$cmd"
                 return 0
             fi
@@ -59,8 +56,8 @@ fi
 
 # ── Step 3: Install dependencies ──
 echo "[3/5] Installing dependencies..."
-"$VENV_DIR/bin/pip" install --upgrade pip -q 2>/dev/null
-"$VENV_DIR/bin/pip" install -e "$PRAX_DIR" -q 2>/dev/null
+"$VENV_DIR/bin/pip" install --upgrade pip -q
+"$VENV_DIR/bin/pip" install -e "$PRAX_DIR" -q
 echo "  ✓ Installed praxeology-mcp + dependencies"
 
 # ── Step 4: Verify installation ──
