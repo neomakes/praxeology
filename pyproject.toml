@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "praxeology-mcp"
+version = "0.1.0"
+description = "Model-agnostic governance OS for AI agent teams — MCP server"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.10"
+authors = [{name = "NeoMakes", email = "neo@neomakes.com"}]
+dependencies = ["mcp>=1.0.0"]
+keywords = ["mcp", "ai-agents", "governance", "praxeology"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.12",
+]
+
+[project.urls]
+Homepage = "https://github.com/neomakes/praxeology"
+Repository = "https://github.com/neomakes/praxeology"
+
+[project.scripts]
+praxeology = "praxeology_mcp.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["praxeology_mcp*"]

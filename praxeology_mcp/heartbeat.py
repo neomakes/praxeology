@@ -1,0 +1,107 @@
+"""
+Praxeology MCP — Heartbeat engine.
+
+Two-tier background check system:
+    Tier 1: Lightweight rule-based check (no LLM, cost = 0)
+    Tier 2: Heavyweight trigger — logs event, placeholder for LLM invocation
+"""
+
+from __future__ import annotations
+
+import threading
+import time
+from datetime import datetime, timezone
+
+from praxeology_mcp.db import get_db, log_metric
+
+
+def _utcnow_iso() -> str:
+    return datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+class Heartbeat:
+    def __init__(self, db_path: str, interval: int = 300):
+        self.db_path = db_path
+        self.interval = interval
+        self._running = False
+        self._thread: threading.Thread | None = None
+
+    def start(self) -> None:
+        """Start heartbeat as daemon thread."""
+        self._running = True
+        self._thread = threading.Thread(target=self._loop, daemon=True)
+        self._thread.start()
+
+    def stop(self) -> None:
+        self._running = False
+
+    def _loop(self) -> None:
+        while self._running:
+            result = self.lightweight_check()
+            if result["needs_attention"]:
+                self.heavyweight_trigger(result["reasons"])
+            time.sleep(self.interval)
+
+    def lightweight_check(self) -> dict:
+        """Rule-based check. No LLM. Cost = 0.
+
+        Returns:
+            {"needs_attention": bool, "reasons": list[str]}
+        """
+        reasons: list[str] = []
+        conn = get_db(self.db_path)
+        try:
+            # Check 1: pending work items in objectives
+            row = conn.execute(
+                "SELECT COUNT(*) AS cnt FROM objectives WHERE status = 'pending'"
+            ).fetchone()
+            if row and row["cnt"] > 0:
+                reasons.append(f"pending_objectives: {row['cnt']} pending work item(s)")
+
+            # Check 2: overdue schedules (next_run < now, enabled = 1)
+            now_iso = _utcnow_iso()
+            row = conn.execute(
+                "SELECT COUNT(*) AS cnt FROM schedules"
+                " WHERE enabled = 1 AND next_run IS NOT NULL AND next_run < ?",
+                (now_iso,),
+            ).fetchone()
+            if row and row["cnt"] > 0:
+                reasons.append(f"overdue_schedules: {row['cnt']} overdue schedule(s)")
+
+            # Check 3: open gaps with frequency > 3
+            row = conn.execute(
+                "SELECT COUNT(*) AS cnt FROM gaps"
+                " WHERE status = 'open' AND frequency > 3"
+            ).fetchone()
+            if row and row["cnt"] > 0:
+                reasons.append(f"high_frequency_gaps: {row['cnt']} open gap(s) with frequency > 3")
+
+            # Check 4: unread delegations with status = 'pending'
+            row = conn.execute(
+                "SELECT COUNT(*) AS cnt FROM delegations WHERE status = 'pending'"
+            ).fetchone()
+            if row and row["cnt"] > 0:
+                reasons.append(f"pending_delegations: {row['cnt']} unread delegation(s)")
+
+        finally:
+            conn.close()
+
+        return {"needs_attention": bool(reasons), "reasons": reasons}
+
+    def heavyweight_trigger(self, reasons: list) -> None:
+        """Log trigger event. LLM invocation placeholder."""
+        conn = get_db(self.db_path)
+        try:
+            log_metric(
+                conn,
+                tool_name="heartbeat.heavyweight_trigger",
+                axis="cross",
+                tokens=0,
+                latency=0,
+            )
+        finally:
+            conn.close()
+
+    def check_once(self) -> dict:
+        """Manual single check (for CLI/testing)."""
+        return self.lightweight_check()

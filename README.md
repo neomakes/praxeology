@@ -103,6 +103,58 @@ This makes agents **distinguishable, consistent, and bounded**. A QA agent sound
 
 ---
 
+## MCP Server — Praxeology Runtime
+
+Praxeology v1 is a document framework. The MCP server makes it a **runtime** — agents can search doctrine, track objectives, record cases, detect gaps, and evolve their own governance.
+
+### Installation
+
+```bash
+pip install praxeology-mcp
+```
+
+Or install from source:
+
+```bash
+git clone https://github.com/neomakes/praxeology.git
+cd praxeology
+pip install -e .
+```
+
+### Quick Start
+
+```bash
+# Bootstrap a new project
+praxeology init --name MyOrg --agents 3
+
+# Migrate existing Praxeology v1 files to DB
+praxeology migrate --project-dir .
+
+# The MCP server starts automatically via .mcp.json
+```
+
+### 17 MCP Tools — 3 Axes × 5 Operations + 2 Cross-Axis
+
+| Axis | search | read | create | escalate | feedback |
+|------|--------|------|--------|----------|----------|
+| **Logical** (Why/How) | Search standards & cases | Read with history | Create standard/case/gap/proposal | Flag for review | Record result + surprise |
+| **Tactical** (What/When) | Search objectives | Read with parent chain | Create goal→work hierarchy | Block + notify parent | Update status |
+| **Contextual** (Who/Where) | Search org structure | Read crew + access | Create space→session | Delegate to other crew | Record KPI review |
+
+**Cross-Axis:**
+- `what_now(crew_id)` — "What should I do right now?" Recommends highest-value action by cross-referencing all 3 axes.
+- `backprop(case_id, result, surprise)` — Records execution result and propagates feedback to all 3 axes. High surprise auto-creates gaps and proposals.
+
+### Heartbeat Engine
+
+Built-in 2-tier background check:
+- **Lightweight** (rule-based, cost = 0): Checks pending work, overdue schedules, open gaps
+- **Heavyweight** (LLM, triggered only when needed): Evaluates whether action is required
+
+Over time, as gaps are absorbed into doctrine, more situations are handled by the lightweight tier — **cost decreases with use**.
+
+---
+
 ## Examples
 
 - [examples/solo-dev/](examples/solo-dev/) — Solo developer + 3 agents (minimal)
