@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Praxeology — 3D Governance Manifold</title>
+<title>Praxeology — 3-Axis Governance Manifold</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body { background: #030510; overflow: hidden; font-family: 'Georgia', serif; }
@@ -36,53 +36,64 @@
     font-size: 1.4vw;
     color: #5A6A7Aaa;
   }
-  #tier-labels {
+  #axis-labels {
     position: absolute;
-    right: 4%;
+    right: 3%;
     top: 50%;
     transform: translateY(-50%);
     display: flex;
     flex-direction: column;
-    gap: 2.5vh;
+    gap: 3vh;
     font-family: 'SF Mono', 'Fira Code', monospace;
-    font-size: 1.0vw;
-    letter-spacing: 0.15em;
+    font-size: 0.9vw;
+    letter-spacing: 0.12em;
   }
-  #tier-labels .tier { opacity: 0.4; transition: opacity 0.3s; }
-  #tier-labels .tier.exec { color: #C47A5A; }
-  #tier-labels .tier.play { color: #9A7ABB; }
-  #tier-labels .tier.proc { color: #5A8AAA; }
-  #tier-labels .tier.doct { color: #3A6A9A; }
-  #tier-labels .tier.strt { color: #1A4A7A; }
-  #ball-label {
+  #axis-labels .axis-group { display: flex; flex-direction: column; gap: 0.3vh; }
+  #axis-labels .axis-title { opacity: 0.8; font-weight: bold; margin-bottom: 0.3em; }
+  #axis-labels .axis-title.logical { color: #E8C84A; }
+  #axis-labels .axis-title.tactical { color: #4A9EFF; }
+  #axis-labels .axis-title.contextual { color: #5AE8A0; }
+  #axis-labels .tier-item { opacity: 0.35; font-size: 0.7vw; color: #8A9AAA; }
+  .ball-label {
     position: absolute;
     font-family: 'Georgia', serif;
-    font-size: 1.0vw;
-    color: #E8C84A;
+    font-size: 0.9vw;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.5s;
     font-style: italic;
   }
+  #label-logical { color: #E8C84A; }
+  #label-tactical { color: #4A9EFF; }
+  #label-contextual { color: #5AE8A0; }
 </style>
 </head>
 <body>
 
 <div id="overlay">
   <h1>praxeology</h1>
-  <div class="subtitle">HIERARCHICAL GOVERNANCE FOR PURPOSEFUL ACTION</div>
+  <div class="subtitle">THREE-AXIS GOVERNANCE FOR AI AGENT TEAMS</div>
   <div class="tagline">The deeper the principle, the stiller the water.</div>
 </div>
 
-<div id="tier-labels">
-  <div class="tier exec">EXEC — NOW</div>
-  <div class="tier play">PLAYBOOK — PATTERNS</div>
-  <div class="tier proc">PROCEDURE — HOW</div>
-  <div class="tier doct">DOCTRINE — WHAT</div>
-  <div class="tier strt">STRATEGY — WHY</div>
+<div id="axis-labels">
+  <div class="axis-group">
+    <div class="axis-title logical">LOGICAL — WHY & HOW</div>
+    <div class="tier-item">Strategy · Doctrine · Procedure · Playbook · Case</div>
+  </div>
+  <div class="axis-group">
+    <div class="axis-title tactical">TACTICAL — WHAT & WHEN</div>
+    <div class="tier-item">Goal · Program · Campaign · Plan · Work</div>
+  </div>
+  <div class="axis-group">
+    <div class="axis-title contextual">CONTEXTUAL — WHO & WHERE</div>
+    <div class="tier-item">Space · Channel · Thread · Crew · Session</div>
+  </div>
 </div>
 
-<div id="ball-label"></div>
+<div class="ball-label" id="label-logical"></div>
+<div class="ball-label" id="label-tactical"></div>
+<div class="ball-label" id="label-contextual"></div>
 
 <script type="importmap">
 {
@@ -110,28 +121,35 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 document.body.prepend(renderer.domElement);
 
 // === LIGHTS ===
-const ambientLight = new THREE.AmbientLight(0x1a2a4a, 0.6);
-scene.add(ambientLight);
+scene.add(new THREE.AmbientLight(0x1a2a4a, 0.6));
 
 const topLight = new THREE.DirectionalLight(0x4A6EFF, 0.4);
 topLight.position.set(5, 20, 10);
 scene.add(topLight);
 
-const essenceLight = new THREE.PointLight(0xE8C84A, 0.6, 30);
+const essenceLight = new THREE.PointLight(0xE8C84A, 0.4, 30);
 essenceLight.position.set(0, 8, 0);
 scene.add(essenceLight);
 
+const tacticalLight = new THREE.PointLight(0x4A9EFF, 0.3, 30);
+tacticalLight.position.set(-5, 6, 5);
+scene.add(tacticalLight);
+
+const contextualLight = new THREE.PointLight(0x5AE8A0, 0.3, 30);
+contextualLight.position.set(5, 6, -5);
+scene.add(contextualLight);
+
+scene.add(new THREE.PointLight(0x1E2FA8, 0.3, 40).position.set(0, -8, 0) || scene.children[scene.children.length - 1]);
 const deepLight = new THREE.PointLight(0x1E2FA8, 0.3, 40);
 deepLight.position.set(0, -8, 0);
 scene.add(deepLight);
 
-// === SURFACE PARAMETERS ===
+// === SURFACE ===
 const GRID = 80;
 const SIZE = 20;
 const geometry = new THREE.PlaneGeometry(SIZE, SIZE, GRID, GRID);
 geometry.rotateX(-Math.PI / 2);
 
-// Surface height function — slowly morphing landscape
 function surfaceHeight(x, z, t) {
   const s = 0.3;
   return (
@@ -142,7 +160,6 @@ function surfaceHeight(x, z, t) {
   );
 }
 
-// Surface gradient (for ball physics)
 function surfaceGradient(x, z, t) {
   const eps = 0.05;
   const hx1 = surfaceHeight(x + eps, z, t);
@@ -152,118 +169,90 @@ function surfaceGradient(x, z, t) {
   return { dx: (hx1 - hx0) / (2 * eps), dz: (hz1 - hz0) / (2 * eps) };
 }
 
-// Color by height — deep blue to storm orange
 const colors = [];
 const posArray = geometry.attributes.position.array;
-for (let i = 0; i < posArray.length; i += 3) {
-  colors.push(0.15, 0.2, 0.4); // placeholder, updated per frame
-}
+for (let i = 0; i < posArray.length; i += 3) colors.push(0.15, 0.2, 0.4);
 geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
 
 const material = new THREE.MeshPhongMaterial({
-  vertexColors: true,
-  shininess: 40,
-  transparent: true,
-  opacity: 0.75,
-  side: THREE.DoubleSide,
-  wireframe: false,
+  vertexColors: true, shininess: 40, transparent: true, opacity: 0.75, side: THREE.DoubleSide,
 });
+scene.add(new THREE.Mesh(geometry, material));
 
-const mesh = new THREE.Mesh(geometry, material);
-scene.add(mesh);
-
-// Wireframe overlay
-const wireMat = new THREE.MeshBasicMaterial({
-  color: 0x4A6EFF,
-  wireframe: true,
-  transparent: true,
-  opacity: 0.06,
-});
+const wireMat = new THREE.MeshBasicMaterial({ color: 0x4A6EFF, wireframe: true, transparent: true, opacity: 0.06 });
 const wireMesh = new THREE.Mesh(geometry.clone(), wireMat);
 scene.add(wireMesh);
 
-// === BALL ===
-const ballGeo = new THREE.SphereGeometry(0.35, 24, 24);
-const ballMat = new THREE.MeshPhongMaterial({
-  color: 0xE8C84A,
-  emissive: 0xD4A017,
-  emissiveIntensity: 0.5,
-  shininess: 100,
-});
-const ball = new THREE.Mesh(ballGeo, ballMat);
-scene.add(ball);
+// === THREE BALLS — one per axis ===
+const BALL_CONFIG = [
+  { name: 'logical',     color: 0xE8C84A, emissive: 0xD4A017, trailColor: 0xD4A017, startX: -3, startZ: -2,
+    tiers: ['Strategy','Doctrine','Procedure','Playbook','Case'] },
+  { name: 'tactical',    color: 0x4A9EFF, emissive: 0x2A6EDD, trailColor: 0x2A6EDD, startX: 2, startZ: 3,
+    tiers: ['Goal','Program','Campaign','Plan','Work'] },
+  { name: 'contextual',  color: 0x5AE8A0, emissive: 0x2AB870, trailColor: 0x2AB870, startX: 5, startZ: -4,
+    tiers: ['Space','Channel','Thread','Crew','Session'] },
+];
 
-// Ball glow
-const glowGeo = new THREE.SphereGeometry(0.6, 16, 16);
-const glowMat = new THREE.MeshBasicMaterial({
-  color: 0xE8C84A,
-  transparent: true,
-  opacity: 0.12,
-});
-const glow = new THREE.Mesh(glowGeo, glowMat);
-scene.add(glow);
-
-// Ball trail
-const trailPoints = [];
-const MAX_TRAIL = 120;
-for (let i = 0; i < MAX_TRAIL; i++) trailPoints.push(new THREE.Vector3(0, 0, 0));
-const trailGeo = new THREE.BufferGeometry().setFromPoints(trailPoints);
-const trailMat = new THREE.LineBasicMaterial({ color: 0xD4A017, transparent: true, opacity: 0.2 });
-const trail = new THREE.Line(trailGeo, trailMat);
-scene.add(trail);
-
-// Ball physics state
-let bx = 0, bz = 0;
-let bvx = 0, bvz = 0;
 const GRAVITY = 0.014;
 const DAMPING = 0.994;
 const BOUNCE_FACTOR = 0.3;
-const REPULSION_ZONE = 1.5; // distance from edge where repulsion kicks in
+const REPULSION_ZONE = 1.5;
 const REPULSION_STRENGTH = 0.006;
+const MAX_TRAIL = 100;
+const tierThresholds = [-2.5, -1.0, 0.5, 2.0, 4.0];
 
-// === TIER LABEL TRACKING ===
-const ballLabel = document.getElementById('ball-label');
-const tiers = ['STRATEGY', 'DOCTRINE', 'PROCEDURE', 'PLAYBOOK', 'EXEC'];
-const tierThresholds = [-2.5, -1.0, 0.5, 2.0, 4.0]; // height thresholds
-
-function getTierName(h) {
-  if (h < tierThresholds[0]) return 'Strategy — Why';
-  if (h < tierThresholds[1]) return 'Doctrine — What';
-  if (h < tierThresholds[2]) return 'Procedure — How';
-  if (h < tierThresholds[3]) return 'Playbook — Execute';
-  return 'Exec — Now';
+function getTierIndex(h) {
+  if (h < tierThresholds[0]) return 0;
+  if (h < tierThresholds[1]) return 1;
+  if (h < tierThresholds[2]) return 2;
+  if (h < tierThresholds[3]) return 3;
+  return 4;
 }
+
+const balls = BALL_CONFIG.map(cfg => {
+  // Mesh
+  const mesh = new THREE.Mesh(
+    new THREE.SphereGeometry(0.35, 24, 24),
+    new THREE.MeshPhongMaterial({ color: cfg.color, emissive: cfg.emissive, emissiveIntensity: 0.5, shininess: 100 })
+  );
+  scene.add(mesh);
+
+  // Glow
+  const glow = new THREE.Mesh(
+    new THREE.SphereGeometry(0.55, 16, 16),
+    new THREE.MeshBasicMaterial({ color: cfg.color, transparent: true, opacity: 0.10 })
+  );
+  scene.add(glow);
+
+  // Trail
+  const trailPts = [];
+  for (let i = 0; i < MAX_TRAIL; i++) trailPts.push(new THREE.Vector3(0, 0, 0));
+  const trailGeo = new THREE.BufferGeometry().setFromPoints(trailPts);
+  const trail = new THREE.Line(trailGeo, new THREE.LineBasicMaterial({ color: cfg.trailColor, transparent: true, opacity: 0.18 }));
+  scene.add(trail);
+
+  return {
+    ...cfg, mesh, glow, trail, trailPts, trailIdx: 0,
+    x: cfg.startX, z: cfg.startZ, vx: 0, vz: 0,
+    label: document.getElementById(`label-${cfg.name}`),
+  };
+});
 
 // === COLOR MAPPING ===
 function heightToColor(h) {
-  // Normalize h from roughly [-5, 5] to [0, 1]
   const t = Math.max(0, Math.min(1, (h + 5) / 10));
-
-  // Deep navy → mid blue → teal → lavender → storm orange
-  const colors = [
-    [0.04, 0.08, 0.25],  // deep abyss (Strategy)
-    [0.10, 0.18, 0.40],  // deep blue (Doctrine)
-    [0.15, 0.30, 0.45],  // mid blue (Procedure)
-    [0.30, 0.28, 0.50],  // lavender (Playbook)
-    [0.55, 0.35, 0.25],  // storm orange (Exec)
+  const cs = [
+    [0.04, 0.08, 0.25], [0.10, 0.18, 0.40], [0.15, 0.30, 0.45],
+    [0.30, 0.28, 0.50], [0.55, 0.35, 0.25],
   ];
-
-  const idx = t * (colors.length - 1);
-  const i = Math.floor(idx);
-  const f = idx - i;
-  const c0 = colors[Math.min(i, colors.length - 1)];
-  const c1 = colors[Math.min(i + 1, colors.length - 1)];
-
-  return [
-    c0[0] + (c1[0] - c0[0]) * f,
-    c0[1] + (c1[1] - c0[1]) * f,
-    c0[2] + (c1[2] - c0[2]) * f,
-  ];
+  const idx = t * (cs.length - 1);
+  const i = Math.floor(idx), f = idx - i;
+  const c0 = cs[Math.min(i, cs.length - 1)], c1 = cs[Math.min(i + 1, cs.length - 1)];
+  return [c0[0]+(c1[0]-c0[0])*f, c0[1]+(c1[1]-c0[1])*f, c0[2]+(c1[2]-c0[2])*f];
 }
 
 // === ANIMATION ===
 const clock = new THREE.Clock();
-let trailIdx = 0;
 
 function animate() {
   requestAnimationFrame(animate);
@@ -273,94 +262,91 @@ function animate() {
   const pos = geometry.attributes.position.array;
   const col = geometry.attributes.color.array;
   const wirePos = wireMesh.geometry.attributes.position.array;
-
   for (let i = 0; i < pos.length; i += 3) {
-    const x = pos[i];
-    const z = pos[i + 2];
+    const x = pos[i], z = pos[i + 2];
     const h = surfaceHeight(x, z, t);
-    pos[i + 1] = h;
-    wirePos[i + 1] = h;
-
+    pos[i + 1] = h; wirePos[i + 1] = h;
     const [r, g, b] = heightToColor(h);
-    col[i] = r;
-    col[i + 1] = g;
-    col[i + 2] = b;
+    col[i] = r; col[i+1] = g; col[i+2] = b;
   }
-
   geometry.attributes.position.needsUpdate = true;
   geometry.attributes.color.needsUpdate = true;
   geometry.computeVertexNormals();
   wireMesh.geometry.attributes.position.needsUpdate = true;
 
-  // Ball physics — roll along surface
-  const grad = surfaceGradient(bx, bz, t);
-  bvx -= grad.dx * GRAVITY;
-  bvz -= grad.dz * GRAVITY;
-  bvx *= DAMPING;
-  bvz *= DAMPING;
-
-  bx += bvx;
-  bz += bvz;
-
-  // Soft repulsion near edges + hard clamp safety
+  // Update each ball
   const halfSize = SIZE / 2 - 1;
-  const edgeXp = halfSize - bx;
-  const edgeXn = bx + halfSize;
-  const edgeZp = halfSize - bz;
-  const edgeZn = bz + halfSize;
 
-  if (edgeXp < REPULSION_ZONE) bvx -= REPULSION_STRENGTH * (1 - edgeXp / REPULSION_ZONE);
-  if (edgeXn < REPULSION_ZONE) bvx += REPULSION_STRENGTH * (1 - edgeXn / REPULSION_ZONE);
-  if (edgeZp < REPULSION_ZONE) bvz -= REPULSION_STRENGTH * (1 - edgeZp / REPULSION_ZONE);
-  if (edgeZn < REPULSION_ZONE) bvz += REPULSION_STRENGTH * (1 - edgeZn / REPULSION_ZONE);
+  for (const b of balls) {
+    const grad = surfaceGradient(b.x, b.z, t);
+    b.vx -= grad.dx * GRAVITY;
+    b.vz -= grad.dz * GRAVITY;
+    b.vx *= DAMPING;
+    b.vz *= DAMPING;
+    b.x += b.vx;
+    b.z += b.vz;
 
-  if (bx > halfSize) { bx = halfSize; bvx *= -BOUNCE_FACTOR; }
-  if (bx < -halfSize) { bx = -halfSize; bvx *= -BOUNCE_FACTOR; }
-  if (bz > halfSize) { bz = halfSize; bvz *= -BOUNCE_FACTOR; }
-  if (bz < -halfSize) { bz = -halfSize; bvz *= -BOUNCE_FACTOR; }
+    // Edge repulsion
+    const exP = halfSize - b.x, exN = b.x + halfSize;
+    const ezP = halfSize - b.z, ezN = b.z + halfSize;
+    if (exP < REPULSION_ZONE) b.vx -= REPULSION_STRENGTH * (1 - exP / REPULSION_ZONE);
+    if (exN < REPULSION_ZONE) b.vx += REPULSION_STRENGTH * (1 - exN / REPULSION_ZONE);
+    if (ezP < REPULSION_ZONE) b.vz -= REPULSION_STRENGTH * (1 - ezP / REPULSION_ZONE);
+    if (ezN < REPULSION_ZONE) b.vz += REPULSION_STRENGTH * (1 - ezN / REPULSION_ZONE);
 
-  const by = surfaceHeight(bx, bz, t) + 0.4;
-  ball.position.set(bx, by, bz);
-  glow.position.copy(ball.position);
-  glow.scale.setScalar(1 + 0.15 * Math.sin(t * 3));
+    if (b.x > halfSize)  { b.x = halfSize;  b.vx *= -BOUNCE_FACTOR; }
+    if (b.x < -halfSize) { b.x = -halfSize; b.vx *= -BOUNCE_FACTOR; }
+    if (b.z > halfSize)  { b.z = halfSize;  b.vz *= -BOUNCE_FACTOR; }
+    if (b.z < -halfSize) { b.z = -halfSize; b.vz *= -BOUNCE_FACTOR; }
 
-  // Trail update
-  trailPoints[trailIdx % MAX_TRAIL].set(bx, by - 0.1, bz);
-  trailIdx++;
-  const trailPositions = trail.geometry.attributes.position.array;
-  for (let i = 0; i < MAX_TRAIL; i++) {
-    const idx = (trailIdx - MAX_TRAIL + i + MAX_TRAIL * 2) % MAX_TRAIL;
-    trailPositions[i * 3] = trailPoints[idx].x;
-    trailPositions[i * 3 + 1] = trailPoints[idx].y;
-    trailPositions[i * 3 + 2] = trailPoints[idx].z;
+    // Ball-to-ball repulsion (gentle)
+    for (const other of balls) {
+      if (other === b) continue;
+      const ddx = b.x - other.x, ddz = b.z - other.z;
+      const dist = Math.sqrt(ddx * ddx + ddz * ddz);
+      if (dist < 2.5 && dist > 0.01) {
+        const force = 0.003 * (2.5 - dist) / dist;
+        b.vx += ddx * force;
+        b.vz += ddz * force;
+      }
+    }
+
+    const by = surfaceHeight(b.x, b.z, t) + 0.4;
+    b.mesh.position.set(b.x, by, b.z);
+    b.glow.position.copy(b.mesh.position);
+    b.glow.scale.setScalar(1 + 0.12 * Math.sin(t * 3 + balls.indexOf(b) * 2));
+
+    // Trail
+    b.trailPts[b.trailIdx % MAX_TRAIL].set(b.x, by - 0.1, b.z);
+    b.trailIdx++;
+    const tp = b.trail.geometry.attributes.position.array;
+    for (let i = 0; i < MAX_TRAIL; i++) {
+      const idx = (b.trailIdx - MAX_TRAIL + i + MAX_TRAIL * 2) % MAX_TRAIL;
+      tp[i*3] = b.trailPts[idx].x; tp[i*3+1] = b.trailPts[idx].y; tp[i*3+2] = b.trailPts[idx].z;
+    }
+    b.trail.geometry.attributes.position.needsUpdate = true;
+
+    // Label
+    const tierIdx = getTierIndex(by - 0.4);
+    b.label.textContent = b.tiers[tierIdx];
+    const sp = b.mesh.position.clone().project(camera);
+    b.label.style.left = ((sp.x * 0.5 + 0.5) * window.innerWidth + 15) + 'px';
+    b.label.style.top  = ((-sp.y * 0.5 + 0.5) * window.innerHeight - 10) + 'px';
+    b.label.style.opacity = '0.7';
   }
-  trail.geometry.attributes.position.needsUpdate = true;
 
-  // Update ball tier label
-  const tierName = getTierName(by - 0.4);
-  ballLabel.textContent = tierName;
-  const screenPos = ball.position.clone().project(camera);
-  const sx = (screenPos.x * 0.5 + 0.5) * window.innerWidth;
-  const sy = (-screenPos.y * 0.5 + 0.5) * window.innerHeight;
-  ballLabel.style.left = (sx + 15) + 'px';
-  ballLabel.style.top = (sy - 10) + 'px';
-  ballLabel.style.opacity = '0.6';
-
-  // Gentle camera orbit
+  // Camera orbit
   camera.position.x = 18 * Math.cos(t * 0.03) + 4 * Math.sin(t * 0.02);
   camera.position.z = 22 * Math.sin(t * 0.03) + 4 * Math.cos(t * 0.02);
   camera.position.y = 14 + 2 * Math.sin(t * 0.05);
   camera.lookAt(0, -1, 0);
 
-  // Essence light pulse
-  essenceLight.intensity = 0.5 + 0.2 * Math.sin(t * 1.5);
-
+  essenceLight.intensity = 0.4 + 0.15 * Math.sin(t * 1.5);
   renderer.render(scene, camera);
 }
 
 animate();
 
-// Resize handler
 window.addEventListener('resize', () => {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
