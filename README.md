@@ -140,12 +140,12 @@ Over time, as gaps are absorbed into doctrine, more situations are handled by th
 
 ```bash
 praxeology init --name MyOrg --agents 3   # Bootstrap new project
-praxeology init --existing                  # Add MCP to existing Praxeology v1 project (coming soon)
+praxeology init --existing                  # Add MCP to existing Praxeology v1 project
 praxeology migrate --project-dir .          # Import .md standards, todo/weekly.json, crew CLAUDE.md into DB
-praxeology heartbeat start                  # Start background heartbeat daemon (coming soon)
-praxeology heartbeat stop                   # Stop heartbeat daemon (coming soon)
-praxeology dashboard                        # Launch web dashboard (localhost:5060) (coming soon)
-praxeology status                           # Show DB stats and heartbeat status (coming soon)
+praxeology heartbeat start                  # Start independent background heartbeat daemon
+praxeology heartbeat stop                   # Stop heartbeat daemon
+praxeology dashboard                        # Launch web dashboard (localhost:5060)
+praxeology status                           # Show DB stats and heartbeat status
 ```
 
 ---
