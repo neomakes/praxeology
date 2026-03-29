@@ -77,9 +77,10 @@ def register(mcp) -> None:
 
         conn = get_db(_db_path())
         try:
-            like = f"%{query}%"
+            safe_query = query.replace("%", "\\%").replace("_", "\\_")
+            like = f"%{safe_query}%"
             params: list[Any] = [like, like]
-            where_clauses = ["(title LIKE ? OR description LIKE ?)"]
+            where_clauses = ["(title LIKE ? ESCAPE '\\' OR description LIKE ? ESCAPE '\\')"]
 
             if tier:
                 where_clauses.append("tier = ?")

@@ -54,6 +54,9 @@ _ALLOWED_COLUMNS = {
     "proposals": {"gap_id", "proposed_by", "proposed_change", "status"},
 }
 
+assert _ALLOWED_TABLES.keys() == _ALLOWED_COLUMNS.keys(), \
+    f"Table/column allowlist mismatch: {_ALLOWED_TABLES.keys() ^ _ALLOWED_COLUMNS.keys()}"
+
 
 # ---------------------------------------------------------------------------
 # Tool registration helper — called by server.py

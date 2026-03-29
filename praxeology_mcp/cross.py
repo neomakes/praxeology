@@ -272,9 +272,9 @@ def register(mcp) -> None:
                 updates["logical"]["proposal_id"] = cursor.lastrowid
 
             # ── Tactical: mark objective done if result signals completion ───
-            _COMPLETION_KEYWORDS = ("done", "complete", "completed", "finished", "resolved")
-            result_lower = result.lower()
-            if objective_id is not None and any(kw in result_lower for kw in _COMPLETION_KEYWORDS):
+            completion_words = {"done", "completed", "finished", "success"}
+            result_words = set(result.lower().split())
+            if objective_id is not None and completion_words & result_words:
                 conn.execute(
                     "UPDATE objectives SET status = 'done', updated_at = ? WHERE id = ?",
                     (_utcnow(), objective_id),

@@ -283,14 +283,14 @@ def get_db(db_path: str) -> sqlite3.Connection:
 
 @contextmanager
 def db_connection(db_path: str = None):
-    """Context manager for DB connections. Ensures proper close."""
+    """Context manager for DB connections. Connection is thread-local pooled; do not close."""
     if db_path is None:
         db_path = str(Path.home() / ".claude" / "praxeology" / "praxeology.db")
     conn = get_db(db_path)
     try:
         yield conn
     finally:
-        conn.close()
+        pass  # Connection is thread-local pooled; do not close
 
 
 def log_metric(

@@ -282,70 +282,67 @@ def register(mcp) -> None:
         days = max(1, min(days, 365))
         conn = get_db(_db_path())
         try:
-            now = datetime.now(timezone.utc)
-            trend: list[dict[str, Any]] = []
+            # Single GROUP BY query per metric instead of N separate queries
+            if metric == "tool_calls":
+                rows = conn.execute(
+                    "SELECT date(created_at) AS day, COUNT(*) AS value"
+                    " FROM metrics_log"
+                    " WHERE created_at >= date('now', ?)"
+                    " GROUP BY date(created_at)"
+                    " ORDER BY day",
+                    (f"-{days} days",),
+                ).fetchall()
+            elif metric == "tokens":
+                rows = conn.execute(
+                    "SELECT date(created_at) AS day, COALESCE(SUM(tokens_used), 0) AS value"
+                    " FROM metrics_log"
+                    " WHERE created_at >= date('now', ?)"
+                    " GROUP BY date(created_at)"
+                    " ORDER BY day",
+                    (f"-{days} days",),
+                ).fetchall()
+            elif metric == "latency":
+                rows = conn.execute(
+                    "SELECT date(created_at) AS day, COALESCE(AVG(latency_ms), 0) AS value"
+                    " FROM metrics_log"
+                    " WHERE created_at >= date('now', ?)"
+                    " GROUP BY date(created_at)"
+                    " ORDER BY day",
+                    (f"-{days} days",),
+                ).fetchall()
+            elif metric == "gaps_opened":
+                rows = conn.execute(
+                    "SELECT date(created_at) AS day, COUNT(*) AS value"
+                    " FROM gaps"
+                    " WHERE created_at >= date('now', ?)"
+                    " GROUP BY date(created_at)"
+                    " ORDER BY day",
+                    (f"-{days} days",),
+                ).fetchall()
+            elif metric == "gaps_resolved":
+                rows = conn.execute(
+                    "SELECT date(created_at) AS day, COUNT(*) AS value"
+                    " FROM gaps"
+                    " WHERE status = 'resolved'"
+                    " AND created_at >= date('now', ?)"
+                    " GROUP BY date(created_at)"
+                    " ORDER BY day",
+                    (f"-{days} days",),
+                ).fetchall()
+            elif metric == "proposals":
+                rows = conn.execute(
+                    "SELECT date(created_at) AS day, COUNT(*) AS value"
+                    " FROM proposals"
+                    " WHERE created_at >= date('now', ?)"
+                    " GROUP BY date(created_at)"
+                    " ORDER BY day",
+                    (f"-{days} days",),
+                ).fetchall()
 
-            for i in range(days - 1, -1, -1):
-                day_start = (now - timedelta(days=i)).replace(
-                    hour=0, minute=0, second=0, microsecond=0
-                )
-                day_end = day_start.replace(
-                    hour=23, minute=59, second=59
-                )
-                ds = day_start.strftime("%Y-%m-%dT%H:%M:%SZ")
-                de = day_end.strftime("%Y-%m-%dT%H:%M:%SZ")
-                date_label = day_start.strftime("%Y-%m-%d")
-
-                if metric == "tool_calls":
-                    row = conn.execute(
-                        "SELECT COUNT(*) AS v FROM metrics_log"
-                        " WHERE created_at >= ? AND created_at <= ?",
-                        (ds, de),
-                    ).fetchone()
-                    value = row["v"] if row else 0
-
-                elif metric == "tokens":
-                    row = conn.execute(
-                        "SELECT COALESCE(SUM(tokens_used), 0) AS v FROM metrics_log"
-                        " WHERE created_at >= ? AND created_at <= ?",
-                        (ds, de),
-                    ).fetchone()
-                    value = row["v"] if row else 0
-
-                elif metric == "latency":
-                    row = conn.execute(
-                        "SELECT COALESCE(AVG(latency_ms), 0) AS v FROM metrics_log"
-                        " WHERE created_at >= ? AND created_at <= ?",
-                        (ds, de),
-                    ).fetchone()
-                    value = round(row["v"], 2) if row else 0.0
-
-                elif metric == "gaps_opened":
-                    row = conn.execute(
-                        "SELECT COUNT(*) AS v FROM gaps"
-                        " WHERE created_at >= ? AND created_at <= ?",
-                        (ds, de),
-                    ).fetchone()
-                    value = row["v"] if row else 0
-
-                elif metric == "gaps_resolved":
-                    row = conn.execute(
-                        "SELECT COUNT(*) AS v FROM gaps"
-                        " WHERE status = 'resolved'"
-                        " AND created_at >= ? AND created_at <= ?",
-                        (ds, de),
-                    ).fetchone()
-                    value = row["v"] if row else 0
-
-                elif metric == "proposals":
-                    row = conn.execute(
-                        "SELECT COUNT(*) AS v FROM proposals"
-                        " WHERE created_at >= ? AND created_at <= ?",
-                        (ds, de),
-                    ).fetchone()
-                    value = row["v"] if row else 0
-
-                trend.append({"date": date_label, "value": value})
+            trend: list[dict[str, Any]] = [
+                {"date": r["day"], "value": round(r["value"], 2) if metric == "latency" else r["value"]}
+                for r in rows
+            ]
 
             latency = (time.monotonic_ns() - t0) // 1_000_000
             log_metric(conn, "metrics_trend", "cross", 0, latency)
