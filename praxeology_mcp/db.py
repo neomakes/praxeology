@@ -198,6 +198,14 @@ CREATE INDEX IF NOT EXISTS idx_channel_access_crew  ON channel_access(crew_id);
 
 CREATE INDEX IF NOT EXISTS idx_metrics_tool         ON metrics_log(tool_name);
 CREATE INDEX IF NOT EXISTS idx_metrics_axis         ON metrics_log(axis);
+
+-- ── Config ────────────────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS config (
+    key        TEXT PRIMARY KEY,
+    value      TEXT NOT NULL,
+    updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
 """
 
 # FTS triggers keep the virtual tables in sync with their content tables.
@@ -291,6 +299,22 @@ def db_connection(db_path: str = None):
         yield conn
     finally:
         pass  # Connection is thread-local pooled; do not close
+
+
+def get_config(conn: sqlite3.Connection, key: str, default: str = None) -> str | None:
+    """Return config value for key, or default if not set."""
+    row = conn.execute("SELECT value FROM config WHERE key = ?", (key,)).fetchone()
+    return row[0] if row else default
+
+
+def set_config(conn: sqlite3.Connection, key: str, value: str) -> None:
+    """Upsert a config key/value pair."""
+    conn.execute(
+        "INSERT INTO config (key, value) VALUES (?, ?)"
+        " ON CONFLICT(key) DO UPDATE SET value = ?, updated_at = datetime('now')",
+        (key, value, value),
+    )
+    conn.commit()
 
 
 def log_metric(

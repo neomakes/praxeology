@@ -13,7 +13,7 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
-from praxeology_mcp.db import get_db, log_metric
+from praxeology_mcp.db import get_config, get_db, log_metric
 
 
 def _utcnow_iso() -> str:
@@ -128,6 +128,11 @@ class Heartbeat:
                     )
                     conn.commit()
 
+            # Send Discord webhook if configured
+            webhook_url = get_config(conn, "discord_webhook")
+            if webhook_url and priority_score >= 5:
+                self._send_discord_alert(webhook_url, priority_score, urgent_gaps, overdue_work, pending_delegations, reasons)
+
             log_metric(conn, "heartbeat.heavyweight_trigger", "cross",
                        tokens=0, latency=0)
 
@@ -148,6 +153,36 @@ class Heartbeat:
             }
         except Exception as exc:
             return {"error": str(exc)}
+
+    def _send_discord_alert(self, webhook_url: str, score: int, gaps: int, overdue: int, delegations: int, reasons: list) -> None:
+        """Send alert to Discord via webhook."""
+        import json
+        import urllib.request
+
+        message = {
+            "content": None,
+            "embeds": [{
+                "title": "Praxeology Heartbeat Alert",
+                "description": f"Priority score: **{score}** — action needed.",
+                "color": 0xD4A843,  # gold
+                "fields": [
+                    {"name": "Urgent Gaps", "value": str(gaps), "inline": True},
+                    {"name": "Overdue Work", "value": str(overdue), "inline": True},
+                    {"name": "Pending Delegations", "value": str(delegations), "inline": True},
+                    {"name": "Reasons", "value": "\n".join(f"• {r}" for r in reasons[:5]) or "—"},
+                ],
+            }]
+        }
+
+        try:
+            req = urllib.request.Request(
+                webhook_url,
+                data=json.dumps(message).encode(),
+                headers={"Content-Type": "application/json"},
+            )
+            urllib.request.urlopen(req, timeout=5)
+        except Exception:
+            pass  # Don't crash heartbeat for webhook failure
 
     def check_once(self) -> dict:
         """Manual single check (for CLI/testing)."""

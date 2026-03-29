@@ -525,6 +525,32 @@ def cmd_daemon(args: argparse.Namespace) -> None:
 
 
 # ---------------------------------------------------------------------------
+# Command: config
+# ---------------------------------------------------------------------------
+
+def cmd_config(args: argparse.Namespace) -> None:
+    from praxeology_mcp.db import get_db, set_config, get_config, init_db
+    db_path = _db_path()
+    init_db(db_path)
+    conn = get_db(db_path)
+
+    if args.list:
+        rows = conn.execute("SELECT key, value, updated_at FROM config ORDER BY key").fetchall()
+        if not rows:
+            print("No configuration set.")
+        for row in rows:
+            print(f"  {row[0]} = {row[1]}  (updated: {row[2]})")
+        return
+
+    if args.discord_webhook:
+        set_config(conn, "discord_webhook", args.discord_webhook)
+        print(f"Discord webhook set: {args.discord_webhook[:50]}...")
+
+    if not any([args.discord_webhook, args.list]):
+        print("No config option specified. Use --list to see current config, or --discord-webhook URL to set webhook.")
+
+
+# ---------------------------------------------------------------------------
 # Command: dashboard
 # ---------------------------------------------------------------------------
 
@@ -631,6 +657,11 @@ def main(argv: list[str] | None = None) -> None:
     daemon_parser = subparsers.add_parser("daemon", help="Manage background daemons")
     daemon_parser.add_argument("action", choices=["list", "stop-all"])
 
+    # config
+    config_parser = subparsers.add_parser("config", help="Set configuration values")
+    config_parser.add_argument("--discord-webhook", help="Discord webhook URL for heartbeat alerts")
+    config_parser.add_argument("--list", action="store_true", help="List all config values")
+
     parsed = parser.parse_args(argv)
 
     if parsed.command == "init":
@@ -647,6 +678,8 @@ def main(argv: list[str] | None = None) -> None:
         cmd_status(parsed)
     elif parsed.command == "daemon":
         cmd_daemon(parsed)
+    elif parsed.command == "config":
+        cmd_config(parsed)
     else:
         parser.print_help()
         sys.exit(1)
