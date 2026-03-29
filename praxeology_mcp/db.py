@@ -10,6 +10,7 @@ Public API:
 from __future__ import annotations
 
 import sqlite3
+import threading
 from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
@@ -264,15 +265,19 @@ def init_db(db_path: str) -> sqlite3.Connection:
     return conn
 
 
-def get_db(db_path: str) -> sqlite3.Connection:
-    """Return an open connection for the given path.
+_local = threading.local()
 
-    Enables WAL, foreign keys, and sqlite3.Row factory.
-    Does NOT create tables — call init_db first.
-    """
-    conn = _connect(db_path)
-    conn.execute("PRAGMA journal_mode=WAL")
-    conn.execute("PRAGMA foreign_keys=ON")
+
+def get_db(db_path: str) -> sqlite3.Connection:
+    """Thread-local singleton connection. Each thread reuses its own connection."""
+    key = f"conn_{db_path}"
+    conn = getattr(_local, key, None)
+    if conn is None:
+        conn = sqlite3.connect(db_path)
+        conn.row_factory = sqlite3.Row
+        conn.execute("PRAGMA journal_mode=WAL")
+        conn.execute("PRAGMA foreign_keys=ON")
+        setattr(_local, key, conn)
     return conn
 
 

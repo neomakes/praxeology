@@ -170,7 +170,6 @@ def register(mcp) -> None:
 
             latency = (time.monotonic_ns() - t0) // 1_000_000
             log_metric(conn, "what_now", "cross", 0, latency)
-            conn.close()
 
             response: dict[str, Any] = {
                 "recommended_action": top_item,
@@ -183,7 +182,6 @@ def register(mcp) -> None:
             return json.dumps(response, ensure_ascii=False)
 
         except Exception as exc:
-            conn.close()
             return json.dumps({"error": str(exc)})
 
     @mcp.tool()
@@ -225,7 +223,6 @@ def register(mcp) -> None:
                 (case_id,),
             ).fetchone()
             if case_row is None:
-                conn.close()
                 return json.dumps({"error": f"No case with id={case_id}"})
 
             standard_id = case_row["standard_id"]
@@ -292,9 +289,7 @@ def register(mcp) -> None:
             updates["contextual"]["metric_logged"] = True
             updates["contextual"]["latency_ms"] = latency
 
-            conn.close()
             return json.dumps(updates, ensure_ascii=False)
 
         except Exception as exc:
-            conn.close()
             return json.dumps({"error": str(exc)})

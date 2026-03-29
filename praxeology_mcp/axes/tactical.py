@@ -97,11 +97,9 @@ def register(mcp) -> None:
             results = [_row_to_dict(r) for r in rows]
             latency = (time.monotonic_ns() - t0) // 1_000_000
             log_metric(conn, "tactical_search", "tactical", 0, latency)
-            conn.close()
             return json.dumps(results, ensure_ascii=False)
 
         except Exception as exc:
-            conn.close()
             return json.dumps({"error": str(exc)})
 
     @mcp.tool()
@@ -122,7 +120,6 @@ def register(mcp) -> None:
                 "SELECT * FROM objectives WHERE id = ?", (id,)
             ).fetchone()
             if row is None:
-                conn.close()
                 return json.dumps({"error": f"No objective with id={id}"})
 
             objective = _row_to_dict(row)
@@ -146,14 +143,12 @@ def register(mcp) -> None:
 
             latency = (time.monotonic_ns() - t0) // 1_000_000
             log_metric(conn, "tactical_read", "tactical", 0, latency)
-            conn.close()
             return json.dumps(
                 {"objective": objective, "ancestors": ancestors},
                 ensure_ascii=False,
             )
 
         except Exception as exc:
-            conn.close()
             return json.dumps({"error": str(exc)})
 
     @mcp.tool()
@@ -197,14 +192,12 @@ def register(mcp) -> None:
                     "SELECT id, tier FROM objectives WHERE id = ?", (parent_id,)
                 ).fetchone()
                 if parent_row is None:
-                    conn.close()
                     return json.dumps({"error": f"No parent objective with id={parent_id}"})
 
                 parent_tier = parent_row["tier"]
                 parent_tier_idx = _TIER_ORDER.index(parent_tier)
                 child_tier_idx = _TIER_ORDER.index(tier)
                 if child_tier_idx <= parent_tier_idx:
-                    conn.close()
                     return json.dumps({
                         "error": (
                             f"Child tier '{tier}' must be lower than parent tier '{parent_tier}'. "
@@ -228,11 +221,9 @@ def register(mcp) -> None:
 
             latency = (time.monotonic_ns() - t0) // 1_000_000
             log_metric(conn, "tactical_create", "tactical", 0, latency)
-            conn.close()
             return json.dumps({"id": new_id, "tier": tier, "title": title.strip()})
 
         except Exception as exc:
-            conn.close()
             return json.dumps({"error": str(exc)})
 
     @mcp.tool()
@@ -260,7 +251,6 @@ def register(mcp) -> None:
                 "SELECT * FROM objectives WHERE id = ?", (id,)
             ).fetchone()
             if row is None:
-                conn.close()
                 return json.dumps({"error": f"No objective with id={id}"})
 
             obj = _row_to_dict(row)
@@ -294,7 +284,6 @@ def register(mcp) -> None:
 
             latency = (time.monotonic_ns() - t0) // 1_000_000
             log_metric(conn, "tactical_escalate", "tactical", 0, latency)
-            conn.close()
 
             return json.dumps(
                 {
@@ -305,7 +294,6 @@ def register(mcp) -> None:
             )
 
         except Exception as exc:
-            conn.close()
             return json.dumps({"error": str(exc)})
 
     @mcp.tool()
@@ -339,7 +327,6 @@ def register(mcp) -> None:
                 "SELECT * FROM objectives WHERE id = ?", (id,)
             ).fetchone()
             if row is None:
-                conn.close()
                 return json.dumps({"error": f"No objective with id={id}"})
 
             obj = _row_to_dict(row)
@@ -370,9 +357,7 @@ def register(mcp) -> None:
 
             latency = (time.monotonic_ns() - t0) // 1_000_000
             log_metric(conn, "tactical_feedback", "tactical", 0, latency)
-            conn.close()
             return json.dumps(response, ensure_ascii=False)
 
         except Exception as exc:
-            conn.close()
             return json.dumps({"error": str(exc)})

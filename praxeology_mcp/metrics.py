@@ -184,11 +184,9 @@ def register(mcp) -> None:
 
             latency = (time.monotonic_ns() - t0) // 1_000_000
             log_metric(conn, "metrics_summary", "cross", 0, latency)
-            conn.close()
             return json.dumps(result, ensure_ascii=False)
 
         except Exception as exc:
-            conn.close()
             return json.dumps({"error": str(exc)})
 
     @mcp.tool()
@@ -257,11 +255,9 @@ def register(mcp) -> None:
 
             latency = (time.monotonic_ns() - t0) // 1_000_000
             log_metric(conn, "metrics_compare", "cross", 0, latency)
-            conn.close()
             return json.dumps(result, ensure_ascii=False)
 
         except Exception as exc:
-            conn.close()
             return json.dumps({"error": str(exc)})
 
     @mcp.tool()
@@ -353,9 +349,7 @@ def register(mcp) -> None:
 
             latency = (time.monotonic_ns() - t0) // 1_000_000
             log_metric(conn, "metrics_trend", "cross", 0, latency)
-            conn.close()
             return json.dumps(trend, ensure_ascii=False)
 
         except Exception as exc:
-            conn.close()
             return json.dumps({"error": str(exc)})

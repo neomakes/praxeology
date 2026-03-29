@@ -124,11 +124,9 @@ def register(mcp) -> None:
             results = [_row_to_dict(r) for r in rows]
             latency = (time.monotonic_ns() - t0) // 1_000_000
             log_metric(conn, "contextual_search", "contextual", 0, latency)
-            conn.close()
             return json.dumps(results, ensure_ascii=False)
 
         except Exception as exc:
-            conn.close()
             return json.dumps({"error": str(exc)})
 
     @mcp.tool()
@@ -160,7 +158,6 @@ def register(mcp) -> None:
                 ).fetchone()
             elif name is not None and tier is not None:
                 if tier not in _VALID_TIERS:
-                    conn.close()
                     return json.dumps(
                         {"error": f"tier must be one of {list(_VALID_TIERS)}"}
                     )
@@ -170,13 +167,11 @@ def register(mcp) -> None:
                     (name, tier),
                 ).fetchone()
             else:
-                conn.close()
                 return json.dumps(
                     {"error": "Provide id, or both name and tier"}
                 )
 
             if row is None:
-                conn.close()
                 return json.dumps({"error": "Context not found"})
 
             ctx = _row_to_dict(row)
@@ -194,11 +189,9 @@ def register(mcp) -> None:
 
             latency = (time.monotonic_ns() - t0) // 1_000_000
             log_metric(conn, "contextual_read", "contextual", 0, latency)
-            conn.close()
             return json.dumps(ctx, ensure_ascii=False)
 
         except Exception as exc:
-            conn.close()
             return json.dumps({"error": str(exc)})
 
     @mcp.tool()
@@ -242,7 +235,6 @@ def register(mcp) -> None:
                     "SELECT id, tier FROM contexts WHERE id = ?", (parent_id,)
                 ).fetchone()
                 if parent_row is None:
-                    conn.close()
                     return json.dumps(
                         {"error": f"No context with id={parent_id}"}
                     )
@@ -251,7 +243,6 @@ def register(mcp) -> None:
                     expected_parent_tier is not None
                     and parent_row["tier"] != expected_parent_tier
                 ):
-                    conn.close()
                     return json.dumps(
                         {
                             "error": (
@@ -291,7 +282,6 @@ def register(mcp) -> None:
 
             latency = (time.monotonic_ns() - t0) // 1_000_000
             log_metric(conn, "contextual_create", "contextual", 0, latency)
-            conn.close()
 
             result: dict[str, Any] = {"id": new_id, "tier": tier, "name": name}
             if access_created:
@@ -299,7 +289,6 @@ def register(mcp) -> None:
             return json.dumps(result)
 
         except Exception as exc:
-            conn.close()
             return json.dumps({"error": str(exc)})
 
     @mcp.tool()
@@ -325,13 +314,11 @@ def register(mcp) -> None:
             ).fetchone()
 
             if session_row is None:
-                conn.close()
                 return json.dumps(
                     {"error": f"No context with id={session_id}"}
                 )
 
             if session_row["tier"] != "session":
-                conn.close()
                 return json.dumps(
                     {
                         "error": (
@@ -361,7 +348,6 @@ def register(mcp) -> None:
 
             latency = (time.monotonic_ns() - t0) // 1_000_000
             log_metric(conn, "contextual_escalate", "contextual", 0, latency)
-            conn.close()
 
             return json.dumps(
                 {
@@ -377,7 +363,6 @@ def register(mcp) -> None:
             )
 
         except Exception as exc:
-            conn.close()
             return json.dumps({"error": str(exc)})
 
     @mcp.tool()
@@ -411,7 +396,6 @@ def register(mcp) -> None:
 
             latency = (time.monotonic_ns() - t0) // 1_000_000
             log_metric(conn, "contextual_feedback", "contextual", 0, latency)
-            conn.close()
 
             return json.dumps(
                 {
@@ -426,5 +410,4 @@ def register(mcp) -> None:
             )
 
         except Exception as exc:
-            conn.close()
             return json.dumps({"error": str(exc)})

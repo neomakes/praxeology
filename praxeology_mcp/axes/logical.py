@@ -47,6 +47,13 @@ _ALLOWED_TABLES = {
     "proposals": "proposals",
 }
 
+_ALLOWED_COLUMNS = {
+    "standards": {"tier", "department", "code", "title", "content", "version"},
+    "cases": {"standard_id", "objective_id", "crew_id", "session_id", "task", "action", "result", "surprise", "output_files"},
+    "gaps": {"case_id", "description", "frequency", "status"},
+    "proposals": {"gap_id", "proposed_by", "proposed_change", "status"},
+}
+
 
 # ---------------------------------------------------------------------------
 # Tool registration helper — called by server.py
@@ -122,11 +129,9 @@ def register(mcp) -> None:
 
             latency = (time.monotonic_ns() - t0) // 1_000_000
             log_metric(conn, "logical_search", "logical", 0, latency)
-            conn.close()
             return json.dumps(results, ensure_ascii=False)
 
         except Exception as exc:
-            conn.close()
             return json.dumps({"error": str(exc)})
 
     @mcp.tool()
@@ -155,11 +160,9 @@ def register(mcp) -> None:
 
             latency = (time.monotonic_ns() - t0) // 1_000_000
             log_metric(conn, "logical_read", "logical", 0, latency)
-            conn.close()
             return json.dumps(_row_to_dict(row), ensure_ascii=False)
 
         except Exception as exc:
-            conn.close()
             return json.dumps({"error": str(exc)})
 
     @mcp.tool()
@@ -182,6 +185,11 @@ def register(mcp) -> None:
         if not data:
             return json.dumps({"error": "data must not be empty"})
 
+        if table in _ALLOWED_COLUMNS:
+            invalid_cols = set(data.keys()) - _ALLOWED_COLUMNS[table]
+            if invalid_cols:
+                return json.dumps({"error": f"Invalid columns: {', '.join(invalid_cols)}"})
+
         # Auto-populate created_at for cases
         if table == "cases" and "created_at" not in data:
             data["created_at"] = _utcnow()
@@ -199,11 +207,9 @@ def register(mcp) -> None:
 
             latency = (time.monotonic_ns() - t0) // 1_000_000
             log_metric(conn, "logical_create", "logical", 0, latency)
-            conn.close()
             return json.dumps({"id": new_id, "table": table})
 
         except Exception as exc:
-            conn.close()
             return json.dumps({"error": str(exc)})
 
     @mcp.tool()
@@ -224,7 +230,6 @@ def register(mcp) -> None:
                 "SELECT id, surprise FROM cases WHERE id = ?", (case_id,)
             ).fetchone()
             if row is None:
-                conn.close()
                 return json.dumps({"error": f"No case with id={case_id}"})
 
             surprise = row["surprise"]
@@ -241,7 +246,6 @@ def register(mcp) -> None:
 
             latency = (time.monotonic_ns() - t0) // 1_000_000
             log_metric(conn, "logical_escalate", "logical", 0, latency)
-            conn.close()
 
             result: dict[str, Any] = {
                 "case_id": case_id,
@@ -254,7 +258,6 @@ def register(mcp) -> None:
             return json.dumps(result)
 
         except Exception as exc:
-            conn.close()
             return json.dumps({"error": str(exc)})
 
     @mcp.tool()
@@ -282,7 +285,6 @@ def register(mcp) -> None:
                 "SELECT id FROM cases WHERE id = ?", (case_id,)
             ).fetchone()
             if row is None:
-                conn.close()
                 return json.dumps({"error": f"No case with id={case_id}"})
 
             conn.execute(
@@ -307,7 +309,6 @@ def register(mcp) -> None:
 
             latency = (time.monotonic_ns() - t0) // 1_000_000
             log_metric(conn, "logical_feedback", "logical", 0, latency)
-            conn.close()
 
             response: dict[str, Any] = {
                 "case_id": case_id,
@@ -320,5 +321,4 @@ def register(mcp) -> None:
             return json.dumps(response)
 
         except Exception as exc:
-            conn.close()
             return json.dumps({"error": str(exc)})
