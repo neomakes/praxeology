@@ -64,7 +64,7 @@ Templates for all four are in `templates/_standard/`.
 Install the Praxeology MCP server to give your agents runtime capabilities:
 
 ```bash
-pip install praxeology-mcp
+pip3 install praxeology-mcp
 praxeology init --name YourOrg --agents 3
 ```
 

@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <code>pip install praxeology-mcp</code> · <a href="#quick-start">Quick Start</a> · <a href="docs/role-design.md">Role Design</a>
+  <code>pip3 install praxeology-mcp</code> · <a href="#quick-start">Quick Start</a> · <a href="docs/role-design.md">Role Design</a>
 </p>
 
 ---
@@ -73,7 +73,7 @@ Not a feature list. A coordination problem solver.
 ## Quick Start
 
 ```bash
-pip install praxeology-mcp
+pip3 install praxeology-mcp
 praxeology init --name MyOrg --agents 3    # Generates CLAUDE.md, _crew/, _standard/, .mcp.json, DB
 praxeology migrate --project-dir .          # Import existing governance docs into DB
 ```
@@ -101,7 +101,7 @@ Praxeology v1 is a document framework. The MCP server makes it a **runtime** —
 ### Installation
 
 ```bash
-pip install praxeology-mcp
+pip3 install praxeology-mcp
 ```
 
 Or install from source:
@@ -109,7 +109,7 @@ Or install from source:
 ```bash
 git clone https://github.com/neomakes/praxeology.git
 cd praxeology
-pip install -e .
+pip3 install -e .
 ```
 
 ### 20 MCP Tools — 3 Axes × 5 Operations + 2 Cross-Axis + 3 Metrics
@@ -194,7 +194,7 @@ The pattern is universal. In Praxeology MCP, every **Case** is a 3-axis junction
 ## Package Structure
 
 ```
-praxeology-mcp/                # pip install praxeology-mcp
+praxeology-mcp/                # pip3 install praxeology-mcp
 ├── praxeology_mcp/
 │   ├── server.py              # FastMCP entry point
 │   ├── db.py                  # SQLite schema + FTS5 + migrations
