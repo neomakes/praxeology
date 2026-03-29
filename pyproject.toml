@@ -7,14 +7,14 @@ name = "praxeology-mcp"
 version = "0.1.0"
 description = "Model-agnostic governance OS for AI agent teams — MCP server"
 readme = "README.md"
-license = {text = "MIT"}
+license = {text = "AGPL-3.0-or-later"}
 requires-python = ">=3.10"
 authors = [{name = "NeoMakes", email = "neo@neomakes.com"}]
 dependencies = ["mcp>=1.0.0"]
 keywords = ["mcp", "ai-agents", "governance", "praxeology"]
 classifiers = [
     "Development Status :: 3 - Alpha",
-    "License :: OSI Approved :: MIT License",
+    "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
     "Programming Language :: Python :: 3.12",
 ]
 

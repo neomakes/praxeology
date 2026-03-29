@@ -6,7 +6,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="MIT License">
+  <img src="https://img.shields.io/badge/License-AGPL--3.0-blue.svg" alt="AGPL-3.0 License">
   <img src="https://img.shields.io/badge/version-0.1.0-green.svg" alt="v0.1.0">
   <img src="https://img.shields.io/badge/status-active-brightgreen.svg" alt="Active">
   <img src="https://img.shields.io/badge/built%20by-NeoMakes-black.svg" alt="NeoMakes">
@@ -273,6 +273,6 @@ The name comes from praxeology, the study of human action. Purposeful action has
 
 ## License
 
-MIT License — see [LICENSE](LICENSE).
+GNU Affero General Public License v3.0 — see [LICENSE](LICENSE).
 
 Copyright (c) 2026 NeoMakes
