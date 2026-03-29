@@ -55,15 +55,30 @@ Each agent has defined **Speech Rules** (sentence limits, tone), **Anti-Patterns
 
 ---
 
-## How It Works
+## How It Works — The Six W's
 
-A 5-tier governance hierarchy. Simple. Universal.
+Every organizational action answers six questions: **Why, How, What, When, Who, Where.** Praxeology organizes these into 3 axes, each with 5 hierarchical layers:
 
 ```
-Strategy (WHY) → Doctrine (WHAT) → Procedure (HOW) → Playbook (PATTERNS) → Case (MEMORY)
+         Logical (Why/How)        Tactical (What/When)      Contextual (Who/Where)
+         ─────────────────        ────────────────────      ──────────────────────
+Tier 1   Strategy                 Goal                      Space
+Tier 2   Doctrine                 Program                   Channel
+Tier 3   Procedure                Campaign                  Thread
+Tier 4   Playbook                 Plan                      Crew
+Tier 5   Case                     Work                      Session
 ```
 
-Higher tiers always override lower ones. No exceptions. Agents resolve decisions by walking up the hierarchy — stopping at the first level that covers the situation. Cases are the experiential memory — every execution is recorded, and similar past cases inform future decisions.
+**Forward Pass — Acting:**
+An agent receives a task (Work). It checks relevant Playbooks and Procedures for how to act, verifies against Doctrine constraints, and executes within its Session context. This is the normal flow — top-down governance guiding action.
+
+**Backward Pass — Learning (`.backprop()`):**
+When the result surprises — a rule was missing, a plan didn't match reality, or a task fell outside someone's authority — the feedback propagates *backward* through all 3 axes simultaneously:
+- **Logical:** Case → Playbook gap → Procedure review → Doctrine amendment
+- **Tactical:** Work result → Plan adjustment → Campaign reprioritization → Goal reassessment
+- **Contextual:** Session learning → Crew skill update → Thread reassignment → Channel restructuring
+
+Higher tiers are stable; lower tiers absorb most changes. Only significant surprises propagate upward — like waves on the surface while the deep ocean stays calm.
 
 ---
 
@@ -73,12 +88,13 @@ Not a feature list. A coordination problem solver.
 
 | Your Problem | Praxeology's Answer |
 |---|---|
-| Agents drift from their role over sessions | **ConstitutionalGuard** — 4-layer behavioral verification |
+| Agents drift from their role over sessions | **ConstitutionalGuard** — behavioral verification against all 3 axes |
 | No way to safely constrain agent actions | **SafetyGate** — Higher tiers lock critical rules that lower tiers cannot override |
-| Agents can't improve their own processes | **SOP Evolution** — Learn-Compress-Apply loop. Gradient descent for governance |
-| Changes in one place break another | **Review Cascade** — Bidirectional propagation (up and down the hierarchy) |
+| Agents can't improve their own processes | **SOP Evolution** — `.backprop()` loop. Gradient descent for governance |
+| Changes in one place break another | **Review Cascade** — Bidirectional propagation across all 3 axes |
 | Agents can't flag when rules are bad | **Proposal Flow** — Structured amendment requests from any agent to the founder |
-| No institutional memory across sessions | **Work Cycle** — Daily gaps → weekly proposals → monthly amendments → quarterly reviews |
+| No institutional memory across sessions | **Case Memory** — Every execution recorded as a Case, searchable for future decisions |
+| Agents don't know what to do next | **`what_now()`** — Cross-axis recommendation engine that finds the highest-value action |
 
 ---
 
