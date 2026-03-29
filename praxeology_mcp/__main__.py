@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import sys
 
-_CLI_COMMANDS = {"init", "connect", "migrate"}
+_CLI_COMMANDS = {"init", "connect", "migrate", "heartbeat", "dashboard", "status"}
 
 
 def main() -> None:

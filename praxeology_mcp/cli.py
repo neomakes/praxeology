@@ -10,6 +10,9 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
+import signal
+import subprocess
 import sys
 from pathlib import Path
 
@@ -149,8 +152,33 @@ def cmd_init(args: argparse.Namespace) -> None:
     cwd = Path.cwd()
     name: str = args.name
     num_agents: int = args.agents
+    existing: bool = getattr(args, "existing", False)
 
     created: list[str] = []
+
+    if existing:
+        # Only create .mcp.json and initialize DB; migrate existing files.
+        mcp_json_path = cwd / ".mcp.json"
+        mcp_json_path.write_text(
+            json.dumps(_build_mcp_json(cwd), indent=2) + "\n", encoding="utf-8"
+        )
+        created.append(str(mcp_json_path))
+
+        db_dir = Path.home() / ".claude" / "praxeology"
+        db_dir.mkdir(parents=True, exist_ok=True)
+        db_path = db_dir / "praxeology.db"
+
+        from praxeology_mcp.db import init_db
+        init_db(str(db_path))
+
+        # Auto-migrate existing files into DB.
+        migrate_args = argparse.Namespace(project_dir=str(cwd))
+        cmd_migrate(migrate_args)
+
+        print("Added Praxeology MCP to existing project. Migrated files to DB.")
+        return
+
+    # Normal (new project) flow.
 
     # 1. Root CLAUDE.md
     root_claude = cwd / "CLAUDE.md"
@@ -455,6 +483,104 @@ def cmd_migrate(args: argparse.Namespace) -> None:
 
 
 # ---------------------------------------------------------------------------
+# Command: heartbeat
+# ---------------------------------------------------------------------------
+
+def cmd_heartbeat(args: argparse.Namespace) -> None:
+    action: str = args.action
+    pid_file = Path.home() / ".claude" / "praxeology" / "heartbeat.pid"
+
+    if action == "start":
+        pid_file.parent.mkdir(parents=True, exist_ok=True)
+        db_path = _db_path()
+
+        proc = subprocess.Popen(
+            [
+                sys.executable,
+                "-c",
+                (
+                    "from praxeology_mcp.heartbeat import Heartbeat; "
+                    "from praxeology_mcp.db import init_db; "
+                    f"db_path = '{db_path}'; "
+                    "init_db(db_path); "
+                    "hb = Heartbeat(db_path, interval=300); "
+                    "hb._running = True; "
+                    "hb._loop()"
+                ),
+            ],
+            start_new_session=True,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
+        pid_file.write_text(str(proc.pid))
+        print(f"Heartbeat started (PID {proc.pid})")
+
+    elif action == "stop":
+        if pid_file.exists():
+            pid = int(pid_file.read_text().strip())
+            try:
+                os.kill(pid, signal.SIGTERM)
+                print(f"Heartbeat stopped (PID {pid})")
+            except ProcessLookupError:
+                print("Heartbeat was not running")
+            pid_file.unlink(missing_ok=True)
+        else:
+            print("No heartbeat PID file found")
+
+    else:
+        print(f"Unknown heartbeat action: {action}", file=sys.stderr)
+        sys.exit(1)
+
+
+# ---------------------------------------------------------------------------
+# Command: dashboard
+# ---------------------------------------------------------------------------
+
+def cmd_dashboard(args: argparse.Namespace) -> None:
+    from praxeology_mcp.dashboard.app import run_dashboard
+    port = getattr(args, "port", 5060)
+    print(f"Starting dashboard at http://localhost:{port}")
+    run_dashboard(port=port)
+
+
+# ---------------------------------------------------------------------------
+# Command: status
+# ---------------------------------------------------------------------------
+
+def cmd_status(args: argparse.Namespace) -> None:
+    db_path = _db_path()
+    if not Path(db_path).exists():
+        print("No Praxeology DB found. Run 'praxeology init' first.")
+        return
+
+    from praxeology_mcp.db import get_db
+    conn = get_db(db_path)
+
+    tables = [
+        "standards", "cases", "gaps", "proposals", "objectives",
+        "schedules", "contexts", "reviews", "delegations", "metrics_log",
+    ]
+    print("Praxeology Status")
+    print("=" * 40)
+    print(f"DB: {db_path}")
+    for t in tables:
+        count = conn.execute(f"SELECT COUNT(*) FROM {t}").fetchone()[0]
+        print(f"  {t}: {count} rows")
+
+    # Heartbeat status
+    pid_file = Path.home() / ".claude" / "praxeology" / "heartbeat.pid"
+    if pid_file.exists():
+        pid = int(pid_file.read_text().strip())
+        try:
+            os.kill(pid, 0)
+            print(f"\nHeartbeat: running (PID {pid})")
+        except ProcessLookupError:
+            print(f"\nHeartbeat: dead (stale PID {pid})")
+    else:
+        print("\nHeartbeat: not running")
+
+
+# ---------------------------------------------------------------------------
 # Entry point
 # ---------------------------------------------------------------------------
 
@@ -472,6 +598,10 @@ def main(argv: list[str] | None = None) -> None:
         "--agents", type=int, default=0, metavar="N",
         help="Number of agent directories to create (default: 0)",
     )
+    init_parser.add_argument(
+        "--existing", action="store_true",
+        help="Add MCP to an existing project (skip scaffold, only create .mcp.json and migrate DB)",
+    )
 
     # connect
     subparsers.add_parser("connect", help="Connect to an existing Praxeology server")
@@ -485,6 +615,27 @@ def main(argv: list[str] | None = None) -> None:
         help="Root directory of the Praxeology v1 project to migrate",
     )
 
+    # heartbeat
+    heartbeat_parser = subparsers.add_parser(
+        "heartbeat", help="Manage the background heartbeat process"
+    )
+    heartbeat_parser.add_argument(
+        "action", choices=["start", "stop"],
+        help="Action to perform: start or stop the heartbeat",
+    )
+
+    # dashboard
+    dashboard_parser = subparsers.add_parser(
+        "dashboard", help="Launch the Praxeology web dashboard"
+    )
+    dashboard_parser.add_argument(
+        "--port", type=int, default=5060, metavar="PORT",
+        help="Port to run the dashboard on (default: 5060)",
+    )
+
+    # status
+    subparsers.add_parser("status", help="Show Praxeology DB and heartbeat status")
+
     parsed = parser.parse_args(argv)
 
     if parsed.command == "init":
@@ -493,6 +644,12 @@ def main(argv: list[str] | None = None) -> None:
         cmd_connect(parsed)
     elif parsed.command == "migrate":
         cmd_migrate(parsed)
+    elif parsed.command == "heartbeat":
+        cmd_heartbeat(parsed)
+    elif parsed.command == "dashboard":
+        cmd_dashboard(parsed)
+    elif parsed.command == "status":
+        cmd_status(parsed)
     else:
         parser.print_help()
         sys.exit(1)
