@@ -84,8 +84,8 @@ class Heartbeat:
             if row and row["cnt"] > 0:
                 reasons.append(f"pending_delegations: {row['cnt']} unread delegation(s)")
 
-        except Exception:
-            pass
+        except Exception as exc:
+            return {"needs_attention": False, "error": str(exc)}
 
         return {"needs_attention": bool(reasons), "reasons": reasons}
 
@@ -160,5 +160,11 @@ def run_daemon(db_path: str = None, interval: int = 300):
     from praxeology_mcp.db import init_db
     init_db(db_path)
     hb = Heartbeat(db_path, interval=interval)
+
+    import signal
+    def handle_sigterm(signum, frame):
+        hb._running = False
+    signal.signal(signal.SIGTERM, handle_sigterm)
+
     hb._running = True
     hb._loop()

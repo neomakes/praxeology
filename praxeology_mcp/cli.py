@@ -10,7 +10,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import sys
 from pathlib import Path
 
@@ -561,14 +560,13 @@ def cmd_status(args: argparse.Namespace) -> None:
         print(f"  {t}: {count} rows")
 
     # Heartbeat status
-    pid_file = Path.home() / ".claude" / "praxeology" / "heartbeat.pid"
-    if pid_file.exists():
-        pid = int(pid_file.read_text().strip())
-        try:
-            os.kill(pid, 0)
-            print(f"\nHeartbeat: running (PID {pid})")
-        except ProcessLookupError:
-            print(f"\nHeartbeat: dead (stale PID {pid})")
+    from praxeology_mcp.daemon import DaemonManager
+    dm = DaemonManager()
+    hb_status = dm.status("heartbeat")
+    if hb_status["running"]:
+        print(f"\nHeartbeat: running (PID {hb_status['pid']})")
+    elif hb_status.get("stale"):
+        print(f"\nHeartbeat: dead (stale PID {hb_status['pid']})")
     else:
         print("\nHeartbeat: not running")
 

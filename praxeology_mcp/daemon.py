@@ -42,12 +42,16 @@ class DaemonManager:
                 pid_file.unlink()  # Stale PID
 
         python = python or sys.executable
-        args_json = json.dumps(args or {})
+
+        env = os.environ.copy()
+        if args:
+            env["_DAEMON_ARGS"] = json.dumps(args)
 
         code = (
-            f"import json; "
+            f"import os, json; "
+            f"kwargs = json.loads(os.environ.get('_DAEMON_ARGS', '{{}}')); "
             f"from {target_module} import {target_func}; "
-            f"{target_func}(**json.loads('{args_json}'))"
+            f"{target_func}(**kwargs)"
         )
 
         proc = subprocess.Popen(
@@ -55,6 +59,7 @@ class DaemonManager:
             start_new_session=True,
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,
+            env=env,
         )
         pid_file.write_text(str(proc.pid))
         return {"status": "started", "pid": proc.pid, "name": name}
@@ -65,16 +70,27 @@ class DaemonManager:
         if not pid_file.exists():
             return {"status": "not_running", "name": name}
 
-        pid = int(pid_file.read_text().strip())
+        try:
+            pid = int(pid_file.read_text().strip())
+        except (ValueError, PermissionError, OSError):
+            pid_file.unlink(missing_ok=True)
+            return {"name": name, "running": False, "pid": None, "error": "corrupt_pid_file"}
+
         try:
             os.kill(pid, signal.SIGTERM)
-            # Wait briefly for clean shutdown
+            # Wait up to 1 second for clean shutdown
             for _ in range(10):
                 try:
                     os.kill(pid, 0)
                     time.sleep(0.1)
                 except ProcessLookupError:
                     break
+            else:
+                # Still running after 1s — force kill
+                try:
+                    os.kill(pid, signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
             result = {"status": "stopped", "pid": pid, "name": name}
         except ProcessLookupError:
             result = {"status": "was_not_running", "pid": pid, "name": name}
@@ -88,7 +104,12 @@ class DaemonManager:
         if not pid_file.exists():
             return {"name": name, "running": False, "pid": None}
 
-        pid = int(pid_file.read_text().strip())
+        try:
+            pid = int(pid_file.read_text().strip())
+        except (ValueError, PermissionError, OSError):
+            pid_file.unlink(missing_ok=True)
+            return {"name": name, "running": False, "pid": None, "error": "corrupt_pid_file"}
+
         try:
             os.kill(pid, 0)
             return {"name": name, "running": True, "pid": pid}
