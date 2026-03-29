@@ -10,7 +10,9 @@ Public API:
 from __future__ import annotations
 
 import sqlite3
+from contextlib import contextmanager
 from datetime import datetime, timezone
+from pathlib import Path
 
 
 # ---------------------------------------------------------------------------
@@ -41,8 +43,12 @@ CREATE TABLE IF NOT EXISTS cases (
     task         TEXT NOT NULL DEFAULT '',
     action       TEXT NOT NULL DEFAULT '',
     result       TEXT NOT NULL DEFAULT '',
-    surprise     REAL NOT NULL DEFAULT 0,
-    created_at   TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ','now'))
+    surprise                REAL NOT NULL DEFAULT 0,
+    output_files            TEXT NOT NULL DEFAULT '',
+    escalated_logical       INTEGER NOT NULL DEFAULT 0,
+    escalated_tactical      INTEGER NOT NULL DEFAULT 0,
+    escalated_contextual    INTEGER NOT NULL DEFAULT 0,
+    created_at              TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ','now'))
 );
 
 CREATE TABLE IF NOT EXISTS gaps (
@@ -268,6 +274,18 @@ def get_db(db_path: str) -> sqlite3.Connection:
     conn.execute("PRAGMA journal_mode=WAL")
     conn.execute("PRAGMA foreign_keys=ON")
     return conn
+
+
+@contextmanager
+def db_connection(db_path: str = None):
+    """Context manager for DB connections. Ensures proper close."""
+    if db_path is None:
+        db_path = str(Path.home() / ".claude" / "praxeology" / "praxeology.db")
+    conn = get_db(db_path)
+    try:
+        yield conn
+    finally:
+        conn.close()
 
 
 def log_metric(

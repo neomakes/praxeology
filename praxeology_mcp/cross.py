@@ -206,6 +206,7 @@ def register(mcp) -> None:
         Returns:
             JSON summary of all updates made across the 3 axes.
         """
+        surprise = max(0.0, min(1.0, surprise))
         t0 = time.monotonic_ns()
         conn = get_db(_db_path())
         updates: dict[str, Any] = {

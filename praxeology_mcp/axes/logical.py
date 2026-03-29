@@ -40,6 +40,14 @@ def _row_to_dict(row) -> dict:
     return dict(row) if row is not None else {}
 
 
+_ALLOWED_TABLES = {
+    "standards": "standards",
+    "cases": "cases",
+    "gaps": "gaps",
+    "proposals": "proposals",
+}
+
+
 # ---------------------------------------------------------------------------
 # Tool registration helper — called by server.py
 # ---------------------------------------------------------------------------
@@ -133,14 +141,14 @@ def register(mcp) -> None:
             JSON object of the record, or error if not found.
         """
         t0 = time.monotonic_ns()
-        allowed = {"standards", "cases", "gaps", "proposals"}
-        if table not in allowed:
-            return json.dumps({"error": f"table must be one of {sorted(allowed)}"})
+        if table not in _ALLOWED_TABLES:
+            return json.dumps({"error": f"Invalid table: {table}"})
+        safe_table = _ALLOWED_TABLES[table]
 
         conn = get_db(_db_path())
         try:
             row = conn.execute(
-                f"SELECT * FROM {table} WHERE id = ?", (id,)
+                f"SELECT * FROM {safe_table} WHERE id = ?", (id,)
             ).fetchone()
             if row is None:
                 return json.dumps({"error": f"No record in {table} with id={id}"})
@@ -167,9 +175,9 @@ def register(mcp) -> None:
             JSON with 'id' of the created record.
         """
         t0 = time.monotonic_ns()
-        allowed = {"standards", "cases", "gaps", "proposals"}
-        if table not in allowed:
-            return json.dumps({"error": f"table must be one of {sorted(allowed)}"})
+        if table not in _ALLOWED_TABLES:
+            return json.dumps({"error": f"Invalid table: {table}"})
+        safe_table = _ALLOWED_TABLES[table]
 
         if not data:
             return json.dumps({"error": "data must not be empty"})
@@ -183,7 +191,7 @@ def register(mcp) -> None:
             cols = ", ".join(data.keys())
             placeholders = ", ".join("?" for _ in data)
             cursor = conn.execute(
-                f"INSERT INTO {table} ({cols}) VALUES ({placeholders})",
+                f"INSERT INTO {safe_table} ({cols}) VALUES ({placeholders})",
                 list(data.values()),
             )
             conn.commit()

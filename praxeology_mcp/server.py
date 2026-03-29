@@ -41,11 +41,13 @@ from praxeology_mcp.axes import logical  # noqa: E402
 from praxeology_mcp.axes import tactical  # noqa: E402
 from praxeology_mcp.axes import contextual  # noqa: E402
 from praxeology_mcp import cross  # noqa: E402
+from praxeology_mcp import metrics  # noqa: E402
 
 logical.register(mcp)
 tactical.register(mcp)
 contextual.register(mcp)
 cross.register(mcp)
+metrics.register(mcp)
 
 # ---------------------------------------------------------------------------
 # Startup

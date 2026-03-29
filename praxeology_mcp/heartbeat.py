@@ -88,17 +88,47 @@ class Heartbeat:
 
         return {"needs_attention": bool(reasons), "reasons": reasons}
 
-    def heavyweight_trigger(self, reasons: list) -> None:
-        """Log trigger event. LLM invocation placeholder."""
+    def heavyweight_trigger(self, reasons: list) -> dict:
+        """Evaluate whether LLM action is needed based on accumulated signals."""
         conn = get_db(self.db_path)
         try:
-            log_metric(
-                conn,
-                tool_name="heartbeat.heavyweight_trigger",
-                axis="cross",
-                tokens=0,
-                latency=0,
+            # Count pending gaps with high frequency (>= 3)
+            urgent_gaps = conn.execute(
+                "SELECT COUNT(*) FROM gaps WHERE status = 'open' AND frequency >= 3"
+            ).fetchone()[0]
+
+            # Count overdue work items
+            overdue_work = conn.execute(
+                "SELECT COUNT(*) FROM objectives WHERE tier = 'work' AND status = 'pending'"
+                " AND due_date < date('now') AND due_date != ''"
+            ).fetchone()[0]
+
+            # Count unhandled delegations
+            pending_delegations = conn.execute(
+                "SELECT COUNT(*) FROM delegations WHERE status = 'pending'"
+            ).fetchone()[0]
+
+            # Decision: if any urgent signal exists, log for LLM attention
+            priority_score = urgent_gaps * 3 + overdue_work * 2 + pending_delegations * 1
+
+            log_metric(conn, "heartbeat.heavyweight_trigger", "cross",
+                       tokens=0, latency=0)
+
+            # Store trigger result for dashboard consumption
+            conn.execute(
+                "INSERT INTO metrics_log (tool_name, axis, tokens_used, latency_ms) VALUES (?, ?, ?, ?)",
+                (f"heartbeat.trigger.priority_{priority_score}", "cross", 0, 0),
             )
+            conn.commit()
+
+            return {
+                "triggered": True,
+                "priority_score": priority_score,
+                "urgent_gaps": urgent_gaps,
+                "overdue_work": overdue_work,
+                "pending_delegations": pending_delegations,
+                "reasons": reasons,
+            }
         finally:
             conn.close()
 
