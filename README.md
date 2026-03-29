@@ -13,18 +13,7 @@
 </p>
 
 <p align="center">
-  <a href="README.md"><strong>English</strong></a> ·
-  <a href="README.ko.md">한국어</a> ·
-  <a href="README.ja.md">日本語</a> ·
-  <a href="README.zh.md">中文</a> ·
-  <a href="README.fr.md">Français</a> ·
-  <a href="README.de.md">Deutsch</a> ·
-  <a href="README.es.md">Español</a>
-</p>
-
-<p align="center">
-  <a href="docs/quickstart.md">Quick Start</a> (<a href="docs/quickstart.ko.md">한국어</a> · <a href="docs/quickstart.ja.md">日本語</a> · <a href="docs/quickstart.zh.md">中文</a> · <a href="docs/quickstart.fr.md">FR</a> · <a href="docs/quickstart.de.md">DE</a> · <a href="docs/quickstart.es.md">ES</a>) ·
-  <a href="docs/role-design.md">Role Design</a> (<a href="docs/role-design.ko.md">한국어</a> · <a href="docs/role-design.ja.md">日本語</a> · <a href="docs/role-design.zh.md">中文</a> · <a href="docs/role-design.fr.md">FR</a> · <a href="docs/role-design.de.md">DE</a> · <a href="docs/role-design.es.md">ES</a>)
+  <code>pip install praxeology-mcp</code> · <a href="#quick-start">Quick Start</a> · <a href="docs/role-design.md">Role Design</a>
 </p>
 
 ---
@@ -101,13 +90,12 @@ Not a feature list. A coordination problem solver.
 ## Quick Start
 
 ```bash
-git clone https://github.com/neomakes/praxeology.git my-org
-cd my-org
-bash setup.sh    # Interactive wizard: org name, mission, departments, agents
-bash launch.sh   # Your governance system is live
+pip install praxeology-mcp
+praxeology init --name MyOrg --agents 3    # Generates CLAUDE.md, _crew/, _standard/, .mcp.json, DB
+praxeology migrate --project-dir .          # Import existing governance docs into DB
 ```
 
-> **New?** Start with [Quick Start Guide](docs/quickstart.md) and [Role Design Guide](docs/role-design.md).
+The MCP server starts automatically when Claude Code loads `.mcp.json`. Your agents immediately gain access to 20 governance tools across all 3 axes.
 
 ---
 
@@ -141,19 +129,7 @@ cd praxeology
 pip install -e .
 ```
 
-### Quick Start
-
-```bash
-# Bootstrap a new project
-praxeology init --name MyOrg --agents 3
-
-# Migrate existing Praxeology v1 files to DB
-praxeology migrate --project-dir .
-
-# The MCP server starts automatically via .mcp.json
-```
-
-### 17 MCP Tools — 3 Axes × 5 Operations + 2 Cross-Axis
+### 20 MCP Tools — 3 Axes × 5 Operations + 2 Cross-Axis + 3 Metrics
 
 | Axis | search | read | create | escalate | feedback |
 |------|--------|------|--------|----------|----------|
@@ -165,6 +141,11 @@ praxeology migrate --project-dir .
 - `what_now(crew_id)` — "What should I do right now?" Recommends highest-value action by cross-referencing all 3 axes.
 - `backprop(case_id, result, surprise)` — The organizational equivalent of automatic differentiation. Records execution result and propagates feedback simultaneously to all 3 axes: updates doctrine (Logical), adjusts plans (Tactical), and logs crew performance (Contextual). High surprise auto-creates gaps; very high surprise auto-generates amendment proposals. Over time, this is gradient descent for governance.
 
+**Metrics:**
+- `metrics_summary(period)` — Aggregate tool usage, token cost, and latency for a given period.
+- `metrics_compare(period1, period2)` — Side-by-side comparison to prove cost decreases with use.
+- `metrics_trend(metric, days)` — Time-series trend for any metric — the evidence that `.backprop()` works.
+
 ### Heartbeat Engine
 
 Built-in 2-tier background check:
@@ -175,27 +156,55 @@ Over time, as gaps are absorbed into doctrine, more situations are handled by th
 
 ---
 
-## Examples
+## CLI Commands
 
-- [examples/solo-dev/](examples/solo-dev/) — Solo developer + 3 agents (minimal)
-- [examples/tech-startup/](examples/tech-startup/) — Early-stage software company
-- [examples/one-piece-crew/](examples/one-piece-crew/) — Fictional crew with full persona system
+```bash
+praxeology init --name MyOrg --agents 3   # Bootstrap new project
+praxeology init --existing                  # Add MCP to existing Praxeology v1 project
+praxeology migrate --project-dir .          # Import .md standards, todo/weekly.json, crew CLAUDE.md into DB
+praxeology heartbeat start                  # Start background heartbeat daemon
+praxeology heartbeat stop                   # Stop heartbeat daemon
+praxeology dashboard                        # Launch web dashboard (localhost:5060)
+praxeology status                           # Show DB stats and heartbeat status
+```
 
 ---
 
 ## The Theory — Why This Works
 
-The same 5-tier structure appears across every domain of organized action:
+The same 5-tier × 3-axis structure appears across every domain of organized action:
 
-| Tier | National Law | Military (C2) | Corporate | Individual | Deep Learning | Essence |
-|------|-------------|---------------|-----------|------------|---------------|---------|
-| **1 Strategy** | Constitution | National Defense Strategy | Articles of Incorporation | Values & Identity | Objective function *J*, Manifold | **Why** — fundamental purpose |
-| **2 Doctrine** | Statute Law | Operational Doctrine | Corporate Regulations | Personal Principles | Constraints *g(x) ≤ 0* | **What** — principles & boundaries |
-| **3 Procedure** | Decree / Rules | OPLAN / OPORD | Operating Guidelines | Goals & Routines | Policy *π*, Control input *u* | **How** — resource allocation |
-| **4 Playbook** | Administrative Rules | TTP (Tactics, Techniques, Procedures) | SOP / Best Practices | Habits & Mastery | Deterministic mapping *y = f(x)* | **Execute** — repeatable patterns |
-| **Case/Exec** | Enforcement | FRAGO / C2 | Work Execution | Flow & Adaptation | Feedback loop *Δe*, Kalman filter | **Now** — real-time control |
+**Logical Axis — WHY & HOW** (rules that govern action)
 
-Governance is not domain-specific. The pattern is universal. A framework that works for a military unit works for a startup or an AI agent fleet. For the full mathematical mapping (systems engineering, gradient descent), see [docs/architecture.md](docs/architecture.md).
+| Tier | National Law | Military | Corporate | Praxeology MCP |
+|------|-------------|----------|-----------|----------------|
+| **1** | Constitution | National Defense Strategy | Articles of Incorporation | **Strategy** |
+| **2** | Statute Law | Operational Doctrine | Corporate Regulations | **Doctrine** |
+| **3** | Decree / Rules | OPLAN / OPORD | Operating Guidelines | **Procedure** |
+| **4** | Administrative Rules | TTP | SOP / Best Practices | **Playbook** |
+| **5** | Enforcement | FRAGO | Work Execution | **Case** |
+
+**Tactical Axis — WHAT & WHEN** (objectives that decompose into action)
+
+| Tier | National Plan | Military | Corporate | Praxeology MCP |
+|------|-------------|----------|-----------|----------------|
+| **1** | National Vision | End State | Mission / OKR | **Goal** |
+| **2** | 5-Year Plan | Campaign Plan | Annual Program | **Program** |
+| **3** | Annual Budget | Operation | Quarterly Initiative | **Campaign** |
+| **4** | Project Plan | Mission | Sprint / Weekly Plan | **Plan** |
+| **5** | Task Execution | Engagement | Daily Todo | **Work** |
+
+**Contextual Axis — WHO & WHERE** (organization that contains action)
+
+| Tier | National Org | Military | Corporate | Praxeology MCP |
+|------|-------------|----------|-----------|----------------|
+| **1** | Nation | Theater | Company | **Space** |
+| **2** | Ministry | Corps / Division | Department | **Channel** |
+| **3** | Bureau | Battalion / Unit | Team / Project | **Thread** |
+| **4** | Office | Soldier | Employee / Agent | **Crew** |
+| **5** | Desk / Shift | Watch / Patrol | Work Session | **Session** |
+
+The pattern is universal. In Praxeology MCP, every **Case** is a 3-axis junction — it references a standard (Logical), an objective (Tactical), and a crew member in a session (Contextual). `.backprop()` propagates feedback through all three simultaneously, like gradient descent across the organizational manifold.
 
 ---
 
@@ -203,56 +212,62 @@ Governance is not domain-specific. The pattern is universal. A framework that wo
 
 ```
 your-org/
-├── CLAUDE.md                  # Root context for AI agents (generated)
-├── launch.sh                  # Daily launch script (generated)
-├── _standard/                 # Governance documents
-│   ├── README.md              # Master index of all governance artifacts
-│   ├── {department}/          # One folder per department
-│   │   ├── STR-{NNN}.md      #   (e.g., strategy, operations, finance, engineering)
-│   │   ├── DOC-{NNN}.md
-│   │   ├── PRC-{NNN}.md
-│   │   └── PLY-{NNN}.md
-├── _crew/                     # Agent / team member definitions
+├── CLAUDE.md                  # Root context for AI agents (generated by praxeology init)
+├── .mcp.json                  # MCP server configuration (auto-generated)
+├── pyproject.toml             # Python package config
+├── praxeology_mcp/            # MCP server runtime
+│   ├── server.py              # FastMCP entry point
+│   ├── db.py                  # SQLite schema + FTS5 + migrations
+│   ├── cross.py               # Cross-axis tools (what_now, backprop)
+│   ├── heartbeat.py           # 2-tier background daemon
+│   ├── metrics.py             # metrics_summary, metrics_compare, metrics_trend
+│   ├── cli.py                 # CLI (init, migrate, heartbeat, dashboard, status)
+│   ├── axes/                  # Per-axis tool modules
+│   │   ├── logical.py         # Logical axis (WHY/HOW) — standards, cases, gaps, proposals
+│   │   ├── tactical.py        # Tactical axis (WHAT/WHEN) — objectives, schedules
+│   │   └── contextual.py      # Contextual axis (WHO/WHERE) — contexts, reviews, delegations
+│   └── dashboard/             # Web dashboard (FastAPI)
+│       ├── app.py             # Routes + localhost-only auth middleware
+│       └── templates/         # Jinja2 HTML templates
+├── _standard/                 # Governance documents (source .md files, migrated to DB)
+│   └── {department}/          # One folder per department
+│       ├── STR-{NNN}.md      #   Strategy, Doctrine, Procedure, Playbook
+│       ├── DOC-{NNN}.md
+│       ├── PRC-{NNN}.md
+│       └── PLY-{NNN}.md
+├── _crew/                     # Agent definitions
 │   ├── CLAUDE.md              # Shared crew rules
 │   └── {agent}/               # Per-agent subdirectory
 │       ├── CLAUDE.md          # Agent context and persona
 │       └── sop.md             # Agent SOPs
-├── _project/                  # Active projects
-├── _setting/                  # Operational settings
-├── docs/                      # Framework documentation
-├── templates/                 # Reusable document templates
-└── examples/                  # Reference implementations
+└── ~/.claude/praxeology/
+    └── praxeology.db          # SQLite database (auto-created)
 ```
 
 ---
 
-## Integration Guides
+## Data Architecture
 
-| Guide | Description |
-|-------|-------------|
-| [Discord Integration](docs/discord-integration.md) | Channel structure, bot mentions, loop prevention |
-| [Google Drive Integration](docs/drive-integration.md) | Symlink setup, regulation storage, workspaces |
-| [Crew Manager Dashboard](docs/crew-manager.md) | Web dashboard for session monitoring |
-| [Claude Code Setup](docs/claude-code-setup.md) | CLAUDE.md hierarchy, MCP servers, per-agent sessions |
-| [Work Cycle](docs/work-cycle.md) | Todo/weekly schemas, reporting cycle, Standard Gap flow |
+Praxeology MCP stores everything in a single SQLite database with FTS5 full-text search:
 
-## Documentation
+| Axis | Tables | Purpose |
+|------|--------|---------|
+| **Logical** | `standards`, `cases`, `gaps`, `proposals` | Governance documents, execution records, detected gaps, amendment proposals |
+| **Tactical** | `objectives`, `schedules` | Goal→Work hierarchy, time-based triggers |
+| **Contextual** | `contexts`, `reviews`, `delegations`, `channel_access` | Org structure, performance reviews, task delegation |
+| **Cross** | `metrics_log` | Tool usage, token cost, latency — auto-logged on every MCP call |
 
-| Document | Description |
-|----------|-------------|
-| [docs/architecture.md](docs/architecture.md) | Design philosophy and core mechanisms |
-| [docs/getting-started.md](docs/getting-started.md) | Prerequisites, installation, first steps |
-| [docs/standard-system.md](docs/standard-system.md) | The 5-tier document system in depth |
-| [docs/crew-system.md](docs/crew-system.md) | Agent management, SOP self-evolution |
-| [docs/tutorial.md](docs/tutorial.md) | Full walkthrough building a governed agent team |
+Every **Case** is a 3-axis junction: it links a `standard_id` (Logical), `objective_id` (Tactical), and `crew_id` + `session_id` (Contextual). This is how `.backprop()` propagates feedback through all three axes simultaneously.
 
 ---
 
 ## Origin
 
-Built by **[NeoMakes](https://neomakes.com)** — a one-person company developing on-device AI for extreme environments. The framework emerged from governing a fleet of AI agents with the same rigor applied to military command structures.
+Built by **[NeoMakes](https://neomakes.com)** — a one-person company developing human-AI interaction technologies for extreme mission environments. The framework emerged from governing a fleet of 9 AI agents with the same rigor applied to military command structures.
 
 The name comes from praxeology, the study of human action. Purposeful action has structure. That structure is universal. Make it explicit, and you can govern anything.
+
+> **Praxeology is the only governance framework where AI agents follow rules, learn from experience, and can explain the reasoning behind every action they take.**
 
 ---
 
