@@ -8,7 +8,7 @@ Build your own self-evolving AI agent governance system in 3 steps.
 
 Write your organization's WHY in `_standard/{department}/STR-101.md`.
 
-A template is provided at `templates/_standard/`. Fill in:
+Fill in:
 
 - **Mission** — one sentence on what you exist to do
 - **Values** — 3-5 principles that guide every decision
@@ -40,13 +40,15 @@ See `role-design.md` for detailed guidance and worked examples.
 
 ## Step 3: Bootstrap Governance
 
-Run the interactive wizard:
+Run the setup script:
 
 ```bash
-bash setup.sh
+git clone https://github.com/neomakes/praxeology.git
+cd praxeology
+./setup.sh
 ```
 
-Or create the four core documents manually:
+Or create the four core documents manually in `_standard/{department}/`:
 
 | Document | Path | Purpose |
 |---|---|---|
@@ -55,20 +57,18 @@ Or create the four core documents manually:
 | PRC-201 | `_standard/{department}/PRC-201.md` | Session management — how sessions start, run, and end |
 | PLY-203 | `_standard/{department}/PLY-203.md` | Self-evolution — how agents detect gaps and propose improvements |
 
-Templates for all four are in `templates/_standard/`.
-
 ---
 
-## Step 4: Connect the MCP Runtime (Optional)
+## Step 4: Connect the MCP Runtime
 
-Install the Praxeology MCP server to give your agents runtime capabilities:
+If you used `./setup.sh`, the MCP runtime is already installed. Otherwise, initialize it manually:
 
 ```bash
-pip3 install praxeology-mcp
 praxeology init --name YourOrg --agents 3
+praxeology migrate --project-dir .    # Import existing .md files into DB
 ```
 
-This adds 17 MCP tools that agents can call:
+This gives your agents access to 20 MCP tools:
 - `what_now()` — recommends the highest-value action right now
 - `logical_search/read/create` — search and manage doctrine
 - `tactical_search/read/create` — manage goal→work hierarchy
@@ -94,10 +94,4 @@ The system is designed so governance tightens over time through use, not through
 
 ## Scaling
 
-| Setup | Reference |
-|---|---|
-| 1 person + 3 agents | `examples/solo-dev/` |
-| 1 person + startup team | `examples/tech-startup/` |
-| 9-agent full crew | `examples/one-piece-crew/` |
-
-Both examples include pre-filled STR, crew CLAUDE.md files, and bootstrapped governance documents you can adapt directly.
+Start with 3 agents (planner, executor, reviewer) and scale up as your governance matures. See [Role Design Guide](role-design.md) for team composition strategies from 3 to 15+ agents.

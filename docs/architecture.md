@@ -305,15 +305,26 @@ Reverse Flow does not bypass the hierarchy — it informs it. An agent cannot us
 
 ---
 
-## Implementation: Plain Files
+## Implementation
 
-Praxeology has no database, no server, no API. It is implemented as:
+Praxeology has two implementation paths:
 
+**v1 — Document Framework** (plain files, no runtime):
 - **Directory hierarchy** mirrors the tier structure
 - **Markdown files** are the documents
 - **CLAUDE.md files** at each directory level auto-load into agent context
 - **Git versioning** provides audit trail and rollback
 - **Frontmatter** encodes document metadata
+
+**MCP Runtime** (v0.1.0+ — database-backed, queryable):
+- **SQLite database** with FTS5 full-text search stores all governance data
+- **20 MCP tools** across 3 axes (Logical, Tactical, Contextual) let agents search, read, create, escalate, and give feedback
+- **`what_now()`** recommends the highest-value action by cross-referencing all 3 axes
+- **`.backprop()`** propagates execution results backward through all axes simultaneously
+- **Heartbeat engine** (2-tier: rule-based + LLM) monitors for gaps and overdue work
+- **`_standard/` and `_crew/`** directories remain optional for bootstrapping and human readability
+
+Both implementations use the same governance principles. The MCP runtime adds queryability, institutional memory, and self-evolution capabilities.
 
 ### Directory Structure
 
