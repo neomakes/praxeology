@@ -59,6 +59,26 @@ Templates for all four are in `templates/_standard/`.
 
 ---
 
+## Step 4: Connect the MCP Runtime (Optional)
+
+Install the Praxeology MCP server to give your agents runtime capabilities:
+
+```bash
+pip install praxeology-mcp
+praxeology init --name YourOrg --agents 3
+```
+
+This adds 17 MCP tools that agents can call:
+- `what_now()` — recommends the highest-value action right now
+- `logical_search/read/create` — search and manage doctrine
+- `tactical_search/read/create` — manage goal→work hierarchy
+- `contextual_read` — check crew roles and permissions
+- `backprop()` — record execution results, auto-detect gaps
+
+With the MCP server, your agents can query doctrine before acting, record cases for institutional memory, and propose governance amendments when rules don't cover a situation.
+
+---
+
 ## What Happens Next
 
 Once deployed, your agents will:
@@ -76,6 +96,7 @@ The system is designed so governance tightens over time through use, not through
 
 | Setup | Reference |
 |---|---|
+| 1 person + 3 agents | `examples/solo-dev/` |
 | 1 person + startup team | `examples/tech-startup/` |
 | 9-agent full crew | `examples/one-piece-crew/` |
 

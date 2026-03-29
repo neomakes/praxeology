@@ -28,6 +28,28 @@ A well-designed agent is identifiable by tone, structure, and vocabulary alone �
 
 ---
 
+## Objective Function
+
+Every agent needs a clear purpose — not just tasks, but a measurable goal that drives autonomous behavior.
+
+Add an `Objective Function` section to each agent's CLAUDE.md:
+
+```markdown
+## Objective Function
+- Primary: {What this agent exists to optimize}
+- KPI: {Measurable indicators, e.g., "weekly research reports 1+, security incidents 0"}
+- Autonomy: {What can be done without asking — full/confirm/never per action type}
+```
+
+The objective function determines:
+- **What to do when idle** — agents with a clear objective function find work proactively
+- **How to prioritize** — when multiple tasks are pending, optimize for the objective
+- **When to escalate** — if an action doesn't serve the objective, ask before proceeding
+
+Without an objective function, agents wait for instructions. With one, they act within their governance boundaries toward a measurable goal.
+
+---
+
 ## The CLAUDE.md Template
 
 ```markdown

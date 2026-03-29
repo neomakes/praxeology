@@ -37,6 +37,8 @@
 
 **Praxeology is the missing governance layer.** It sits above your coding tools, not replacing them — ensuring your agents operate as a coherent organization rather than a collection of independent chatbots.
 
+It governs three axes simultaneously: **Logical** (why and how — doctrine hierarchy), **Tactical** (what and when — goal-to-task decomposition), and **Contextual** (who and where — organizational structure). Agents query all three axes to determine the right action, and feed results back via `.backprop()` — the organizational equivalent of automatic differentiation.
+
 ---
 
 ## Production Proof
@@ -47,19 +49,21 @@ This isn't theory. [NeoMakes](https://neomakes.com) runs this every day.
 > Daily todos → Weekly reviews → Monthly amendments
 > Agents detect gaps, propose fixes, evolve their own SOPs.
 
+> Praxeology is the only governance framework where AI agents follow rules, learn from experience, and can explain the reasoning behind their actions.
+
 Each agent has defined **Speech Rules** (sentence limits, tone), **Anti-Patterns** (forbidden behaviors), and **Emotional Triggers** (situation-dependent response changes) — ensuring consistent, distinguishable behavior across all 9 agents. NeoMakes is one instance. Yours will look different.
 
 ---
 
 ## How It Works
 
-A 4+1 tier governance hierarchy. Simple. Universal.
+A 5-tier governance hierarchy. Simple. Universal.
 
 ```
-Strategy (WHY) → Doctrine (WHAT) → Procedure (HOW) → Playbook (PATTERNS) → Execution (NOW)
+Strategy (WHY) → Doctrine (WHAT) → Procedure (HOW) → Playbook (PATTERNS) → Case (MEMORY)
 ```
 
-Higher tiers always override lower ones. No exceptions. Agents resolve decisions by walking up the hierarchy — stopping at the first level that covers the situation.
+Higher tiers always override lower ones. No exceptions. Agents resolve decisions by walking up the hierarchy — stopping at the first level that covers the situation. Cases are the experiential memory — every execution is recorded, and similar past cases inform future decisions.
 
 ---
 
@@ -143,7 +147,7 @@ praxeology migrate --project-dir .
 
 **Cross-Axis:**
 - `what_now(crew_id)` — "What should I do right now?" Recommends highest-value action by cross-referencing all 3 axes.
-- `backprop(case_id, result, surprise)` — Records execution result and propagates feedback to all 3 axes. High surprise auto-creates gaps and proposals.
+- `backprop(case_id, result, surprise)` — The organizational equivalent of automatic differentiation. Records execution result and propagates feedback simultaneously to all 3 axes: updates doctrine (Logical), adjusts plans (Tactical), and logs crew performance (Contextual). High surprise auto-creates gaps; very high surprise auto-generates amendment proposals. Over time, this is gradient descent for governance.
 
 ### Heartbeat Engine
 
@@ -165,7 +169,7 @@ Over time, as gaps are absorbed into doctrine, more situations are handled by th
 
 ## The Theory — Why This Works
 
-The same 4+1 tier structure appears across every domain of organized action:
+The same 5-tier structure appears across every domain of organized action:
 
 | Tier | National Law | Military (C2) | Corporate | Individual | Deep Learning | Essence |
 |------|-------------|---------------|-----------|------------|---------------|---------|
@@ -173,7 +177,7 @@ The same 4+1 tier structure appears across every domain of organized action:
 | **2 Doctrine** | Statute Law | Operational Doctrine | Corporate Regulations | Personal Principles | Constraints *g(x) ≤ 0* | **What** — principles & boundaries |
 | **3 Procedure** | Decree / Rules | OPLAN / OPORD | Operating Guidelines | Goals & Routines | Policy *π*, Control input *u* | **How** — resource allocation |
 | **4 Playbook** | Administrative Rules | TTP (Tactics, Techniques, Procedures) | SOP / Best Practices | Habits & Mastery | Deterministic mapping *y = f(x)* | **Execute** — repeatable patterns |
-| **Exec** | Enforcement | FRAGO / C2 | Work Execution | Flow & Adaptation | Feedback loop *Δe*, Kalman filter | **Now** — real-time control |
+| **Case/Exec** | Enforcement | FRAGO / C2 | Work Execution | Flow & Adaptation | Feedback loop *Δe*, Kalman filter | **Now** — real-time control |
 
 Governance is not domain-specific. The pattern is universal. A framework that works for a military unit works for a startup or an AI agent fleet. For the full mathematical mapping (systems engineering, gradient descent), see [docs/architecture.md](docs/architecture.md).
 
@@ -222,7 +226,7 @@ your-org/
 |----------|-------------|
 | [docs/architecture.md](docs/architecture.md) | Design philosophy and core mechanisms |
 | [docs/getting-started.md](docs/getting-started.md) | Prerequisites, installation, first steps |
-| [docs/standard-system.md](docs/standard-system.md) | The 4+1 tier document system in depth |
+| [docs/standard-system.md](docs/standard-system.md) | The 5-tier document system in depth |
 | [docs/crew-system.md](docs/crew-system.md) | Agent management, SOP self-evolution |
 | [docs/tutorial.md](docs/tutorial.md) | Full walkthrough building a governed agent team |
 
