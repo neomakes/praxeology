@@ -515,9 +515,12 @@ def cmd_daemon(args: argparse.Namespace) -> None:
         daemons = dm.list_all()
         if not daemons:
             print("No daemons registered.")
-        for d in daemons:
-            status = "running" if d["running"] else "stopped"
-            print(f"  {d['name']}: {status} (PID {d.get('pid', '?')})")
+        else:
+            print("Praxeology Daemons")
+            print("=" * 40)
+            for d in daemons:
+                status = "running" if d["running"] else "stopped"
+                print(f"  {d['name']}: {status} (PID {d.get('pid', '?')})")
     elif args.action == "stop-all":
         results = dm.stop_all()
         for r in results:
@@ -543,8 +546,16 @@ def cmd_config(args: argparse.Namespace) -> None:
         return
 
     if args.discord_webhook:
+        import re
+        webhook_pattern = re.compile(r"^https://discord\.com/api/webhooks/\d+/.+$")
+        if not webhook_pattern.match(args.discord_webhook):
+            print("Error: Invalid Discord webhook URL. Expected format: https://discord.com/api/webhooks/{id}/{token}")
+            return
         set_config(conn, "discord_webhook", args.discord_webhook)
-        print(f"Discord webhook set: {args.discord_webhook[:50]}...")
+        # Mask the token portion
+        url = args.discord_webhook
+        masked = url[:url.rfind("/") + 4] + "***" if "/" in url else url[:20] + "***"
+        print(f"Discord webhook set: {masked}")
 
     if not any([args.discord_webhook, args.list]):
         print("No config option specified. Use --list to see current config, or --discord-webhook URL to set webhook.")
@@ -595,6 +606,17 @@ def cmd_status(args: argparse.Namespace) -> None:
         print(f"\nHeartbeat: dead (stale PID {hb_status['pid']})")
     else:
         print("\nHeartbeat: not running")
+
+    # Config
+    config_rows = conn.execute("SELECT key, value FROM config ORDER BY key").fetchall()
+    if config_rows:
+        print("\nConfig:")
+        for row in config_rows:
+            key, value = row[0], row[1]
+            # Mask sensitive values
+            if "webhook" in key or "token" in key:
+                value = value[:30] + "***" if len(value) > 30 else "***"
+            print(f"  {key} = {value}")
 
 
 # ---------------------------------------------------------------------------

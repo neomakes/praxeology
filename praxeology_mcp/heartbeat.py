@@ -180,9 +180,21 @@ class Heartbeat:
                 data=json.dumps(message).encode(),
                 headers={"Content-Type": "application/json"},
             )
-            urllib.request.urlopen(req, timeout=5)
-        except Exception:
-            pass  # Don't crash heartbeat for webhook failure
+            resp = urllib.request.urlopen(req, timeout=5)
+            status = resp.getcode()
+            if status not in (200, 204):
+                # Non-success — log it
+                from praxeology_mcp.db import get_db, log_metric
+                conn = get_db(self.db_path)
+                log_metric(conn, f"heartbeat.webhook_http_{status}", "cross", tokens_used=0, latency_ms=0)
+        except Exception as exc:
+            # Log webhook error to metrics (daemon has no stderr)
+            try:
+                from praxeology_mcp.db import get_db, log_metric
+                conn = get_db(self.db_path)
+                log_metric(conn, "heartbeat.webhook_error", "cross", tokens_used=0, latency_ms=0)
+            except Exception:
+                pass  # Last resort — don't crash heartbeat
 
     def check_once(self) -> dict:
         """Manual single check (for CLI/testing)."""
