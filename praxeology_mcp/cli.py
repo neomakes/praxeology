@@ -11,8 +11,6 @@ from __future__ import annotations
 import argparse
 import json
 import os
-import signal
-import subprocess
 import sys
 from pathlib import Path
 
@@ -487,49 +485,44 @@ def cmd_migrate(args: argparse.Namespace) -> None:
 # ---------------------------------------------------------------------------
 
 def cmd_heartbeat(args: argparse.Namespace) -> None:
-    action: str = args.action
-    pid_file = Path.home() / ".claude" / "praxeology" / "heartbeat.pid"
+    from praxeology_mcp.daemon import DaemonManager
+    dm = DaemonManager()
+    db_path = _db_path()
 
-    if action == "start":
-        pid_file.parent.mkdir(parents=True, exist_ok=True)
-        db_path = _db_path()
-
-        proc = subprocess.Popen(
-            [
-                sys.executable,
-                "-c",
-                (
-                    "from praxeology_mcp.heartbeat import Heartbeat; "
-                    "from praxeology_mcp.db import init_db; "
-                    f"db_path = '{db_path}'; "
-                    "init_db(db_path); "
-                    "hb = Heartbeat(db_path, interval=300); "
-                    "hb._running = True; "
-                    "hb._loop()"
-                ),
-            ],
-            start_new_session=True,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
+    if args.action == "start":
+        result = dm.start(
+            target_module="praxeology_mcp.heartbeat",
+            target_func="run_daemon",
+            name="heartbeat",
+            args={"db_path": db_path, "interval": 300},
         )
-        pid_file.write_text(str(proc.pid))
-        print(f"Heartbeat started (PID {proc.pid})")
-
-    elif action == "stop":
-        if pid_file.exists():
-            pid = int(pid_file.read_text().strip())
-            try:
-                os.kill(pid, signal.SIGTERM)
-                print(f"Heartbeat stopped (PID {pid})")
-            except ProcessLookupError:
-                print("Heartbeat was not running")
-            pid_file.unlink(missing_ok=True)
-        else:
-            print("No heartbeat PID file found")
-
+        print(f"Heartbeat: {result['status']} (PID {result.get('pid', '?')})")
+    elif args.action == "stop":
+        result = dm.stop("heartbeat")
+        print(f"Heartbeat: {result['status']}")
     else:
-        print(f"Unknown heartbeat action: {action}", file=sys.stderr)
+        print(f"Unknown heartbeat action: {args.action}", file=sys.stderr)
         sys.exit(1)
+
+
+# ---------------------------------------------------------------------------
+# Command: daemon
+# ---------------------------------------------------------------------------
+
+def cmd_daemon(args: argparse.Namespace) -> None:
+    from praxeology_mcp.daemon import DaemonManager
+    dm = DaemonManager()
+    if args.action == "list":
+        daemons = dm.list_all()
+        if not daemons:
+            print("No daemons registered.")
+        for d in daemons:
+            status = "running" if d["running"] else "stopped"
+            print(f"  {d['name']}: {status} (PID {d.get('pid', '?')})")
+    elif args.action == "stop-all":
+        results = dm.stop_all()
+        for r in results:
+            print(f"  {r['name']}: {r['status']}")
 
 
 # ---------------------------------------------------------------------------
@@ -636,6 +629,10 @@ def main(argv: list[str] | None = None) -> None:
     # status
     subparsers.add_parser("status", help="Show Praxeology DB and heartbeat status")
 
+    # daemon
+    daemon_parser = subparsers.add_parser("daemon", help="Manage background daemons")
+    daemon_parser.add_argument("action", choices=["list", "stop-all"])
+
     parsed = parser.parse_args(argv)
 
     if parsed.command == "init":
@@ -650,6 +647,8 @@ def main(argv: list[str] | None = None) -> None:
         cmd_dashboard(parsed)
     elif parsed.command == "status":
         cmd_status(parsed)
+    elif parsed.command == "daemon":
+        cmd_daemon(parsed)
     else:
         parser.print_help()
         sys.exit(1)

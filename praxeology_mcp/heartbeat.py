@@ -11,6 +11,7 @@ from __future__ import annotations
 import threading
 import time
 from datetime import datetime, timezone
+from pathlib import Path
 
 from praxeology_mcp.db import get_db, log_metric
 
@@ -150,3 +151,14 @@ class Heartbeat:
     def check_once(self) -> dict:
         """Manual single check (for CLI/testing)."""
         return self.lightweight_check()
+
+
+def run_daemon(db_path: str = None, interval: int = 300):
+    """Entry point for daemon mode. Called by DaemonManager."""
+    if db_path is None:
+        db_path = str(Path.home() / ".claude" / "praxeology" / "praxeology.db")
+    from praxeology_mcp.db import init_db
+    init_db(db_path)
+    hb = Heartbeat(db_path, interval=interval)
+    hb._running = True
+    hb._loop()
