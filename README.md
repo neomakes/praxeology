@@ -73,12 +73,13 @@ Not a feature list. A coordination problem solver.
 ## Quick Start
 
 ```bash
-pip3 install praxeology-mcp
-praxeology init --name MyOrg --agents 3    # Generates CLAUDE.md, _crew/, _standard/, .mcp.json, DB
-praxeology migrate --project-dir .          # Import existing governance docs into DB
+git clone https://github.com/neomakes/praxeology.git
+cd praxeology
+./setup.sh                                  # Python check, venv, install, CLI setup — one command
+praxeology init --name MyOrg --agents 3     # Generates CLAUDE.md, _crew/, _standard/, .mcp.json, DB
 ```
 
-The MCP server starts automatically when Claude Code loads `.mcp.json`. Your agents immediately gain access to 20 governance tools across all 3 axes.
+That's it. Claude Code auto-loads `.mcp.json` — your agents immediately get 20 governance tools. Ask any agent: `what_now()`
 
 ---
 
@@ -101,16 +102,12 @@ Praxeology v1 is a document framework. The MCP server makes it a **runtime** —
 ### Installation
 
 ```bash
-pip3 install praxeology-mcp
-```
-
-Or install from source:
-
-```bash
 git clone https://github.com/neomakes/praxeology.git
 cd praxeology
-pip3 install -e .
+./setup.sh    # Creates venv, installs deps, adds 'praxeology' to PATH
 ```
+
+Requires Python 3.10+. On macOS: `brew install python@3.12` if needed.
 
 ### 20 MCP Tools — 3 Axes × 5 Operations + 2 Cross-Axis + 3 Metrics
 
