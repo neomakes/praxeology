@@ -244,17 +244,44 @@ def _sanitize_name(raw: str) -> str:
     return raw.replace("/", "").replace("\\", "").replace("..", "").strip()
 
 
-def _try_suggest(parent_tier: str, parent_content: str, child_tier: str, count: int = 4) -> list[str]:
-    """Call local LLM to suggest child tier items. Returns empty list on failure."""
+_onboard_llm = None  # Set during onboard LLM selection
+
+
+def _detect_backends() -> list[dict]:
+    """Detect available LLM backends."""
+    backends = []
+
+    # Check Ollama
     try:
-        from praxeology_mcp.agent_runner import LLMClient
-        llm = LLMClient(model="qwen3:14b", backend="ollama")
+        import urllib.request
+        resp = urllib.request.urlopen("http://localhost:11434/api/tags", timeout=3)
+        data = json.loads(resp.read().decode())
+        models = [m["name"] for m in data.get("models", [])]
+        if models:
+            backends.append({"backend": "ollama", "models": models, "label": f"Ollama (localhost:11434) — {', '.join(models[:5])}"})
+    except Exception:
+        pass
+
+    # Check Claude API
+    api_key = os.environ.get("ANTHROPIC_API_KEY", "")
+    if api_key:
+        backends.append({"backend": "claude", "models": ["claude-sonnet-4-6", "claude-haiku-4-5-20251001"], "label": "Claude API (key detected)"})
+
+    return backends
+
+
+def _try_suggest(parent_tier: str, parent_content: str, child_tier: str, count: int = 4) -> list[str]:
+    """Call LLM to suggest child tier items. Returns empty list on failure."""
+    global _onboard_llm
+    if _onboard_llm is None:
+        return []
+    try:
         prompt = (
             f'Given this {parent_tier}: "{parent_content}"\n\n'
             f"Suggest exactly {count} concise {child_tier} items for an AI agent governance system. "
             f"Return ONLY a JSON array of {count} strings, nothing else."
         )
-        response = llm.chat([
+        response = _onboard_llm.chat([
             {"role": "system", "content": "You are a governance design assistant. Return only valid JSON arrays."},
             {"role": "user", "content": prompt},
         ])
@@ -271,6 +298,20 @@ def _try_suggest(parent_tier: str, parent_content: str, child_tier: str, count: 
 
 def _suggest_and_select(parent_tier: str, parent_content: str, child_tier: str, label: str) -> list[str]:
     """Suggest items via LLM, let user select + add custom. Returns selected items."""
+    global _onboard_llm
+    if _onboard_llm is None:
+        # No LLM — manual only
+        selected: list[str] = []
+        print(f"  {label} (enter empty line to finish):")
+        n = 1
+        while True:
+            item = input(f"    {label} {n}: ").strip()
+            if not item:
+                break
+            selected.append(item)
+            n += 1
+        return selected
+
     print(f"  Generating {child_tier} suggestions...", end=" ", flush=True)
     suggestions = _try_suggest(parent_tier, parent_content, child_tier)
 
@@ -283,14 +324,14 @@ def _suggest_and_select(parent_tier: str, parent_content: str, child_tier: str, 
         print()
         sel = input(f"  Select (e.g. 1,3 or 0 for manual): ").strip()
 
-        selected: list[str] = []
+        selected = []
         if sel != "0":
             for part in sel.split(","):
                 part = part.strip()
                 if part.isdigit() and 1 <= int(part) <= len(suggestions):
                     selected.append(suggestions[int(part) - 1])
     else:
-        print("LLM not available. Manual input.")
+        print("failed. Manual input.")
         selected = []
 
     # Always allow adding more manually
@@ -308,12 +349,51 @@ def _suggest_and_select(parent_tier: str, parent_content: str, child_tier: str, 
 
 def cmd_onboard(_args: argparse.Namespace) -> None:
     """Interactive 3-phase setup wizard with LLM-assisted forward prediction."""
+    global _onboard_llm
     try:
         print()
-        print("  Praxeology — Onboard Wizard (LLM-assisted)")
-        print("  =============================================")
+        print("  Praxeology — Onboard Wizard")
+        print("  ============================")
         print()
 
+        # ── LLM backend selection ──
+        print("  Detecting available LLM backends...")
+        backends = _detect_backends()
+
+        if backends:
+            for i, b in enumerate(backends, 1):
+                print(f"    [{i}] {b['label']}")
+            print(f"    [{len(backends) + 1}] No LLM — manual input only")
+            print()
+            choice = input(f"  Select backend [1]: ").strip() or "1"
+
+            if choice.isdigit() and 1 <= int(choice) <= len(backends):
+                selected_backend = backends[int(choice) - 1]
+                # Model selection
+                models = selected_backend["models"]
+                print()
+                for i, m in enumerate(models, 1):
+                    print(f"    [{i}] {m}")
+                model_choice = input(f"  Select model [1]: ").strip() or "1"
+                if model_choice.isdigit() and 1 <= int(model_choice) <= len(models):
+                    model_name = models[int(model_choice) - 1]
+                else:
+                    model_name = models[0]
+
+                from praxeology_mcp.agent_runner import LLMClient
+                _onboard_llm = LLMClient(
+                    model=model_name,
+                    backend=selected_backend["backend"],
+                )
+                print(f"\n  Using: {selected_backend['backend']} / {model_name}")
+            else:
+                _onboard_llm = None
+                print("\n  Manual input mode.")
+        else:
+            print("    No LLM backends detected. Manual input mode.")
+            _onboard_llm = None
+
+        print()
         org_name = input("  Organization name: ").strip()
         if not org_name:
             print("  Organization name cannot be empty.")
