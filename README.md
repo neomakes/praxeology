@@ -108,19 +108,19 @@ Each agent runs as an **independent daemon process** with its own LLM backbone. 
 │              Praxeology Runtime                  │
 │                                                  │
 │  Agent Daemons (one per crew member):            │
-│    zoro-daemon  → Ollama qwen3:14b              │
-│    robin-daemon → Claude API                     │
-│    nami-daemon  → Ollama qwen3:14b              │
+│    agent-1  → Ollama qwen3:14b (local, free)    │
+│    agent-2  → Claude API (cloud, high quality)   │
+│    agent-3  → Ollama qwen3:14b (local, free)    │
 │                                                  │
-│  Each daemon runs:                               │
+│  Each daemon runs autonomously:                  │
 │    what_now() → LLM call → tool execution        │
 │    → backprop() → repeat                         │
 │                                                  │
-│  Heartbeat Daemon:                               │
+│  Sentinel (safety net when all agents are off):  │
 │    DB monitoring → Discord alerts                │
 │                                                  │
 │  Channels:                                       │
-│    Discord (bot listener) · Web Dashboard        │
+│    Discord · Telegram · Web Dashboard            │
 ├─────────────────────────────────────────────────┤
 │  Governance DB (SQLite + FTS5)                   │
 │  20 MCP Tools (Logical × Tactical × Contextual) │
@@ -129,12 +129,12 @@ Each agent runs as an **independent daemon process** with its own LLM backbone. 
 
 ### Backbone Options
 
-Each agent can use a different backbone — mix and match:
+Each agent can use a different LLM backbone — mix and match:
 
 | Backbone | Cost | Quality | Setup |
 |----------|------|---------|-------|
-| Ollama (local) | Free | Good (14B+) | `praxeology start --crew zoro --model qwen3:14b` |
-| Claude API | API pricing | Excellent | `praxeology start --crew robin --model claude-opus-4-6` |
+| Ollama (local) | Free | Good (14B+) | `praxeology start --crew builder --model qwen3:14b` |
+| Claude API | API pricing | Excellent | `praxeology start --crew reviewer --model claude-opus-4-6` |
 | LM Studio | Free | Varies | Configure endpoint in `praxeology config` |
 
 Requires Python 3.10+. On macOS: `brew install python@3.12` if needed. For Ollama: `brew install ollama && ollama pull qwen3:14b`.
@@ -170,12 +170,13 @@ Over time, as gaps are absorbed into doctrine, more situations are handled by th
 
 **Getting Started:**
 ```bash
-praxeology onboard                              # Interactive wizard: org name, crew, rules, goals
-praxeology start                                 # Start all agents as independent daemons
-praxeology start --crew zoro --model qwen3:14b   # Start one agent with specific backbone
-praxeology stop                                  # Stop all agents
-praxeology stop --crew zoro                      # Stop one agent
-praxeology dashboard                             # Launch web dashboard (localhost:5060)
+praxeology onboard                                  # Interactive wizard: org name, crew, rules, goals
+praxeology start                                     # Start all agents as independent daemons
+praxeology start --crew builder --model qwen3:14b    # Start one agent with specific backbone
+praxeology stop                                      # Stop all agents (sentinel stays as safety net)
+praxeology stop --crew builder                       # Stop one agent
+praxeology stop --all                                # Stop everything including sentinel
+praxeology dashboard                                 # Launch web dashboard (localhost:5060)
 ```
 
 **Management:**
@@ -183,8 +184,11 @@ praxeology dashboard                             # Launch web dashboard (localho
 praxeology status                           # Show agent states, DB stats, config
 praxeology migrate --project-dir .          # Import existing .md/JSON files into DB
 praxeology config --discord-webhook URL     # Set Discord webhook for alerts
+praxeology config --default-model MODEL     # Set default LLM backbone
 praxeology config --list                    # Show all config values
 ```
+
+See [CLI Reference](docs/cli-reference.md) for the full command list.
 
 ---
 
