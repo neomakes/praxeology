@@ -76,24 +76,22 @@ Not a feature list. A coordination problem solver.
 git clone https://github.com/neomakes/praxeology.git
 cd praxeology
 ./setup.sh                # Install (Python check, venv, deps — one command)
+source .venv/bin/activate  # Activate the virtual environment
 praxeology onboard        # Design your org (interactive wizard: name, crew, rules, goals)
 praxeology start           # All agents start working autonomously
 praxeology dashboard       # Monitor everything from your browser
 ```
 
-That's it. Each agent runs as an independent daemon — finds its own work via `what_now()`, executes with its own LLM backbone (Ollama or Claude), records results via `backprop()`, and repeats. You monitor from the dashboard.
+Or design your organization interactively within a Claude Code session:
 
----
-
-## Agent Design System
-
-Every agent gets a `CLAUDE.md` that defines not just *what* it does, but *how* it behaves:
-
-```
-Identity → Persona → Speech Rules → Anti-Patterns → Emotional Triggers → Values → Boundaries
+```bash
+source .venv/bin/activate
+claude                     # Open Claude Code session in project directory
+# Ask: "Help me design a 3-agent team for my startup using praxeology onboard"
+# Claude calls onboard_suggest() to generate governance hierarchy with you
 ```
 
-This makes agents **distinguishable, consistent, and bounded**. A QA agent sounds different from an executor. A planner never writes code. A reviewer never approves their own work. See [Role Design Guide](docs/role-design.md) for the full template and scaling strategies (3 to 15+ agents).
+Each agent runs as an independent daemon — finds its own work via `what_now()`, executes with its own LLM backbone (Ollama or Claude), records results via `backprop()`, and repeats. You monitor from the dashboard.
 
 ---
 
@@ -217,8 +215,8 @@ The same 5-tier × 3-axis structure appears across every domain of organized act
 
 **Logical Axis — WHY & HOW** (rules that govern action)
 
-| Tier | National Law | Military | Corporate | Praxeology MCP |
-|------|-------------|----------|-----------|----------------|
+| Tier | Government | Military | Corporate | Praxeology |
+|:----:|:----------------------|:--------------------------|:--------------------------|:--------------|
 | **1** | Constitution | National Defense Strategy | Articles of Incorporation | **Strategy** |
 | **2** | Statute Law | Operational Doctrine | Corporate Regulations | **Doctrine** |
 | **3** | Decree / Rules | OPLAN / OPORD | Operating Guidelines | **Procedure** |
@@ -227,8 +225,8 @@ The same 5-tier × 3-axis structure appears across every domain of organized act
 
 **Tactical Axis — WHAT & WHEN** (objectives that decompose into action)
 
-| Tier | National Plan | Military | Corporate | Praxeology MCP |
-|------|-------------|----------|-----------|----------------|
+| Tier | Government | Military | Corporate | Praxeology |
+|:----:|:----------------------|:--------------------------|:--------------------------|:--------------|
 | **1** | National Vision | End State | Mission / OKR | **Goal** |
 | **2** | 5-Year Plan | Campaign Plan | Annual Program | **Program** |
 | **3** | Annual Budget | Operation | Quarterly Initiative | **Campaign** |
@@ -237,8 +235,8 @@ The same 5-tier × 3-axis structure appears across every domain of organized act
 
 **Contextual Axis — WHO & WHERE** (organization that contains action)
 
-| Tier | National Org | Military | Corporate | Praxeology MCP |
-|------|-------------|----------|-----------|----------------|
+| Tier | Government | Military | Corporate | Praxeology |
+|:----:|:----------------------|:--------------------------|:--------------------------|:--------------|
 | **1** | Nation | Theater | Company | **Space** |
 | **2** | Ministry | Corps / Division | Department | **Channel** |
 | **3** | Bureau | Battalion / Unit | Team / Project | **Thread** |
