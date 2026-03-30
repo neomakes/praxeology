@@ -285,36 +285,41 @@ def _print_progress_tree(space: str = "", channels: list = None, crew: list = No
     # ── Contextual: Space → Channel → Thread → Crew ──
     if space:
         print("  WHO & WHERE")
-        print(f"    {space} (Space)")
+        print(f"    SPC-001  {space}")
         if channels:
-            # Build crew-to-thread lookup
+            # Build crew-to-thread lookup + crew counter
             crew_by_thread: dict[str, list[str]] = {}
+            crew_counter = 0
+            crew_code_map: dict[str, str] = {}
             if crew:
                 for c in crew:
                     c_name = c["name"] if isinstance(c, dict) else c
+                    if c_name not in crew_code_map:
+                        crew_counter += 1
+                        crew_code_map[c_name] = f"CRW-{crew_counter:03d}"
                     c_threads = c.get("threads", []) if isinstance(c, dict) else []
                     for th_key in c_threads:
                         crew_by_thread.setdefault(th_key, []).append(c_name)
 
+            th_global = 0
             for ci, ch in enumerate(channels):
                 ch_name = ch["name"] if isinstance(ch, dict) else ch
                 threads = ch.get("threads", []) if isinstance(ch, dict) else []
                 is_last_ch = ci == len(channels) - 1
                 ch_prefix = "└──" if is_last_ch else "├──"
-                print(f"      {ch_prefix} # {ch_name}")
+                print(f"      {ch_prefix} CHN-{ci+1:03d}  {ch_name}")
                 for ti, th in enumerate(threads):
+                    th_global += 1
                     th_key = f"{ch_name}/{th}"
                     th_crew = crew_by_thread.get(th_key, [])
                     is_last_th = ti == len(threads) - 1
                     th_indent = "          " if is_last_ch else "      │   "
                     th_prefix = "└──" if (is_last_th and not th_crew) else "├──"
-                    print(f"{th_indent}{th_prefix} {th}")
-                    # Show crew under their thread
+                    print(f"{th_indent}{th_prefix} THR-{th_global:03d}  {th}")
                     for ci2, cn in enumerate(th_crew):
-                        is_last_crew = ci2 == len(th_crew) - 1 and is_last_th
                         crew_indent = th_indent + ("    " if is_last_th else "│   ")
                         crew_prefix = "└──" if ci2 == len(th_crew) - 1 else "├──"
-                        print(f"{crew_indent}{crew_prefix} @{cn}")
+                        print(f"{crew_indent}{crew_prefix} {crew_code_map.get(cn, 'CRW')}  @{cn}")
 
             # Show unassigned crew
             assigned = set()
@@ -324,29 +329,31 @@ def _print_progress_tree(space: str = "", channels: list = None, crew: list = No
                 unassigned = [c for c in crew if (c["name"] if isinstance(c, dict) else c) not in assigned]
                 for i, c in enumerate(unassigned):
                     name = c["name"] if isinstance(c, dict) else c
-                    print(f"      └── @{name} (unassigned)")
+                    print(f"      └── {crew_code_map.get(name, 'CRW')}  @{name} (unassigned)")
 
     # ── Tactical: Goal → Program → Campaign → Plan ──
     if goal:
         print("  WHAT & WHEN")
-        print(f"    {goal} (Goal)")
+        print(f"    GOL-001  {goal}")
+        pln_global = 0
         if programs:
             for pi, prog in enumerate(programs):
                 is_last_prog = pi == len(programs) - 1
                 prog_prefix = "└──" if is_last_prog else "├──"
-                print(f"      {prog_prefix} {prog} (Program)")
+                print(f"      {prog_prefix} PRG-{pi+1:03d}  {prog}")
                 if campaigns:
                     prog_camps = [c for c in campaigns if c.get("program") == prog]
                     for ci, camp in enumerate(prog_camps):
                         is_last_camp = ci == len(prog_camps) - 1
                         camp_indent = "          " if is_last_prog else "      │   "
                         camp_prefix = "└──" if is_last_camp else "├──"
-                        print(f"{camp_indent}{camp_prefix} {camp['name']} (Campaign)")
+                        print(f"{camp_indent}{camp_prefix} CMP-{pi+1}{ci+1:02d}  {camp['name']}")
                         for pli, plan in enumerate(camp.get("plans", [])):
+                            pln_global += 1
                             is_last_plan = pli == len(camp["plans"]) - 1
                             plan_indent = camp_indent + ("    " if is_last_camp else "│   ")
                             plan_prefix = "└──" if is_last_plan else "├──"
-                            print(f"{plan_indent}{plan_prefix} {plan}")
+                            print(f"{plan_indent}{plan_prefix} PLN-{pln_global:03d}  {plan}")
 
     print()
 
