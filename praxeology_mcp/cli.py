@@ -442,7 +442,7 @@ def _suggest_and_select(parent_tier: str, parent_content: str, child_tier: str, 
 
 def cmd_onboard(_args: argparse.Namespace) -> None:
     """Interactive 3-phase setup wizard with LLM-assisted forward prediction."""
-    global _onboard_llm
+    global _onboard_llm, _onboard_lang
     try:
         print()
         print("  Praxeology — Onboard Wizard")
@@ -494,19 +494,20 @@ def cmd_onboard(_args: argparse.Namespace) -> None:
             _onboard_llm = None
         print()
 
-        org_name = input("  Organization name: ").strip()
+        ko = _onboard_lang == "ko"
+        org_name = input("  조직명: " if ko else "  Organization name: ").strip()
         if not org_name:
-            print("  Organization name cannot be empty.")
+            print("  조직명을 입력해주세요." if ko else "  Organization name cannot be empty.")
             sys.exit(1)
 
         # ══════════════════════════════════════════════════════════════
         # Phase 1: WHY & HOW (Logical)
         # ══════════════════════════════════════════════════════════════
         print()
-        print("  ── Phase 1/3: Why & How (Logical) ──")
+        print("  ── 1/3단계: 왜 & 어떻게 (Logical) ──" if ko else "  ── Phase 1/3: Why & How (Logical) ──")
         print()
 
-        mission = input("  Strategy (mission/vision): ").strip()
+        mission = input("  전략 (미션/비전): " if ko else "  Strategy (mission/vision): ").strip()
         print()
 
         # LLM-assisted tree: Strategy → Doctrines
@@ -546,10 +547,10 @@ def cmd_onboard(_args: argparse.Namespace) -> None:
         # Phase 2: WHO & WHERE (Contextual)
         # ══════════════════════════════════════════════════════════════
         _print_progress_tree(mission=mission, rules=rules, procedures=procedures)
-        print("  ── Phase 2/3: Who & Where (Contextual) ──")
+        print("  ── 2/3단계: 누가 & 어디서 (Contextual) ──" if ko else "  ── Phase 2/3: Who & Where (Contextual) ──")
         print()
 
-        space_name = input(f"  Space name [{org_name}]: ").strip() or org_name
+        space_name = input(f"  공간명 [{org_name}]: " if ko else f"  Space name [{org_name}]: ").strip() or org_name
         print()
 
         # LLM-assisted: Space+Strategy → Channel suggestions
@@ -652,12 +653,12 @@ def cmd_onboard(_args: argparse.Namespace) -> None:
         sys.stdout.flush()
         print()
         print("  ══════════════════════════════════════════")
-        print("  ── Phase 3/3: What & When (Tactical) ──")
+        print("  ── 3/3단계: 무엇을 & 언제 (Tactical) ──" if ko else "  ── Phase 3/3: What & When (Tactical) ──")
         print("  ══════════════════════════════════════════")
         print()
         sys.stdout.flush()
 
-        goal = input("  Goal (long-term objective): ").strip()
+        goal = input("  목표 (장기 목표): " if ko else "  Goal (long-term objective): ").strip()
         print()
 
         # LLM-assisted: Goal → Program suggestions
