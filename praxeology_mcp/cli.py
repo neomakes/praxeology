@@ -449,7 +449,15 @@ def cmd_onboard(_args: argparse.Namespace) -> None:
         print("  ============================")
         print()
 
-        # ── LLM backend selection ──
+        # ── 1. Language selection (first) ──
+        print("  Language / 언어:")
+        print("    [1] English")
+        print("    [2] 한국어")
+        lang_choice = input("  Select [1]: ").strip() or "1"
+        _onboard_lang = "ko" if lang_choice == "2" else "en"
+        print()
+
+        # ── 2. LLM backend selection ──
         print("  Detecting available LLM backends...")
         backends = _detect_backends()
 
@@ -462,7 +470,6 @@ def cmd_onboard(_args: argparse.Namespace) -> None:
 
             if choice.isdigit() and 1 <= int(choice) <= len(backends):
                 selected_backend = backends[int(choice) - 1]
-                # Model selection
                 models = selected_backend["models"]
                 print()
                 for i, m in enumerate(models, 1):
@@ -485,14 +492,6 @@ def cmd_onboard(_args: argparse.Namespace) -> None:
         else:
             print("    No LLM backends detected. Manual input mode.")
             _onboard_llm = None
-
-        # ── Language selection ──
-        print()
-        print("  Language / 언어:")
-        print("    [1] English")
-        print("    [2] 한국어")
-        lang_choice = input("  Select [1]: ").strip() or "1"
-        _onboard_lang = "ko" if lang_choice == "2" else "en"
         print()
 
         org_name = input("  Organization name: ").strip()
