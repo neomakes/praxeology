@@ -244,12 +244,74 @@ def _sanitize_name(raw: str) -> str:
     return raw.replace("/", "").replace("\\", "").replace("..", "").strip()
 
 
+def _try_suggest(parent_tier: str, parent_content: str, child_tier: str, count: int = 4) -> list[str]:
+    """Call local LLM to suggest child tier items. Returns empty list on failure."""
+    try:
+        from praxeology_mcp.agent_runner import LLMClient
+        llm = LLMClient(model="qwen3:14b", backend="ollama")
+        prompt = (
+            f'Given this {parent_tier}: "{parent_content}"\n\n'
+            f"Suggest exactly {count} concise {child_tier} items for an AI agent governance system. "
+            f"Return ONLY a JSON array of {count} strings, nothing else."
+        )
+        response = llm.chat([
+            {"role": "system", "content": "You are a governance design assistant. Return only valid JSON arrays."},
+            {"role": "user", "content": prompt},
+        ])
+        content = response.get("content", "")
+        start = content.find("[")
+        end = content.rfind("]") + 1
+        if start >= 0 and end > start:
+            import json as _json
+            return _json.loads(content[start:end])[:count]
+    except Exception:
+        pass
+    return []
+
+
+def _suggest_and_select(parent_tier: str, parent_content: str, child_tier: str, label: str) -> list[str]:
+    """Suggest items via LLM, let user select + add custom. Returns selected items."""
+    print(f"  Generating {child_tier} suggestions...", end=" ", flush=True)
+    suggestions = _try_suggest(parent_tier, parent_content, child_tier)
+
+    if suggestions:
+        print("done.")
+        print()
+        for i, s in enumerate(suggestions, 1):
+            print(f"    [{i}] {s}")
+        print(f"    [0] Skip suggestions / enter manually")
+        print()
+        sel = input(f"  Select (e.g. 1,3 or 0 for manual): ").strip()
+
+        selected: list[str] = []
+        if sel != "0":
+            for part in sel.split(","):
+                part = part.strip()
+                if part.isdigit() and 1 <= int(part) <= len(suggestions):
+                    selected.append(suggestions[int(part) - 1])
+    else:
+        print("LLM not available. Manual input.")
+        selected = []
+
+    # Always allow adding more manually
+    print(f"  Add more {label} (enter empty line to finish):")
+    n = len(selected) + 1
+    while True:
+        item = input(f"    {label} {n}: ").strip()
+        if not item:
+            break
+        selected.append(item)
+        n += 1
+
+    return selected
+
+
 def cmd_onboard(_args: argparse.Namespace) -> None:
-    """Interactive 3-phase setup wizard: Logical → Contextual → Tactical."""
+    """Interactive 3-phase setup wizard with LLM-assisted forward prediction."""
     try:
         print()
-        print("  Praxeology — Onboard Wizard")
-        print("  ============================")
+        print("  Praxeology — Onboard Wizard (LLM-assisted)")
+        print("  =============================================")
         print()
 
         org_name = input("  Organization name: ").strip()
@@ -267,26 +329,35 @@ def cmd_onboard(_args: argparse.Namespace) -> None:
         mission = input("  Strategy (mission/vision): ").strip()
         print()
 
-        print("  Doctrine rules (enter empty line to finish):")
-        rules: list[str] = []
-        n = 1
-        while True:
-            rule = input(f"    Rule {n}: ").strip()
-            if not rule:
-                break
-            rules.append(rule)
-            n += 1
+        # LLM-assisted: Strategy → Doctrine suggestions
+        if mission:
+            rules = _suggest_and_select("strategy", mission, "doctrine rule", "Rule")
+        else:
+            rules = []
+            print("  Doctrine rules (enter empty line to finish):")
+            n = 1
+            while True:
+                rule = input(f"    Rule {n}: ").strip()
+                if not rule:
+                    break
+                rules.append(rule)
+                n += 1
         print()
 
-        print("  Procedures (enter empty line to finish):")
-        procedures: list[str] = []
-        n = 1
-        while True:
-            proc = input(f"    Procedure {n}: ").strip()
-            if not proc:
-                break
-            procedures.append(proc)
-            n += 1
+        # LLM-assisted: Strategy+Doctrine → Procedure suggestions
+        ctx = f"Strategy: {mission}. Doctrines: {', '.join(rules)}" if mission else ""
+        if ctx:
+            procedures = _suggest_and_select("strategy and doctrine", ctx, "operational procedure", "Procedure")
+        else:
+            procedures = []
+            print("  Procedures (enter empty line to finish):")
+            n = 1
+            while True:
+                proc = input(f"    Procedure {n}: ").strip()
+                if not proc:
+                    break
+                procedures.append(proc)
+                n += 1
         print()
 
         # ══════════════════════════════════════════════════════════════
@@ -298,30 +369,61 @@ def cmd_onboard(_args: argparse.Namespace) -> None:
         space_name = input(f"  Space name [{org_name}]: ").strip() or org_name
         print()
 
-        print("  Channels (enter empty line to finish):")
+        # LLM-assisted: Space+Strategy → Channel suggestions
+        space_ctx = f"Organization: {space_name}. Strategy: {mission}"
+        ch_suggestions = _suggest_and_select("organization", space_ctx, "department/channel name", "Channel")
+
         channels: list[dict] = []
-        n = 1
-        while True:
-            ch_name = input(f"    Channel {n} name: ").strip()
-            if not ch_name:
-                break
-            # Threads under this channel
-            threads: list[str] = []
-            print(f"    Threads in '{ch_name}' (enter empty line to finish):")
-            t = 1
-            while True:
-                th_name = input(f"      Thread {t}: ").strip()
-                if not th_name:
-                    break
-                threads.append(th_name)
-                t += 1
-            channels.append({"name": ch_name, "threads": threads})
-            n += 1
+        for ch_name in ch_suggestions:
+            # LLM-assisted: Channel → Thread suggestions
+            th_ctx = f"Organization: {space_name}. Channel: {ch_name}"
+            th_suggestions = _suggest_and_select("channel", th_ctx, "thread/topic name", "Thread")
+            channels.append({"name": ch_name, "threads": th_suggestions})
         print()
 
-        print("  Crew members (enter empty line for name to finish):")
+        # LLM-assisted: Organization context → Crew role suggestions
+        crew_ctx = f"Organization: {space_name}. Strategy: {mission}. Channels: {', '.join(c['name'] for c in channels)}"
+        print("  Generating crew role suggestions...", end=" ", flush=True)
+        crew_suggestions = _try_suggest("organization with channels", crew_ctx, "agent role (format: Name / Role / Department)")
+
+        if crew_suggestions:
+            print("done.")
+            for i, s in enumerate(crew_suggestions, 1):
+                print(f"    [{i}] {s}")
+            print(f"    [0] Skip suggestions / enter manually")
+            print()
+            sel = input("  Select roles to create (e.g. 1,3 or 0): ").strip()
+        else:
+            print("LLM not available.")
+            sel = "0"
+
         crew_members: list[dict] = []
-        n = 1
+
+        # Add selected suggestions
+        if sel != "0" and crew_suggestions:
+            for part in sel.split(","):
+                part = part.strip()
+                if part.isdigit() and 1 <= int(part) <= len(crew_suggestions):
+                    suggested = crew_suggestions[int(part) - 1]
+                    # Parse "Name / Role / Department" format
+                    parts = [p.strip() for p in suggested.split("/")]
+                    name = _sanitize_name(parts[0]) if len(parts) > 0 else ""
+                    role = parts[1] if len(parts) > 1 else ""
+                    dept = parts[2] if len(parts) > 2 else ""
+                    if name:
+                        persona = input(f"    Persona for {name}: ").strip()
+                        ch_assign = ""
+                        if channels:
+                            ch_names = ", ".join(ch["name"] for ch in channels)
+                            ch_assign = input(f"    Channel for {name} [{ch_names}]: ").strip()
+                        crew_members.append({
+                            "name": name, "role": role, "department": dept,
+                            "persona": persona, "channel": ch_assign,
+                        })
+
+        # Always allow adding more manually
+        print("  Add more crew (enter empty name to finish):")
+        n = len(crew_members) + 1
         while True:
             print(f"  Crew {n}:")
             raw_name = input("    Name: ").strip()
@@ -331,7 +433,6 @@ def cmd_onboard(_args: argparse.Namespace) -> None:
             role = input("    Role: ").strip()
             department = input("    Department: ").strip()
             persona = input("    Persona: ").strip()
-            # Channel assignment
             if channels:
                 ch_names = ", ".join(ch["name"] for ch in channels)
                 channel = input(f"    Channel [{ch_names}]: ").strip()
@@ -358,20 +459,34 @@ def cmd_onboard(_args: argparse.Namespace) -> None:
         goal = input("  Goal (long-term objective): ").strip()
         print()
 
-        plan = input("  Plan (short-term plan): ").strip()
+        # LLM-assisted: Goal → Program suggestions
+        if goal:
+            programs = _suggest_and_select("goal", goal, "program (major initiative)", "Program")
+        else:
+            programs = []
         print()
 
-        print("  Work items (enter empty line to finish):")
-        work_items: list[dict] = []
-        n = 1
-        crew_names = ", ".join(m["name"] for m in crew_members)
-        while True:
-            title = input(f"    Work {n} title: ").strip()
-            if not title:
-                break
-            assignee = input(f"    Assignee [{crew_names}]: ").strip()
-            work_items.append({"title": title, "assignee": assignee})
-            n += 1
+        # LLM-assisted: Programs → Campaign suggestions (per program)
+        campaigns: list[dict] = []  # [{"name": str, "program": str, "plans": [str]}]
+        for prog in programs:
+            prog_ctx = f"Goal: {goal}. Program: {prog}"
+            camp_names = _suggest_and_select("program", prog_ctx, "campaign (quarterly initiative)", "Campaign")
+            for camp in camp_names:
+                # LLM-assisted: Campaign → Plan suggestions
+                camp_ctx = f"Goal: {goal}. Program: {prog}. Campaign: {camp}"
+                plans = _suggest_and_select("campaign", camp_ctx, "plan (sprint/weekly plan)", "Plan")
+                campaigns.append({"name": camp, "program": prog, "plans": plans})
+        print()
+
+        # If no programs, allow direct plan input
+        if not programs:
+            plan = input("  Plan (short-term plan): ").strip()
+            plans_flat = [plan] if plan else []
+        else:
+            plans_flat = []  # plans are inside campaigns
+
+        # Work items are NOT collected — what_now() will generate them
+        print("  (Work items will be auto-generated by what_now() from Plans.)")
         print()
 
         # ══════════════════════════════════════════════════════════════
@@ -490,7 +605,7 @@ def cmd_onboard(_args: argparse.Namespace) -> None:
 
         conn.commit()
 
-        # ── Tactical axis ──
+        # ── Tactical axis (Goal → Program → Campaign → Plan) ──
         goal_id = None
         if goal:
             cur = conn.execute(
@@ -500,21 +615,39 @@ def cmd_onboard(_args: argparse.Namespace) -> None:
             goal_id = cur.lastrowid
             counts["objectives"] += 1
 
-        plan_id = None
-        if plan:
+        # Programs → Campaigns → Plans (from LLM-assisted input)
+        for prog_name in programs:
             cur = conn.execute(
-                "INSERT INTO objectives (tier, parent_id, title) VALUES ('plan', ?, ?)",
-                (goal_id, plan),
+                "INSERT INTO objectives (tier, parent_id, title) VALUES ('program', ?, ?)",
+                (goal_id, prog_name),
             )
-            plan_id = cur.lastrowid
+            prog_id = cur.lastrowid
             counts["objectives"] += 1
 
-        for item in work_items:
-            conn.execute(
-                "INSERT INTO objectives (tier, parent_id, title, assignee) VALUES ('work', ?, ?, ?)",
-                (plan_id or goal_id, item["title"], item.get("assignee") or None),
-            )
-            counts["objectives"] += 1
+            for camp in campaigns:
+                if camp["program"] == prog_name:
+                    cur = conn.execute(
+                        "INSERT INTO objectives (tier, parent_id, title) VALUES ('campaign', ?, ?)",
+                        (prog_id, camp["name"]),
+                    )
+                    camp_id = cur.lastrowid
+                    counts["objectives"] += 1
+
+                    for plan_name in camp["plans"]:
+                        conn.execute(
+                            "INSERT INTO objectives (tier, parent_id, title) VALUES ('plan', ?, ?)",
+                            (camp_id, plan_name),
+                        )
+                        counts["objectives"] += 1
+
+        # Fallback: direct plan input (if no programs)
+        if not programs and plans_flat:
+            for p in plans_flat:
+                conn.execute(
+                    "INSERT INTO objectives (tier, parent_id, title) VALUES ('plan', ?, ?)",
+                    (goal_id, p),
+                )
+                counts["objectives"] += 1
 
         conn.commit()
 
