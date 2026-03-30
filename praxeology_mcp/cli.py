@@ -591,61 +591,70 @@ def cmd_onboard(_args: argparse.Namespace) -> None:
                              space=space_name, channels=channels)
         print()
 
-        # LLM-assisted: Organization context → Crew role suggestions
+        # LLM-assisted: Organization context → Crew suggestions (with name + persona)
         crew_ctx = f"Organization: {space_name}. Strategy: {mission}. Channels: {', '.join(c['name'] for c in channels)}"
-        print("  Generating crew role suggestions...", end=" ", flush=True)
-        crew_suggestions = _try_suggest("organization with channels", crew_ctx, "agent role (format: Name / Role / Department)")
+        crew_format = "이름 / 역할 / 부서 / 페르소나(한줄)" if ko else "Name / Role / Department / Persona(one line)"
+        print(f"  {'크루 제안 생성 중' if ko else 'Generating crew suggestions'}...", end=" ", flush=True)
+        crew_suggestions = _try_suggest("organization with channels", crew_ctx,
+                                        f"AI agent crew member (format: {crew_format})")
 
         if crew_suggestions:
-            print("done.")
+            print("완료." if ko else "done.")
             for i, s in enumerate(crew_suggestions, 1):
                 print(f"    [{i}] {s}")
-            print(f"    [0] Skip suggestions / enter manually")
+            print(f"    [0] {'건너뛰기 / 직접 입력' if ko else 'Skip / enter manually'}")
             print()
-            sel = input("  Select roles to create (e.g. 1,3 or 0): ").strip()
+            sel = input(f"  {'선택 (예: 1,3 또는 0)' if ko else 'Select (e.g. 1,3 or 0)'}: ").strip()
         else:
-            print("LLM not available.")
+            print("LLM 사용 불가." if ko else "LLM not available.")
             sel = "0"
 
         crew_members: list[dict] = []
 
-        # Add selected suggestions
+        # Add selected suggestions — parse "Name / Role / Department / Persona"
         if sel != "0" and crew_suggestions:
             for part in sel.split(","):
                 part = part.strip()
                 if part.isdigit() and 1 <= int(part) <= len(crew_suggestions):
                     suggested = crew_suggestions[int(part) - 1]
-                    # Parse "Name / Role / Department" format
                     parts = [p.strip() for p in suggested.split("/")]
                     name = _sanitize_name(parts[0]) if len(parts) > 0 else ""
                     role = parts[1] if len(parts) > 1 else ""
                     dept = parts[2] if len(parts) > 2 else ""
+                    persona = parts[3] if len(parts) > 3 else ""
                     if name:
-                        persona = input(f"    Persona for {name}: ").strip()
+                        # Allow editing persona if LLM provided one
+                        if not persona:
+                            persona = input(f"    {'페르소나' if ko else 'Persona'} ({name}): ").strip()
+                        else:
+                            edit = input(f"    {'페르소나' if ko else 'Persona'} ({name}) [{persona[:40]}]: ").strip()
+                            if edit:
+                                persona = edit
                         ch_assign = ""
                         if channels:
                             ch_names = ", ".join(ch["name"] for ch in channels)
-                            ch_assign = input(f"    Channel for {name} [{ch_names}]: ").strip()
+                            ch_assign = input(f"    {'채널' if ko else 'Channel'} ({name}) [{ch_names}]: ").strip()
                         crew_members.append({
                             "name": name, "role": role, "department": dept,
                             "persona": persona, "channel": ch_assign,
                         })
+                        print(f"    + @{name} ({role})")
 
         # Always allow adding more manually
-        print("  Add more crew (enter empty name to finish):")
+        print(f"  {'추가 크루 (빈 이름으로 종료)' if ko else 'Add more crew (empty name to finish)'}:")
         n = len(crew_members) + 1
         while True:
-            print(f"  Crew {n}:")
-            raw_name = input("    Name: ").strip()
+            print(f"  {'크루' if ko else 'Crew'} {n}:")
+            raw_name = input(f"    {'이름' if ko else 'Name'}: ").strip()
             name = _sanitize_name(raw_name)
             if not name:
                 break
-            role = input("    Role: ").strip()
-            department = input("    Department: ").strip()
-            persona = input("    Persona: ").strip()
+            role = input(f"    {'역할' if ko else 'Role'}: ").strip()
+            department = input(f"    {'부서' if ko else 'Department'}: ").strip()
+            persona = input(f"    {'페르소나' if ko else 'Persona'}: ").strip()
             if channels:
                 ch_names = ", ".join(ch["name"] for ch in channels)
-                channel = input(f"    Channel [{ch_names}]: ").strip()
+                channel = input(f"    {'채널' if ko else 'Channel'} [{ch_names}]: ").strip()
             else:
                 channel = ""
             crew_members.append({
