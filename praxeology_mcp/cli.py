@@ -270,12 +270,13 @@ def cmd_onboard(_args: argparse.Namespace) -> None:
         crew_members: list[dict] = []
         for i in range(1, num_crew + 1):
             print(f"  Crew member {i}:")
-            raw_name = input("    Name: ").strip()
-            # Sanitize: prevent path traversal
-            name = raw_name.replace("/", "").replace("\\", "").replace("..", "").strip()
-            if not name:
-                print("    Invalid name. Skipping.")
-                continue
+            while True:
+                raw_name = input("    Name: ").strip()
+                # Sanitize: prevent path traversal
+                name = raw_name.replace("/", "").replace("\\", "").replace("..", "").strip()
+                if name:
+                    break
+                print("    Name cannot be empty. Try again.")
             role = input("    Role: ").strip()
             department = input("    Department: ").strip()
             persona = input("    Persona: ").strip()

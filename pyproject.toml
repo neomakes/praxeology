@@ -10,7 +10,7 @@ readme = "README.md"
 license = {text = "AGPL-3.0-or-later"}
 requires-python = ">=3.10"
 authors = [{name = "NeoMakes", email = "neo@neomakes.com"}]
-dependencies = ["mcp>=1.0.0"]
+dependencies = ["mcp>=1.0.0", "fastapi>=0.110.0", "uvicorn>=0.29.0", "jinja2>=3.1.0"]
 keywords = ["mcp", "ai-agents", "governance", "praxeology"]
 classifiers = [
     "Development Status :: 3 - Alpha",
