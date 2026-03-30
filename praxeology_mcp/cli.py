@@ -1431,7 +1431,19 @@ def cmd_status(args: argparse.Namespace) -> None:
 # Command: start (agent daemons)
 # ---------------------------------------------------------------------------
 
+def _tmux_session_name(crew_name: str) -> str:
+    return f"prax-{crew_name.lower().replace(' ', '-')}"
+
+
+def _tmux_session_exists(session_name: str) -> bool:
+    import subprocess
+    result = subprocess.run(["tmux", "has-session", "-t", session_name],
+                            capture_output=True)
+    return result.returncode == 0
+
+
 def cmd_start(args: argparse.Namespace) -> None:
+    import subprocess
     from praxeology_mcp.daemon import DaemonManager
     from praxeology_mcp.db import get_db, init_db
 
@@ -1442,26 +1454,27 @@ def cmd_start(args: argparse.Namespace) -> None:
 
     backend = getattr(args, "backend", "ollama")
     model = getattr(args, "model", "qwen3:14b")
+    headless = getattr(args, "headless", False)
     interval = getattr(args, "interval", 60)
     base_url = getattr(args, "base_url", None)
     crew_filter = getattr(args, "crew", None)
+    project_dir = str(Path.cwd())
 
     if crew_filter:
-        # Start a single crew member
         crew_names = [crew_filter]
     else:
-        # Start all registered crew from DB
         rows = conn.execute(
             "SELECT name FROM contextual WHERE tier = 'crew' ORDER BY name"
         ).fetchall()
         if not rows:
-            print("No crew members registered. Run 'praxeology onboard' or 'praxeology migrate' first.")
+            print("No crew members registered. Run 'praxeology onboard' first.")
             return
         crew_names = [r["name"] for r in rows]
 
-    print(f"Starting {len(crew_names)} agent(s) — model={model} backend={backend}")
+    mode = "headless" if headless else "session"
+    print(f"Starting {len(crew_names)} agent(s) — model={model} backend={backend} mode={mode}")
 
-    # Start heartbeat if not running
+    # Start Sentinel if not running
     hb_status = dm.status("heartbeat")
     if not hb_status.get("running"):
         hb_result = dm.start(
@@ -1470,29 +1483,67 @@ def cmd_start(args: argparse.Namespace) -> None:
             name="heartbeat",
             args={"db_path": db_path, "interval": 300},
         )
-        print(f"  heartbeat: {hb_result['status']} (PID {hb_result.get('pid', '?')})")
+        print(f"  Sentinel: {hb_result['status']} (PID {hb_result.get('pid', '?')})")
 
     for crew_name in crew_names:
-        daemon_name = f"agent-{crew_name.lower().replace(' ', '-')}"
-        agent_args = {
-            "crew_id": crew_name,
-            "model": model,
-            "db_path": db_path,
-            "backend": backend,
-            "interval": interval,
-        }
-        if base_url:
-            agent_args["base_url"] = base_url
+        session_name = _tmux_session_name(crew_name)
 
-        result = dm.start(
-            target_module="praxeology_mcp.agent_runner",
-            target_func="run_agent",
-            name=daemon_name,
-            args=agent_args,
-        )
-        print(f"  {crew_name}: {result['status']} (PID {result.get('pid', '?')})")
+        if headless:
+            # Headless mode: AgentRunner daemon (no session access, 24/7)
+            daemon_name = f"agent-{crew_name.lower().replace(' ', '-')}"
+            agent_args = {
+                "crew_id": crew_name, "model": model, "db_path": db_path,
+                "backend": backend, "interval": interval,
+            }
+            if base_url:
+                agent_args["base_url"] = base_url
+            result = dm.start(
+                target_module="praxeology_mcp.agent_runner",
+                target_func="run_agent",
+                name=daemon_name, args=agent_args,
+            )
+            print(f"  {crew_name}: {result['status']} (headless, PID {result.get('pid', '?')})")
+        else:
+            # Session mode: tmux + Claude Code (interactive, attachable)
+            if _tmux_session_exists(session_name):
+                print(f"  {crew_name}: already running (tmux: {session_name})")
+                continue
 
-    print(f"\nAll agents started. Use 'praxeology dashboard' to monitor.")
+            # Build Claude Code command with appropriate backend
+            env_setup = ""
+            if backend == "ollama":
+                ollama_url = base_url or "http://localhost:11434"
+                env_setup = (
+                    f"export ANTHROPIC_AUTH_TOKEN=ollama && "
+                    f"export ANTHROPIC_API_KEY='' && "
+                    f"export ANTHROPIC_BASE_URL={ollama_url} && "
+                )
+
+            claude_cmd = f"{env_setup}cd {project_dir} && claude --model {model}"
+
+            subprocess.run([
+                "tmux", "new-session", "-d", "-s", session_name,
+                "bash", "-c", claude_cmd,
+            ])
+
+            # Inject initial prompt after a brief delay
+            import time
+            time.sleep(2)
+            init_prompt = (
+                f"You are {crew_name}. Read CLAUDE.md and _crew/{crew_name.lower()}/CLAUDE.md. "
+                f"Then call what_now('{crew_name}') to find your first task. "
+                f"Execute the task, then call backprop() with the result. Repeat."
+            )
+            subprocess.run([
+                "tmux", "send-keys", "-t", session_name, init_prompt, "Enter",
+            ])
+
+            print(f"  {crew_name}: started (tmux: {session_name})")
+
+    print(f"\nAll agents started.")
+    if not headless:
+        print(f"  Attach: praxeology attach --crew <name>")
+    print(f"  Monitor: praxeology dashboard")
 
 
 # ---------------------------------------------------------------------------
@@ -1500,6 +1551,7 @@ def cmd_start(args: argparse.Namespace) -> None:
 # ---------------------------------------------------------------------------
 
 def cmd_stop(args: argparse.Namespace) -> None:
+    import subprocess
     from praxeology_mcp.daemon import DaemonManager
 
     dm = DaemonManager()
@@ -1507,29 +1559,92 @@ def cmd_stop(args: argparse.Namespace) -> None:
     stop_all = getattr(args, "stop_all", False)
 
     if stop_all:
+        # Stop all headless daemons
         results = dm.stop_all()
-        if not results:
-            print("No daemons running.")
         for r in results:
             print(f"  {r['name']}: {r['status']}")
+        # Kill all tmux prax- sessions
+        try:
+            out = subprocess.run(["tmux", "list-sessions", "-F", "#{session_name}"],
+                                 capture_output=True, text=True)
+            for line in out.stdout.strip().splitlines():
+                if line.startswith("prax-"):
+                    subprocess.run(["tmux", "kill-session", "-t", line])
+                    print(f"  {line}: killed (tmux)")
+        except Exception:
+            pass
+        if not results:
+            print("No daemons running.")
         return
 
     if crew_filter:
+        # Stop headless daemon
         daemon_name = f"agent-{crew_filter.lower().replace(' ', '-')}"
         result = dm.stop(daemon_name)
-        print(f"  {crew_filter}: {result['status']}")
+        if result.get("status") != "not_running":
+            print(f"  {crew_filter}: {result['status']} (headless)")
+
+        # Kill tmux session
+        session_name = _tmux_session_name(crew_filter)
+        if _tmux_session_exists(session_name):
+            subprocess.run(["tmux", "kill-session", "-t", session_name])
+            print(f"  {crew_filter}: killed (tmux: {session_name})")
+        elif result.get("status") == "not_running":
+            print(f"  {crew_filter}: not running")
         return
 
-    # Stop all agent-* daemons but keep heartbeat
+    # Stop all agent daemons + tmux sessions, keep Sentinel
     daemons = dm.list_all()
-    agent_daemons = [d for d in daemons if d["name"].startswith("agent-")]
-    if not agent_daemons:
-        print("No agent daemons running.")
+    for d in daemons:
+        if d["name"].startswith("agent-"):
+            result = dm.stop(d["name"])
+            print(f"  {d['name']}: {result['status']}")
+    try:
+        out = subprocess.run(["tmux", "list-sessions", "-F", "#{session_name}"],
+                             capture_output=True, text=True)
+        for line in out.stdout.strip().splitlines():
+            if line.startswith("prax-"):
+                subprocess.run(["tmux", "kill-session", "-t", line])
+                print(f"  {line}: killed (tmux)")
+    except Exception:
+        pass
+
+
+# ---------------------------------------------------------------------------
+# Command: attach (connect to agent session)
+# ---------------------------------------------------------------------------
+
+def cmd_attach(args: argparse.Namespace) -> None:
+    import subprocess
+
+    crew_name = args.crew
+    if not crew_name:
+        # List available sessions
+        try:
+            out = subprocess.run(["tmux", "list-sessions", "-F", "#{session_name} #{session_attached}"],
+                                 capture_output=True, text=True)
+            sessions = []
+            for line in out.stdout.strip().splitlines():
+                parts = line.split()
+                if parts and parts[0].startswith("prax-"):
+                    name = parts[0][5:]  # Remove "prax-" prefix
+                    attached = "(attached)" if len(parts) > 1 and parts[1] != "0" else "(detached)"
+                    sessions.append((name, attached))
+                    print(f"  {name} {attached}")
+            if not sessions:
+                print("No agent sessions running. Use 'praxeology start' first.")
+        except FileNotFoundError:
+            print("tmux not installed. Install with: brew install tmux")
         return
 
-    for d in agent_daemons:
-        result = dm.stop(d["name"])
-        print(f"  {d['name']}: {result['status']}")
+    session_name = _tmux_session_name(crew_name)
+    if not _tmux_session_exists(session_name):
+        print(f"No session for '{crew_name}'. Start with: praxeology start --crew {crew_name}")
+        return
+
+    # Attach to the session (replaces current terminal)
+    import os
+    os.execvp("tmux", ["tmux", "attach", "-t", session_name])
 
 
 # ---------------------------------------------------------------------------
@@ -1601,17 +1716,22 @@ def main(argv: list[str] | None = None) -> None:
     subparsers.add_parser("onboard", help="Interactive setup wizard for new organization")
 
     # start
-    start_parser = subparsers.add_parser("start", help="Start agent daemons")
+    start_parser = subparsers.add_parser("start", help="Start agent sessions")
     start_parser.add_argument("--crew", metavar="NAME", help="Start a specific crew member (default: all)")
     start_parser.add_argument("--model", default="qwen3:14b", help="LLM model (default: qwen3:14b)")
     start_parser.add_argument("--backend", default="ollama", choices=["ollama", "claude"], help="LLM backend")
-    start_parser.add_argument("--interval", type=int, default=60, help="Seconds between ticks (default: 60)")
+    start_parser.add_argument("--headless", action="store_true", help="Headless daemon mode (no session, 24/7)")
+    start_parser.add_argument("--interval", type=int, default=60, help="Headless tick interval (default: 60)")
     start_parser.add_argument("--base-url", default=None, help="LLM API base URL override")
 
     # stop
-    stop_parser = subparsers.add_parser("stop", help="Stop agent daemons")
+    stop_parser = subparsers.add_parser("stop", help="Stop agent sessions")
     stop_parser.add_argument("--crew", metavar="NAME", help="Stop a specific crew member")
-    stop_parser.add_argument("--all", action="store_true", dest="stop_all", help="Stop all agents + heartbeat")
+    stop_parser.add_argument("--all", action="store_true", dest="stop_all", help="Stop all agents + sentinel")
+
+    # attach
+    attach_parser = subparsers.add_parser("attach", help="Attach to an agent session")
+    attach_parser.add_argument("--crew", metavar="NAME", help="Crew member to attach to (omit to list)")
 
     parsed = parser.parse_args(argv)
 
@@ -1637,6 +1757,8 @@ def main(argv: list[str] | None = None) -> None:
         cmd_start(parsed)
     elif parsed.command == "stop":
         cmd_stop(parsed)
+    elif parsed.command == "attach":
+        cmd_attach(parsed)
     else:
         parser.print_help()
         sys.exit(1)
