@@ -329,7 +329,7 @@ def cmd_onboard(_args: argparse.Namespace) -> None:
         mission = input("  Strategy (mission/vision): ").strip()
         print()
 
-        # LLM-assisted: Strategy → Doctrine suggestions
+        # LLM-assisted tree: Strategy → Doctrines
         if mission:
             rules = _suggest_and_select("strategy", mission, "doctrine rule", "Rule")
         else:
@@ -344,20 +344,22 @@ def cmd_onboard(_args: argparse.Namespace) -> None:
                 n += 1
         print()
 
-        # LLM-assisted: Strategy+Doctrine → Procedure suggestions
-        ctx = f"Strategy: {mission}. Doctrines: {', '.join(rules)}" if mission else ""
-        if ctx:
-            procedures = _suggest_and_select("strategy and doctrine", ctx, "operational procedure", "Procedure")
-        else:
-            procedures = []
-            print("  Procedures (enter empty line to finish):")
-            n = 1
-            while True:
-                proc = input(f"    Procedure {n}: ").strip()
-                if not proc:
-                    break
-                procedures.append(proc)
-                n += 1
+        # Tree: each Doctrine → Procedures for that doctrine
+        procedures: list[dict] = []  # [{"name": str, "doctrine": str}]
+        for rule in rules:
+            rule_ctx = f"Strategy: {mission}. Doctrine: {rule}"
+            print(f"  Procedures for doctrine: '{rule[:60]}'")
+            procs = _suggest_and_select("doctrine", rule_ctx, "procedure", "Procedure")
+            for p in procs:
+                procedures.append({"name": p, "doctrine": rule})
+
+            # Tree: each Procedure → Playbooks for that procedure
+            for proc in procs:
+                proc_ctx = f"Strategy: {mission}. Doctrine: {rule}. Procedure: {proc}"
+                print(f"    Playbooks for procedure: '{proc[:50]}'")
+                playbooks = _suggest_and_select("procedure", proc_ctx, "playbook (concrete how-to)", "Playbook")
+                for pb in playbooks:
+                    procedures.append({"name": pb, "doctrine": rule, "playbook_of": proc})
         print()
 
         # ══════════════════════════════════════════════════════════════
@@ -555,11 +557,30 @@ def cmd_onboard(_args: argparse.Namespace) -> None:
             )
             counts["standards"] += 1
 
-        for i, proc in enumerate(procedures, 1):
-            conn.execute(
-                "INSERT INTO standards (tier, department, code, title, content) VALUES (?, ?, ?, ?, ?)",
-                ("procedure", "org", f"PRC-{i:03d}", f"Procedure {i}", proc),
-            )
+        prc_n = 0
+        ply_n = 0
+        for proc in procedures:
+            if isinstance(proc, dict):
+                if proc.get("playbook_of"):
+                    ply_n += 1
+                    conn.execute(
+                        "INSERT INTO standards (tier, department, code, title, content) VALUES (?, ?, ?, ?, ?)",
+                        ("playbook", "org", f"PLY-{ply_n:03d}", proc["name"],
+                         f"Playbook for procedure: {proc.get('playbook_of', '')}"),
+                    )
+                else:
+                    prc_n += 1
+                    conn.execute(
+                        "INSERT INTO standards (tier, department, code, title, content) VALUES (?, ?, ?, ?, ?)",
+                        ("procedure", "org", f"PRC-{prc_n:03d}", proc["name"],
+                         f"Under doctrine: {proc.get('doctrine', '')}"),
+                    )
+            else:
+                prc_n += 1
+                conn.execute(
+                    "INSERT INTO standards (tier, department, code, title, content) VALUES (?, ?, ?, ?, ?)",
+                    ("procedure", "org", f"PRC-{prc_n:03d}", f"Procedure {prc_n}", proc),
+                )
             counts["standards"] += 1
 
         conn.commit()
