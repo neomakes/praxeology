@@ -292,9 +292,15 @@ def cmd_onboard(_args: argparse.Namespace) -> None:
         print()
 
         # Step 5: Core doctrine rules
-        print("  Core rules (comma-separated):")
-        rules_raw = input("  > ").strip()
-        rules = [r.strip() for r in rules_raw.split(",") if r.strip()]
+        print("  Core doctrine rules (enter empty line to finish):")
+        rules = []
+        rule_num = 1
+        while True:
+            rule = input(f"  Rule {rule_num}: ").strip()
+            if not rule:
+                break
+            rules.append(rule)
+            rule_num += 1
         print()
 
         # Step 6: Primary goal
@@ -302,9 +308,15 @@ def cmd_onboard(_args: argparse.Namespace) -> None:
         print()
 
         # Step 7: Immediate work items
-        print("  Immediate work items (comma-separated):")
-        work_raw = input("  > ").strip()
-        work_items = [w.strip() for w in work_raw.split(",") if w.strip()]
+        print("  Immediate work items (enter empty line to finish):")
+        work_items = []
+        work_num = 1
+        while True:
+            item = input(f"  Work {work_num}: ").strip()
+            if not item:
+                break
+            work_items.append(item)
+            work_num += 1
         print()
 
         # --- Generate everything ---
