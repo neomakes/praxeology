@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -235,6 +236,230 @@ def cmd_init(args: argparse.Namespace) -> None:
 
 
 # ---------------------------------------------------------------------------
+# Command: onboard
+# ---------------------------------------------------------------------------
+
+def cmd_onboard(_args: argparse.Namespace) -> None:
+    """Interactive setup wizard for a new organization."""
+    try:
+        print()
+        print("  Praxeology — Onboard Wizard")
+        print("  ============================")
+        print()
+
+        # Step 1: Organization name
+        org_name = input("  Organization name: ").strip()
+        if not org_name:
+            print("Organization name cannot be empty.")
+            sys.exit(1)
+        print()
+
+        # Step 2: Number of crew members
+        while True:
+            try:
+                num_crew = int(input("  How many crew members? ").strip())
+                if num_crew < 1:
+                    print("  At least 1 crew member is required.")
+                    continue
+                break
+            except ValueError:
+                print("  Please enter a non-negative integer.")
+        print()
+
+        # Step 3: Crew member details
+        crew_members: list[dict] = []
+        for i in range(1, num_crew + 1):
+            print(f"  Crew member {i}:")
+            raw_name = input("    Name: ").strip()
+            # Sanitize: prevent path traversal
+            name = raw_name.replace("/", "").replace("\\", "").replace("..", "").strip()
+            if not name:
+                print("    Invalid name. Skipping.")
+                continue
+            role = input("    Role: ").strip()
+            department = input("    Department: ").strip()
+            persona = input("    Persona: ").strip()
+            crew_members.append({
+                "name": name,
+                "role": role,
+                "department": department,
+                "persona": persona,
+            })
+            print()
+
+        # Step 4: Mission/Strategy
+        mission = input("  Mission/Strategy: ").strip()
+        print()
+
+        # Step 5: Core doctrine rules
+        print("  Core rules (comma-separated):")
+        rules_raw = input("  > ").strip()
+        rules = [r.strip() for r in rules_raw.split(",") if r.strip()]
+        print()
+
+        # Step 6: Primary goal
+        goal = input("  Primary goal: ").strip()
+        print()
+
+        # Step 7: Immediate work items
+        print("  Immediate work items (comma-separated):")
+        work_raw = input("  > ").strip()
+        work_items = [w.strip() for w in work_raw.split(",") if w.strip()]
+        print()
+
+        # --- Generate everything ---
+        print("  Generating...")
+        cwd = Path.cwd()
+        created: list[str] = []
+
+        # 1. Root CLAUDE.md
+        root_claude = cwd / "CLAUDE.md"
+        root_claude.write_text(_ROOT_CLAUDE_MD.format(name=org_name), encoding="utf-8")
+        print(f"    + CLAUDE.md")
+        created.append(str(root_claude))
+
+        # 2. _crew/CLAUDE.md
+        crew_dir = cwd / "_crew"
+        crew_dir.mkdir(exist_ok=True)
+        crew_claude = crew_dir / "CLAUDE.md"
+        crew_claude.write_text(_CREW_CLAUDE_MD.format(name=org_name), encoding="utf-8")
+        print(f"    + _crew/CLAUDE.md")
+        created.append(str(crew_claude))
+
+        # 3. Per-crew CLAUDE.md files
+        for idx, member in enumerate(crew_members, start=1):
+            member_dir = crew_dir / member["name"].lower()
+            member_dir.mkdir(exist_ok=True)
+            member_claude = member_dir / "CLAUDE.md"
+            content = _AGENT_CLAUDE_MD.format(
+                agent_name=member["name"],
+                agent_num=idx,
+            )
+            # Fill in role, department, persona placeholders
+            content = content.replace(
+                "- Role: [Define role here]",
+                f"- Role: {member['role']}",
+            ).replace(
+                "- Department: [Define department here]",
+                f"- Department: {member['department']}",
+            ).replace(
+                "[Describe the agent's personality and working style here.]",
+                member["persona"],
+            )
+            member_claude.write_text(content, encoding="utf-8")
+            print(f"    + _crew/{member['name'].lower()}/CLAUDE.md")
+            created.append(str(member_claude))
+
+        # 4. _standard/ directory
+        standard_dir = cwd / "_standard"
+        standard_dir.mkdir(exist_ok=True)
+        print(f"    + _standard/")
+        created.append(str(standard_dir) + "/")
+
+        # 5. .mcp.json
+        mcp_json_path = cwd / ".mcp.json"
+        mcp_json_path.write_text(
+            json.dumps(_build_mcp_json(cwd), indent=2) + "\n", encoding="utf-8"
+        )
+        print(f"    + .mcp.json")
+        created.append(str(mcp_json_path))
+
+        # 6. Initialize DB and insert records
+        db_dir = Path.home() / ".claude" / "praxeology"
+        db_dir.mkdir(parents=True, exist_ok=True)
+        db_path = db_dir / "praxeology.db"
+
+        from praxeology_mcp.db import init_db, get_db
+        conn = init_db(str(db_path))
+
+        num_standards = 0
+        num_objectives = 0
+        num_crew_contexts = 0
+
+        # Strategy standard
+        if mission:
+            conn.execute(
+                "INSERT INTO standards (tier, department, code, title, content)"
+                " VALUES (?, ?, ?, ?, ?)",
+                ("strategy", "org", "STR-001", f"{org_name} — Strategy", mission),
+            )
+            num_standards += 1
+
+        # Doctrine standards
+        for rule_idx, rule in enumerate(rules, start=1):
+            conn.execute(
+                "INSERT INTO standards (tier, department, code, title, content)"
+                " VALUES (?, ?, ?, ?, ?)",
+                ("doctrine", "org", f"DOC-{rule_idx:03d}", f"Doctrine {rule_idx}", rule),
+            )
+            num_standards += 1
+
+        conn.commit()
+
+        # Goal objective
+        if goal:
+            conn.execute(
+                "INSERT INTO objectives (tier, title, description)"
+                " VALUES (?, ?, ?)",
+                ("goal", f"{org_name} — Primary Goal", goal),
+            )
+            num_objectives += 1
+
+        # Plan objective
+        if work_items:
+            cur = conn.execute(
+                "INSERT INTO objectives (tier, title) VALUES ('plan', ?)",
+                (f"{org_name} — Initial Plan",),
+            )
+            plan_id = cur.lastrowid
+            num_objectives += 1
+
+            # Work objectives
+            for item in work_items:
+                conn.execute(
+                    "INSERT INTO objectives (tier, parent_id, title)"
+                    " VALUES ('work', ?, ?)",
+                    (plan_id, item),
+                )
+                num_objectives += 1
+
+        conn.commit()
+
+        # Crew contexts
+        for member in crew_members:
+            member_dir = crew_dir / member["name"].lower()
+            conn.execute(
+                "INSERT INTO contexts (tier, name, metadata)"
+                " VALUES ('crew', ?, ?)",
+                (
+                    member["name"],
+                    json.dumps({
+                        "role": member["role"],
+                        "department": member["department"],
+                        "source_dir": str(member_dir),
+                    }),
+                ),
+            )
+            num_crew_contexts += 1
+
+        conn.commit()
+
+        print(
+            f"    + Database initialized "
+            f"({num_standards} standards, {num_objectives} objectives, "
+            f"{num_crew_contexts} crew)"
+        )
+        print()
+        print("  Onboard complete! Run 'praxeology start' to begin.")
+        print()
+
+    except KeyboardInterrupt:
+        print()
+        print("Onboard cancelled.")
+        sys.exit(0)
+
+
+# ---------------------------------------------------------------------------
 # Command: connect
 # ---------------------------------------------------------------------------
 
@@ -267,8 +492,11 @@ _PRIORITY_MAP = {
 }
 
 
+_DEFAULT_DB = str(Path.home() / ".claude" / "praxeology" / "praxeology.db")
+
+
 def _db_path() -> str:
-    return str(Path.home() / ".claude" / "praxeology" / "praxeology.db")
+    return os.environ.get("PRAXEOLOGY_DB", _DEFAULT_DB)
 
 
 def cmd_migrate(args: argparse.Namespace) -> None:
@@ -620,6 +848,111 @@ def cmd_status(args: argparse.Namespace) -> None:
 
 
 # ---------------------------------------------------------------------------
+# Command: start (agent daemons)
+# ---------------------------------------------------------------------------
+
+def cmd_start(args: argparse.Namespace) -> None:
+    from praxeology_mcp.daemon import DaemonManager
+    from praxeology_mcp.db import get_db, init_db
+
+    dm = DaemonManager()
+    db_path = _db_path()
+    init_db(db_path)
+    conn = get_db(db_path)
+
+    backend = getattr(args, "backend", "ollama")
+    model = getattr(args, "model", "qwen3:14b")
+    interval = getattr(args, "interval", 60)
+    base_url = getattr(args, "base_url", None)
+    crew_filter = getattr(args, "crew", None)
+
+    if crew_filter:
+        # Start a single crew member
+        crew_names = [crew_filter]
+    else:
+        # Start all registered crew from DB
+        rows = conn.execute(
+            "SELECT name FROM contexts WHERE tier = 'crew' ORDER BY name"
+        ).fetchall()
+        if not rows:
+            print("No crew members registered. Run 'praxeology onboard' or 'praxeology migrate' first.")
+            return
+        crew_names = [r["name"] for r in rows]
+
+    print(f"Starting {len(crew_names)} agent(s) — model={model} backend={backend}")
+
+    # Start heartbeat if not running
+    hb_status = dm.status("heartbeat")
+    if not hb_status.get("running"):
+        hb_result = dm.start(
+            target_module="praxeology_mcp.heartbeat",
+            target_func="run_daemon",
+            name="heartbeat",
+            args={"db_path": db_path, "interval": 300},
+        )
+        print(f"  heartbeat: {hb_result['status']} (PID {hb_result.get('pid', '?')})")
+
+    for crew_name in crew_names:
+        daemon_name = f"agent-{crew_name.lower().replace(' ', '-')}"
+        agent_args = {
+            "crew_id": crew_name,
+            "model": model,
+            "db_path": db_path,
+            "backend": backend,
+            "interval": interval,
+        }
+        if base_url:
+            agent_args["base_url"] = base_url
+
+        result = dm.start(
+            target_module="praxeology_mcp.agent_runner",
+            target_func="run_agent",
+            name=daemon_name,
+            args=agent_args,
+        )
+        print(f"  {crew_name}: {result['status']} (PID {result.get('pid', '?')})")
+
+    print(f"\nAll agents started. Use 'praxeology dashboard' to monitor.")
+
+
+# ---------------------------------------------------------------------------
+# Command: stop (agent daemons)
+# ---------------------------------------------------------------------------
+
+def cmd_stop(args: argparse.Namespace) -> None:
+    from praxeology_mcp.daemon import DaemonManager
+
+    dm = DaemonManager()
+    crew_filter = getattr(args, "crew", None)
+    stop_all = getattr(args, "stop_all", False)
+
+    if stop_all:
+        results = dm.stop_all()
+        if not results:
+            print("No daemons running.")
+        for r in results:
+            print(f"  {r['name']}: {r['status']}")
+        return
+
+    if crew_filter:
+        daemon_name = f"agent-{crew_filter.lower().replace(' ', '-')}"
+        result = dm.stop(daemon_name)
+        print(f"  {crew_filter}: {result['status']}")
+        return
+
+    # Stop all agent-* daemons but keep heartbeat
+    daemons = dm.list_all()
+    agent_daemons = [d for d in daemons if d["name"].startswith("agent-")]
+    if not agent_daemons:
+        print("No agent daemons running.")
+        return
+
+    for d in agent_daemons:
+        result = dm.stop(d["name"])
+        print(f"  {d['name']}: {result['status']}")
+
+
+# ---------------------------------------------------------------------------
 # Entry point
 # ---------------------------------------------------------------------------
 
@@ -684,6 +1017,22 @@ def main(argv: list[str] | None = None) -> None:
     config_parser.add_argument("--discord-webhook", help="Discord webhook URL for heartbeat alerts")
     config_parser.add_argument("--list", action="store_true", help="List all config values")
 
+    # onboard
+    subparsers.add_parser("onboard", help="Interactive setup wizard for new organization")
+
+    # start
+    start_parser = subparsers.add_parser("start", help="Start agent daemons")
+    start_parser.add_argument("--crew", metavar="NAME", help="Start a specific crew member (default: all)")
+    start_parser.add_argument("--model", default="qwen3:14b", help="LLM model (default: qwen3:14b)")
+    start_parser.add_argument("--backend", default="ollama", choices=["ollama", "claude"], help="LLM backend")
+    start_parser.add_argument("--interval", type=int, default=60, help="Seconds between ticks (default: 60)")
+    start_parser.add_argument("--base-url", default=None, help="LLM API base URL override")
+
+    # stop
+    stop_parser = subparsers.add_parser("stop", help="Stop agent daemons")
+    stop_parser.add_argument("--crew", metavar="NAME", help="Stop a specific crew member")
+    stop_parser.add_argument("--all", action="store_true", dest="stop_all", help="Stop all agents + heartbeat")
+
     parsed = parser.parse_args(argv)
 
     if parsed.command == "init":
@@ -702,6 +1051,12 @@ def main(argv: list[str] | None = None) -> None:
         cmd_daemon(parsed)
     elif parsed.command == "config":
         cmd_config(parsed)
+    elif parsed.command == "onboard":
+        cmd_onboard(parsed)
+    elif parsed.command == "start":
+        cmd_start(parsed)
+    elif parsed.command == "stop":
+        cmd_stop(parsed)
     else:
         parser.print_help()
         sys.exit(1)
