@@ -239,228 +239,289 @@ def cmd_init(args: argparse.Namespace) -> None:
 # Command: onboard
 # ---------------------------------------------------------------------------
 
+def _sanitize_name(raw: str) -> str:
+    """Remove path traversal characters from a name."""
+    return raw.replace("/", "").replace("\\", "").replace("..", "").strip()
+
+
 def cmd_onboard(_args: argparse.Namespace) -> None:
-    """Interactive setup wizard for a new organization."""
+    """Interactive 3-phase setup wizard: Logical → Contextual → Tactical."""
     try:
         print()
         print("  Praxeology — Onboard Wizard")
         print("  ============================")
         print()
 
-        # Step 1: Organization name
         org_name = input("  Organization name: ").strip()
         if not org_name:
-            print("Organization name cannot be empty.")
+            print("  Organization name cannot be empty.")
             sys.exit(1)
+
+        # ══════════════════════════════════════════════════════════════
+        # Phase 1: WHY & HOW (Logical)
+        # ══════════════════════════════════════════════════════════════
+        print()
+        print("  ── Phase 1/3: Why & How (Logical) ──")
         print()
 
-        # Step 2: Number of crew members
+        mission = input("  Strategy (mission/vision): ").strip()
+        print()
+
+        print("  Doctrine rules (enter empty line to finish):")
+        rules: list[str] = []
+        n = 1
         while True:
-            try:
-                num_crew = int(input("  How many crew members? ").strip())
-                if num_crew < 1:
-                    print("  At least 1 crew member is required.")
-                    continue
-                break
-            except ValueError:
-                print("  Please enter a non-negative integer.")
-        print()
-
-        # Step 3: Crew member details
-        crew_members: list[dict] = []
-        for i in range(1, num_crew + 1):
-            print(f"  Crew member {i}:")
-            while True:
-                raw_name = input("    Name: ").strip()
-                # Sanitize: prevent path traversal
-                name = raw_name.replace("/", "").replace("\\", "").replace("..", "").strip()
-                if name:
-                    break
-                print("    Name cannot be empty. Try again.")
-            role = input("    Role: ").strip()
-            department = input("    Department: ").strip()
-            persona = input("    Persona: ").strip()
-            crew_members.append({
-                "name": name,
-                "role": role,
-                "department": department,
-                "persona": persona,
-            })
-            print()
-
-        # Step 4: Mission/Strategy
-        mission = input("  Mission/Strategy: ").strip()
-        print()
-
-        # Step 5: Core doctrine rules
-        print("  Core doctrine rules (enter empty line to finish):")
-        rules = []
-        rule_num = 1
-        while True:
-            rule = input(f"  Rule {rule_num}: ").strip()
+            rule = input(f"    Rule {n}: ").strip()
             if not rule:
                 break
             rules.append(rule)
-            rule_num += 1
+            n += 1
         print()
 
-        # Step 6: Primary goal
-        goal = input("  Primary goal: ").strip()
-        print()
-
-        # Step 7: Immediate work items
-        print("  Immediate work items (enter empty line to finish):")
-        work_items = []
-        work_num = 1
+        print("  Procedures (enter empty line to finish):")
+        procedures: list[str] = []
+        n = 1
         while True:
-            item = input(f"  Work {work_num}: ").strip()
-            if not item:
+            proc = input(f"    Procedure {n}: ").strip()
+            if not proc:
                 break
-            work_items.append(item)
-            work_num += 1
+            procedures.append(proc)
+            n += 1
         print()
 
-        # --- Generate everything ---
+        # ══════════════════════════════════════════════════════════════
+        # Phase 2: WHO & WHERE (Contextual)
+        # ══════════════════════════════════════════════════════════════
+        print("  ── Phase 2/3: Who & Where (Contextual) ──")
+        print()
+
+        space_name = input(f"  Space name [{org_name}]: ").strip() or org_name
+        print()
+
+        print("  Channels (enter empty line to finish):")
+        channels: list[dict] = []
+        n = 1
+        while True:
+            ch_name = input(f"    Channel {n} name: ").strip()
+            if not ch_name:
+                break
+            # Threads under this channel
+            threads: list[str] = []
+            print(f"    Threads in '{ch_name}' (enter empty line to finish):")
+            t = 1
+            while True:
+                th_name = input(f"      Thread {t}: ").strip()
+                if not th_name:
+                    break
+                threads.append(th_name)
+                t += 1
+            channels.append({"name": ch_name, "threads": threads})
+            n += 1
+        print()
+
+        print("  Crew members (enter empty line for name to finish):")
+        crew_members: list[dict] = []
+        n = 1
+        while True:
+            print(f"  Crew {n}:")
+            raw_name = input("    Name: ").strip()
+            name = _sanitize_name(raw_name)
+            if not name:
+                break
+            role = input("    Role: ").strip()
+            department = input("    Department: ").strip()
+            persona = input("    Persona: ").strip()
+            # Channel assignment
+            if channels:
+                ch_names = ", ".join(ch["name"] for ch in channels)
+                channel = input(f"    Channel [{ch_names}]: ").strip()
+            else:
+                channel = ""
+            crew_members.append({
+                "name": name, "role": role, "department": department,
+                "persona": persona, "channel": channel,
+            })
+            n += 1
+            print()
+
+        if not crew_members:
+            print("  At least 1 crew member is required.")
+            sys.exit(1)
+
+        # ══════════════════════════════════════════════════════════════
+        # Phase 3: WHAT & WHEN (Tactical)
+        # ══════════════════════════════════════════════════════════════
+        print()
+        print("  ── Phase 3/3: What & When (Tactical) ──")
+        print()
+
+        goal = input("  Goal (long-term objective): ").strip()
+        print()
+
+        plan = input("  Plan (short-term plan): ").strip()
+        print()
+
+        print("  Work items (enter empty line to finish):")
+        work_items: list[dict] = []
+        n = 1
+        crew_names = ", ".join(m["name"] for m in crew_members)
+        while True:
+            title = input(f"    Work {n} title: ").strip()
+            if not title:
+                break
+            assignee = input(f"    Assignee [{crew_names}]: ").strip()
+            work_items.append({"title": title, "assignee": assignee})
+            n += 1
+        print()
+
+        # ══════════════════════════════════════════════════════════════
+        # Generate files + DB
+        # ══════════════════════════════════════════════════════════════
         print("  Generating...")
         cwd = Path.cwd()
-        created: list[str] = []
 
-        # 1. Root CLAUDE.md
+        # Files: CLAUDE.md, _crew/, _standard/, .mcp.json
         root_claude = cwd / "CLAUDE.md"
         root_claude.write_text(_ROOT_CLAUDE_MD.format(name=org_name), encoding="utf-8")
-        print(f"    + CLAUDE.md")
-        created.append(str(root_claude))
+        print("    + CLAUDE.md")
 
-        # 2. _crew/CLAUDE.md
         crew_dir = cwd / "_crew"
         crew_dir.mkdir(exist_ok=True)
         crew_claude = crew_dir / "CLAUDE.md"
         crew_claude.write_text(_CREW_CLAUDE_MD.format(name=org_name), encoding="utf-8")
-        print(f"    + _crew/CLAUDE.md")
-        created.append(str(crew_claude))
+        print("    + _crew/CLAUDE.md")
 
-        # 3. Per-crew CLAUDE.md files
         for idx, member in enumerate(crew_members, start=1):
             member_dir = crew_dir / member["name"].lower()
             member_dir.mkdir(exist_ok=True)
-            member_claude = member_dir / "CLAUDE.md"
-            content = _AGENT_CLAUDE_MD.format(
-                agent_name=member["name"],
-                agent_num=idx,
-            )
-            # Fill in role, department, persona placeholders
+            content = _AGENT_CLAUDE_MD.format(agent_name=member["name"], agent_num=idx)
             content = content.replace(
-                "- Role: [Define role here]",
-                f"- Role: {member['role']}",
+                "- Role: [Define role here]", f"- Role: {member['role']}",
             ).replace(
-                "- Department: [Define department here]",
-                f"- Department: {member['department']}",
+                "- Department: [Define department here]", f"- Department: {member['department']}",
             ).replace(
-                "[Describe the agent's personality and working style here.]",
-                member["persona"],
+                "[Describe the agent's personality and working style here.]", member["persona"],
             )
-            member_claude.write_text(content, encoding="utf-8")
+            (member_dir / "CLAUDE.md").write_text(content, encoding="utf-8")
             print(f"    + _crew/{member['name'].lower()}/CLAUDE.md")
-            created.append(str(member_claude))
 
-        # 4. _standard/ directory
         standard_dir = cwd / "_standard"
         standard_dir.mkdir(exist_ok=True)
-        print(f"    + _standard/")
-        created.append(str(standard_dir) + "/")
+        print("    + _standard/")
 
-        # 5. .mcp.json
         mcp_json_path = cwd / ".mcp.json"
         mcp_json_path.write_text(
             json.dumps(_build_mcp_json(cwd), indent=2) + "\n", encoding="utf-8"
         )
-        print(f"    + .mcp.json")
-        created.append(str(mcp_json_path))
+        print("    + .mcp.json")
 
-        # 6. Initialize DB and insert records
+        # DB
         db_dir = Path.home() / ".claude" / "praxeology"
         db_dir.mkdir(parents=True, exist_ok=True)
         db_path = db_dir / "praxeology.db"
 
-        from praxeology_mcp.db import init_db, get_db
+        from praxeology_mcp.db import init_db
         conn = init_db(str(db_path))
 
-        num_standards = 0
-        num_objectives = 0
-        num_crew_contexts = 0
+        counts = {"standards": 0, "objectives": 0, "contexts": 0}
 
-        # Strategy standard
+        # ── Logical axis ──
         if mission:
             conn.execute(
-                "INSERT INTO standards (tier, department, code, title, content)"
-                " VALUES (?, ?, ?, ?, ?)",
+                "INSERT INTO standards (tier, department, code, title, content) VALUES (?, ?, ?, ?, ?)",
                 ("strategy", "org", "STR-001", f"{org_name} — Strategy", mission),
             )
-            num_standards += 1
+            counts["standards"] += 1
 
-        # Doctrine standards
-        for rule_idx, rule in enumerate(rules, start=1):
+        for i, rule in enumerate(rules, 1):
             conn.execute(
-                "INSERT INTO standards (tier, department, code, title, content)"
-                " VALUES (?, ?, ?, ?, ?)",
-                ("doctrine", "org", f"DOC-{rule_idx:03d}", f"Doctrine {rule_idx}", rule),
+                "INSERT INTO standards (tier, department, code, title, content) VALUES (?, ?, ?, ?, ?)",
+                ("doctrine", "org", f"DOC-{i:03d}", f"Doctrine {i}", rule),
             )
-            num_standards += 1
+            counts["standards"] += 1
+
+        for i, proc in enumerate(procedures, 1):
+            conn.execute(
+                "INSERT INTO standards (tier, department, code, title, content) VALUES (?, ?, ?, ?, ?)",
+                ("procedure", "org", f"PRC-{i:03d}", f"Procedure {i}", proc),
+            )
+            counts["standards"] += 1
 
         conn.commit()
 
-        # Goal objective
-        if goal:
-            conn.execute(
-                "INSERT INTO objectives (tier, title, description)"
-                " VALUES (?, ?, ?)",
-                ("goal", f"{org_name} — Primary Goal", goal),
-            )
-            num_objectives += 1
+        # ── Contextual axis ──
+        # Space
+        cur = conn.execute(
+            "INSERT INTO contexts (tier, name, metadata) VALUES ('space', ?, ?)",
+            (space_name, json.dumps({"org": org_name})),
+        )
+        space_id = cur.lastrowid
+        counts["contexts"] += 1
 
-        # Plan objective
-        if work_items:
+        # Channels + Threads
+        channel_id_map: dict[str, int] = {}
+        for ch in channels:
             cur = conn.execute(
-                "INSERT INTO objectives (tier, title) VALUES ('plan', ?)",
-                (f"{org_name} — Initial Plan",),
+                "INSERT INTO contexts (tier, parent_id, name) VALUES ('channel', ?, ?)",
+                (space_id, ch["name"]),
+            )
+            ch_id = cur.lastrowid
+            channel_id_map[ch["name"]] = ch_id
+            counts["contexts"] += 1
+
+            for th_name in ch["threads"]:
+                conn.execute(
+                    "INSERT INTO contexts (tier, parent_id, name) VALUES ('thread', ?, ?)",
+                    (ch_id, th_name),
+                )
+                counts["contexts"] += 1
+
+        # Crew
+        for member in crew_members:
+            parent_id = channel_id_map.get(member.get("channel", ""), space_id)
+            conn.execute(
+                "INSERT INTO contexts (tier, parent_id, name, metadata) VALUES ('crew', ?, ?, ?)",
+                (parent_id, member["name"], json.dumps({
+                    "role": member["role"], "department": member["department"],
+                    "source_dir": str(crew_dir / member["name"].lower()),
+                })),
+            )
+            counts["contexts"] += 1
+
+        conn.commit()
+
+        # ── Tactical axis ──
+        goal_id = None
+        if goal:
+            cur = conn.execute(
+                "INSERT INTO objectives (tier, title, description) VALUES ('goal', ?, ?)",
+                (f"{org_name} — Goal", goal),
+            )
+            goal_id = cur.lastrowid
+            counts["objectives"] += 1
+
+        plan_id = None
+        if plan:
+            cur = conn.execute(
+                "INSERT INTO objectives (tier, parent_id, title) VALUES ('plan', ?, ?)",
+                (goal_id, plan),
             )
             plan_id = cur.lastrowid
-            num_objectives += 1
+            counts["objectives"] += 1
 
-            # Work objectives
-            for item in work_items:
-                conn.execute(
-                    "INSERT INTO objectives (tier, parent_id, title)"
-                    " VALUES ('work', ?, ?)",
-                    (plan_id, item),
-                )
-                num_objectives += 1
-
-        conn.commit()
-
-        # Crew contexts
-        for member in crew_members:
-            member_dir = crew_dir / member["name"].lower()
+        for item in work_items:
             conn.execute(
-                "INSERT INTO contexts (tier, name, metadata)"
-                " VALUES ('crew', ?, ?)",
-                (
-                    member["name"],
-                    json.dumps({
-                        "role": member["role"],
-                        "department": member["department"],
-                        "source_dir": str(member_dir),
-                    }),
-                ),
+                "INSERT INTO objectives (tier, parent_id, title, assignee) VALUES ('work', ?, ?, ?)",
+                (plan_id or goal_id, item["title"], item.get("assignee") or None),
             )
-            num_crew_contexts += 1
+            counts["objectives"] += 1
 
         conn.commit()
 
         print(
             f"    + Database initialized "
-            f"({num_standards} standards, {num_objectives} objectives, "
-            f"{num_crew_contexts} crew)"
+            f"({counts['standards']} standards, {counts['contexts']} contexts, "
+            f"{counts['objectives']} objectives)"
         )
         print()
         print("  Onboard complete! Run 'praxeology start' to begin.")
