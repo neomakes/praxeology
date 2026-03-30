@@ -239,6 +239,67 @@ def cmd_init(args: argparse.Namespace) -> None:
 # Command: onboard
 # ---------------------------------------------------------------------------
 
+def _print_progress_tree(space: str = "", channels: list = None, crew: list = None,
+                         rules: list = None, procedures: list = None,
+                         goal: str = "", programs: list = None, campaigns: list = None) -> None:
+    """Print current onboard progress as ASCII tree."""
+    print()
+    print("  ── Progress ──")
+
+    if rules is not None:
+        print(f"  WHY & HOW")
+        for i, r in enumerate(rules):
+            is_last = i == len(rules) - 1 and not procedures
+            prefix = "└──" if is_last else "├──"
+            print(f"    {prefix} DOC: {r[:50]}")
+        if procedures:
+            for i, p in enumerate(procedures):
+                name = p["name"] if isinstance(p, dict) else p
+                is_last = i == len(procedures) - 1
+                prefix = "└──" if is_last else "├──"
+                tier = "PLY" if isinstance(p, dict) and p.get("playbook_of") else "PRC"
+                print(f"    {prefix} {tier}: {name[:50]}")
+
+    if space:
+        print(f"  WHO & WHERE")
+        print(f"    {space} (Space)")
+        if channels:
+            for i, ch in enumerate(channels):
+                is_last_ch = i == len(channels) - 1 and not crew
+                ch_prefix = "└──" if is_last_ch else "├──"
+                ch_name = ch["name"] if isinstance(ch, dict) else ch
+                print(f"      {ch_prefix} # {ch_name}")
+                threads = ch.get("threads", []) if isinstance(ch, dict) else []
+                for j, th in enumerate(threads):
+                    is_last_th = j == len(threads) - 1
+                    th_prefix = "└──" if is_last_th else "├──"
+                    indent = "          " if is_last_ch else "      │   "
+                    print(f"{indent}{th_prefix} {th}")
+        if crew:
+            for i, c in enumerate(crew):
+                is_last = i == len(crew) - 1
+                prefix = "└──" if is_last else "├──"
+                name = c["name"] if isinstance(c, dict) else c
+                print(f"      {prefix} @{name}")
+
+    if goal:
+        print(f"  WHAT & WHEN")
+        print(f"    {goal} (Goal)")
+        if programs:
+            for i, prog in enumerate(programs):
+                is_last = i == len(programs) - 1
+                prefix = "└──" if is_last else "├──"
+                print(f"      {prefix} {prog}")
+                if campaigns:
+                    for camp in campaigns:
+                        if camp.get("program") == prog:
+                            print(f"      │   ├── {camp['name']}")
+                            for plan in camp.get("plans", []):
+                                print(f"      │   │   └── {plan[:40]}")
+
+    print()
+
+
 def _sanitize_name(raw: str) -> str:
     """Remove path traversal characters from a name."""
     return raw.replace("/", "").replace("\\", "").replace("..", "").strip()
@@ -445,6 +506,7 @@ def cmd_onboard(_args: argparse.Namespace) -> None:
         # ══════════════════════════════════════════════════════════════
         # Phase 2: WHO & WHERE (Contextual)
         # ══════════════════════════════════════════════════════════════
+        _print_progress_tree(rules=rules, procedures=procedures)
         print("  ── Phase 2/3: Who & Where (Contextual) ──")
         print()
 
@@ -457,10 +519,20 @@ def cmd_onboard(_args: argparse.Namespace) -> None:
 
         channels: list[dict] = []
         for ch_name in ch_suggestions:
-            # LLM-assisted: Channel → Thread suggestions
-            th_ctx = f"Organization: {space_name}. Channel: {ch_name}"
-            th_suggestions = _suggest_and_select("channel", th_ctx, "thread/topic name", "Thread")
+            # Show progress tree with current channel highlighted
+            _print_progress_tree(
+                space=space_name,
+                channels=channels + [{"name": ch_name, "threads": ["(selecting...)"]}],
+            )
+            # LLM-assisted: Channel → Thread suggestions (with explicit channel context)
+            th_ctx = f"Organization: {space_name}. Channel: '{ch_name}'. Strategy: {mission}. Suggest threads/topics specifically for the '{ch_name}' channel."
+            th_suggestions = _suggest_and_select(
+                f"channel named '{ch_name}'", th_ctx, f"thread/topic for '{ch_name}'", "Thread"
+            )
             channels.append({"name": ch_name, "threads": th_suggestions})
+
+        # Show completed contextual tree
+        _print_progress_tree(space=space_name, channels=channels)
         print()
 
         # LLM-assisted: Organization context → Crew role suggestions
@@ -534,6 +606,8 @@ def cmd_onboard(_args: argparse.Namespace) -> None:
         # ══════════════════════════════════════════════════════════════
         # Phase 3: WHAT & WHEN (Tactical)
         # ══════════════════════════════════════════════════════════════
+        _print_progress_tree(rules=rules, procedures=procedures,
+                             space=space_name, channels=channels, crew=crew_members)
         print()
         print("  ── Phase 3/3: What & When (Tactical) ──")
         print()
