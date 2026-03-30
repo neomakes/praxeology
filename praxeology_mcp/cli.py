@@ -612,30 +612,35 @@ def cmd_onboard(_args: argparse.Namespace) -> None:
                              space=space_name, channels=channels)
         print()
 
-        # LLM-assisted: Organization context → Crew suggestions (with name + persona)
+        # LLM-assisted: Crew suggestions — repeatable loop
+        crew_members: list[dict] = []
         crew_ctx = f"Organization: {space_name}. Strategy: {mission}. Channels: {', '.join(c['name'] for c in channels)}"
         crew_format = ("고유한 사람 이름(예: Zoro, Atlas, Nova) / 역할 / 부서 / 페르소나(성격 한줄 묘사)"
                        if ko else
                        "unique person name (e.g. Zoro, Atlas, Nova) / Role / Department / Persona(one-line personality)")
-        print(f"  {'크루 제안 생성 중' if ko else 'Generating crew suggestions'}...", end=" ", flush=True)
-        crew_suggestions = _try_suggest("organization with channels", crew_ctx,
-                                        f"AI agent crew member (format: {crew_format}). The first field MUST be a unique person name, NOT a job title.")
 
-        if crew_suggestions:
-            print("완료." if ko else "done.")
-            for i, s in enumerate(crew_suggestions, 1):
-                print(f"    [{i}] {s}")
-            print(f"    [0] {'건너뛰기 / 직접 입력' if ko else 'Skip / enter manually'}")
-            print()
-            sel = input(f"  {'선택 (예: 1,3 또는 0)' if ko else 'Select (e.g. 1,3 or 0)'}: ").strip()
-        else:
-            print("LLM 사용 불가." if ko else "LLM not available.")
-            sel = "0"
+        while True:
+            existing_names = ", ".join(m["name"] for m in crew_members)
+            exclude = f" Exclude already created: {existing_names}." if existing_names else ""
+            print(f"  {'크루 제안 생성 중' if ko else 'Generating crew suggestions'}...", end=" ", flush=True)
+            crew_suggestions = _try_suggest("organization with channels", crew_ctx,
+                                            f"AI agent crew member (format: {crew_format}). The first field MUST be a unique person name, NOT a job title.{exclude}")
 
-        crew_members: list[dict] = []
+            if crew_suggestions:
+                print("완료." if ko else "done.")
+                for i, s in enumerate(crew_suggestions, 1):
+                    print(f"    [{i}] {s}")
+                print(f"    [0] {'건너뛰기 / 직접 입력' if ko else 'Skip / enter manually'}")
+                print()
+                sel = input(f"  {'선택 (예: 1,3 또는 0)' if ko else 'Select (e.g. 1,3 or 0)'}: ").strip()
+            else:
+                print("LLM 사용 불가." if ko else "LLM not available.")
+                break
 
-        # Add selected suggestions — parse "Name / Role / Department / Persona"
-        if sel != "0" and crew_suggestions:
+            if sel == "0":
+                break
+
+            # Add selected suggestions — parse "Name / Role / Department / Persona"
             for part in sel.split(","):
                 part = part.strip()
                 if part.isdigit() and 1 <= int(part) <= len(crew_suggestions):
@@ -646,14 +651,11 @@ def cmd_onboard(_args: argparse.Namespace) -> None:
                     dept = parts[2] if len(parts) > 2 else ""
                     persona = parts[3] if len(parts) > 3 else ""
                     if suggested_name:
-                        # Allow editing name
                         name_edit = input(f"    {'이름' if ko else 'Name'} [{suggested_name}]: ").strip()
                         name = _sanitize_name(name_edit) if name_edit else suggested_name
-                        # Allow editing role
                         role_edit = input(f"    {'역할' if ko else 'Role'} [{role}]: ").strip()
                         if role_edit:
                             role = role_edit
-                        # Allow editing persona
                         if persona:
                             p_edit = input(f"    {'페르소나' if ko else 'Persona'} [{persona[:50]}]: ").strip()
                             if p_edit:
@@ -671,15 +673,20 @@ def cmd_onboard(_args: argparse.Namespace) -> None:
                             for ti, th in enumerate(all_threads, 1):
                                 print(f"      [{ti}] {th}")
                             th_sel = input(f"    {'선택 (예: 1,2)' if ko else 'Select (e.g. 1,2)'}: ").strip()
-                            for p in th_sel.split(","):
-                                p = p.strip()
-                                if p.isdigit() and 1 <= int(p) <= len(all_threads):
-                                    threads_assigned.append(all_threads[int(p) - 1])
+                            for p2 in th_sel.split(","):
+                                p2 = p2.strip()
+                                if p2.isdigit() and 1 <= int(p2) <= len(all_threads):
+                                    threads_assigned.append(all_threads[int(p2) - 1])
                         crew_members.append({
                             "name": name, "role": role, "department": dept,
                             "persona": persona, "threads": threads_assigned,
                         })
                         print(f"    + @{name} ({role})")
+
+            # Ask for more suggestions
+            more = input(f"\n  {'추가 제안 생성? (y/n)' if ko else 'More suggestions? (y/n)'} [y]: ").strip().lower()
+            if more == "n":
+                break
 
         # Always allow adding more manually
         print(f"  {'추가 크루 (빈 이름으로 종료)' if ko else 'Add more crew (empty name to finish)'}:")
