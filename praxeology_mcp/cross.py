@@ -293,3 +293,63 @@ def register(mcp) -> None:
 
         except Exception as exc:
             return json.dumps({"error": str(exc)})
+
+    @mcp.tool()
+    def onboard_suggest(parent_tier: str, parent_content: str, child_tier: str) -> str:
+        """Forward prediction: suggest child tier items from parent context.
+
+        Uses local LLM (Ollama) to generate 4 suggestions for the next tier
+        in the governance hierarchy. Used during onboarding via Claude Code session.
+
+        Hierarchy chains:
+            Logical:    Strategy → Doctrine → Procedure → Playbook
+            Tactical:   Goal → Program → Campaign → Plan
+            Contextual: Space → Channel → Thread → Crew
+
+        Args:
+            parent_tier:    Name of the parent tier (e.g. "strategy", "goal", "space")
+            parent_content: Content of the parent item
+            child_tier:     Name of the child tier to suggest (e.g. "doctrine", "program")
+
+        Returns:
+            JSON with suggestions array (4 items) or empty if LLM unavailable.
+        """
+        t0 = time.monotonic_ns()
+        try:
+            from praxeology_mcp.agent_runner import LLMClient
+
+            llm = LLMClient(model="qwen3:14b", backend="ollama")
+            prompt = (
+                f'Given this {parent_tier}: "{parent_content}"\n\n'
+                f"Suggest exactly 4 concise {child_tier} items for an AI agent governance system. "
+                f"Return ONLY a JSON array of 4 strings, nothing else."
+            )
+            response = llm.chat([
+                {"role": "system", "content": "You are a governance design assistant. Return only valid JSON arrays."},
+                {"role": "user", "content": prompt},
+            ])
+
+            content = response.get("content", "")
+            start = content.find("[")
+            end = content.rfind("]") + 1
+            suggestions = []
+            if start >= 0 and end > start:
+                suggestions = json.loads(content[start:end])[:4]
+
+            conn = get_db(_db_path())
+            latency = (time.monotonic_ns() - t0) // 1_000_000
+            log_metric(conn, "onboard_suggest", "cross", 0, latency)
+
+            return json.dumps({
+                "parent_tier": parent_tier,
+                "child_tier": child_tier,
+                "suggestions": suggestions,
+            }, ensure_ascii=False)
+
+        except Exception as exc:
+            return json.dumps({
+                "parent_tier": parent_tier,
+                "child_tier": child_tier,
+                "suggestions": [],
+                "note": f"LLM unavailable: {exc}",
+            })
