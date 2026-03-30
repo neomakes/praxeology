@@ -1530,9 +1530,15 @@ def cmd_start(args: argparse.Namespace) -> None:
             import time
             time.sleep(2)
             init_prompt = (
-                f"You are {crew_name}. Read CLAUDE.md and _crew/{crew_name.lower()}/CLAUDE.md. "
-                f"Then call what_now('{crew_name}') to find your first task. "
-                f"Execute the task, then call backprop() with the result. Repeat."
+                f"You are {crew_name}. "
+                f"CRITICAL: You MUST use the actual MCP tools provided to you. "
+                f"Do NOT simulate or pretend to call tools. Do NOT write tool names as text. "
+                f"Use the real tool functions that appear in your tool list. "
+                f"Step 1: Call the what_now tool with crew_id='{crew_name}'. "
+                f"Step 2: Based on the result, execute the recommended task using the available MCP tools (logical_create, tactical_create, etc). "
+                f"Step 3: When done, call the backprop tool with the case_id, result, and surprise score. "
+                f"Step 4: Call what_now again and repeat. "
+                f"If no tools appear in your tool list, say 'NO MCP TOOLS AVAILABLE' and stop."
             )
             subprocess.run([
                 "tmux", "send-keys", "-t", session_name, init_prompt, "Enter",
