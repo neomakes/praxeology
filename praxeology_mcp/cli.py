@@ -1359,7 +1359,7 @@ def cmd_status(args: argparse.Namespace) -> None:
     doc_c = conn.execute("SELECT COUNT(*) FROM logical WHERE tier='doctrine'").fetchone()[0]
     prc_c = conn.execute("SELECT COUNT(*) FROM logical WHERE tier='procedure'").fetchone()[0]
     ply_c = conn.execute("SELECT COUNT(*) FROM logical WHERE tier='playbook'").fetchone()[0]
-    print(f"  Standards:  {str_c + doc_c + prc_c + ply_c} (STR: {str_c}, DOC: {doc_c}, PRC: {prc_c}, PLY: {ply_c})")
+    print(f"  Logical:    {str_c + doc_c + prc_c + ply_c} (STR: {str_c}, DOC: {doc_c}, PRC: {prc_c}, PLY: {ply_c})")
     print(f"  Cases:      {conn.execute('SELECT COUNT(*) FROM cases').fetchone()[0]}")
     print(f"  Gaps:       {conn.execute('SELECT COUNT(*) FROM gaps').fetchone()[0]}")
     print(f"  Proposals:  {conn.execute('SELECT COUNT(*) FROM proposals').fetchone()[0]}")
@@ -1373,7 +1373,7 @@ def cmd_status(args: argparse.Namespace) -> None:
     pln_c = conn.execute("SELECT COUNT(*) FROM tactical WHERE tier='plan'").fetchone()[0]
     wrk_c = conn.execute("SELECT COUNT(*) FROM tactical WHERE tier='work'").fetchone()[0]
     total_obj = gol_c + prg_c + cmp_c + pln_c + wrk_c
-    print(f"  Objectives: {total_obj} (GOL: {gol_c}, PRG: {prg_c}, CMP: {cmp_c}, PLN: {pln_c}, WRK: {wrk_c})")
+    print(f"  Tactical:   {total_obj} (GOL: {gol_c}, PRG: {prg_c}, CMP: {cmp_c}, PLN: {pln_c}, WRK: {wrk_c})")
     print(f"  Schedules:  {conn.execute('SELECT COUNT(*) FROM schedules').fetchone()[0]}")
     print()
 
@@ -1385,7 +1385,7 @@ def cmd_status(args: argparse.Namespace) -> None:
     crw_c = conn.execute("SELECT COUNT(*) FROM contextual WHERE tier='crew'").fetchone()[0]
     ses_c = conn.execute("SELECT COUNT(*) FROM contextual WHERE tier='session'").fetchone()[0]
     total_ctx = spc_c + chn_c + thr_c + crw_c + ses_c
-    print(f"  Contexts:   {total_ctx} (SPC: {spc_c}, CHN: {chn_c}, THR: {thr_c}, CRW: {crw_c}, SES: {ses_c})")
+    print(f"  Contextual: {total_ctx} (SPC: {spc_c}, CHN: {chn_c}, THR: {thr_c}, CRW: {crw_c}, SES: {ses_c})")
     print(f"  Reviews:    {conn.execute('SELECT COUNT(*) FROM reviews').fetchone()[0]}")
     print(f"  Delegations:{conn.execute('SELECT COUNT(*) FROM delegations').fetchone()[0]}")
     print()
