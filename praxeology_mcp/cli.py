@@ -593,10 +593,12 @@ def cmd_onboard(_args: argparse.Namespace) -> None:
 
         # LLM-assisted: Organization context → Crew suggestions (with name + persona)
         crew_ctx = f"Organization: {space_name}. Strategy: {mission}. Channels: {', '.join(c['name'] for c in channels)}"
-        crew_format = "이름 / 역할 / 부서 / 페르소나(한줄)" if ko else "Name / Role / Department / Persona(one line)"
+        crew_format = ("고유한 사람 이름(예: Zoro, Atlas, Nova) / 역할 / 부서 / 페르소나(성격 한줄 묘사)"
+                       if ko else
+                       "unique person name (e.g. Zoro, Atlas, Nova) / Role / Department / Persona(one-line personality)")
         print(f"  {'크루 제안 생성 중' if ko else 'Generating crew suggestions'}...", end=" ", flush=True)
         crew_suggestions = _try_suggest("organization with channels", crew_ctx,
-                                        f"AI agent crew member (format: {crew_format})")
+                                        f"AI agent crew member (format: {crew_format}). The first field MUST be a unique person name, NOT a job title.")
 
         if crew_suggestions:
             print("완료." if ko else "done.")
@@ -618,18 +620,25 @@ def cmd_onboard(_args: argparse.Namespace) -> None:
                 if part.isdigit() and 1 <= int(part) <= len(crew_suggestions):
                     suggested = crew_suggestions[int(part) - 1]
                     parts = [p.strip() for p in suggested.split("/")]
-                    name = _sanitize_name(parts[0]) if len(parts) > 0 else ""
+                    suggested_name = _sanitize_name(parts[0]) if len(parts) > 0 else ""
                     role = parts[1] if len(parts) > 1 else ""
                     dept = parts[2] if len(parts) > 2 else ""
                     persona = parts[3] if len(parts) > 3 else ""
-                    if name:
-                        # Allow editing persona if LLM provided one
-                        if not persona:
-                            persona = input(f"    {'페르소나' if ko else 'Persona'} ({name}): ").strip()
+                    if suggested_name:
+                        # Allow editing name
+                        name_edit = input(f"    {'이름' if ko else 'Name'} [{suggested_name}]: ").strip()
+                        name = _sanitize_name(name_edit) if name_edit else suggested_name
+                        # Allow editing role
+                        role_edit = input(f"    {'역할' if ko else 'Role'} [{role}]: ").strip()
+                        if role_edit:
+                            role = role_edit
+                        # Allow editing persona
+                        if persona:
+                            p_edit = input(f"    {'페르소나' if ko else 'Persona'} [{persona[:50]}]: ").strip()
+                            if p_edit:
+                                persona = p_edit
                         else:
-                            edit = input(f"    {'페르소나' if ko else 'Persona'} ({name}) [{persona[:40]}]: ").strip()
-                            if edit:
-                                persona = edit
+                            persona = input(f"    {'페르소나' if ko else 'Persona'}: ").strip()
                         ch_assign = ""
                         if channels:
                             ch_names = ", ".join(ch["name"] for ch in channels)
