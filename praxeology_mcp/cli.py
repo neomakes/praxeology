@@ -287,23 +287,44 @@ def _print_progress_tree(space: str = "", channels: list = None, crew: list = No
         print("  WHO & WHERE")
         print(f"    {space} (Space)")
         if channels:
+            # Build crew-to-thread lookup
+            crew_by_thread: dict[str, list[str]] = {}
+            if crew:
+                for c in crew:
+                    c_name = c["name"] if isinstance(c, dict) else c
+                    c_threads = c.get("threads", []) if isinstance(c, dict) else []
+                    for th_key in c_threads:
+                        crew_by_thread.setdefault(th_key, []).append(c_name)
+
             for ci, ch in enumerate(channels):
                 ch_name = ch["name"] if isinstance(ch, dict) else ch
                 threads = ch.get("threads", []) if isinstance(ch, dict) else []
-                is_last_ch = ci == len(channels) - 1 and not crew
+                is_last_ch = ci == len(channels) - 1
                 ch_prefix = "└──" if is_last_ch else "├──"
                 print(f"      {ch_prefix} # {ch_name}")
                 for ti, th in enumerate(threads):
+                    th_key = f"{ch_name}/{th}"
+                    th_crew = crew_by_thread.get(th_key, [])
                     is_last_th = ti == len(threads) - 1
                     th_indent = "          " if is_last_ch else "      │   "
-                    th_prefix = "└──" if is_last_th else "├──"
+                    th_prefix = "└──" if (is_last_th and not th_crew) else "├──"
                     print(f"{th_indent}{th_prefix} {th}")
-        if crew:
-            for i, c in enumerate(crew):
-                is_last = i == len(crew) - 1
-                prefix = "└──" if is_last else "├──"
-                name = c["name"] if isinstance(c, dict) else c
-                print(f"      {prefix} @{name}")
+                    # Show crew under their thread
+                    for ci2, cn in enumerate(th_crew):
+                        is_last_crew = ci2 == len(th_crew) - 1 and is_last_th
+                        crew_indent = th_indent + ("    " if is_last_th else "│   ")
+                        crew_prefix = "└──" if ci2 == len(th_crew) - 1 else "├──"
+                        print(f"{crew_indent}{crew_prefix} @{cn}")
+
+            # Show unassigned crew
+            assigned = set()
+            for names in crew_by_thread.values():
+                assigned.update(names)
+            if crew:
+                unassigned = [c for c in crew if (c["name"] if isinstance(c, dict) else c) not in assigned]
+                for i, c in enumerate(unassigned):
+                    name = c["name"] if isinstance(c, dict) else c
+                    print(f"      └── @{name} (unassigned)")
 
     # ── Tactical: Goal → Program → Campaign → Plan ──
     if goal:
@@ -639,13 +660,24 @@ def cmd_onboard(_args: argparse.Namespace) -> None:
                                 persona = p_edit
                         else:
                             persona = input(f"    {'페르소나' if ko else 'Persona'}: ").strip()
-                        ch_assign = ""
-                        if channels:
-                            ch_names = ", ".join(ch["name"] for ch in channels)
-                            ch_assign = input(f"    {'채널' if ko else 'Channel'} ({name}) [{ch_names}]: ").strip()
+                        # Thread multi-select
+                        all_threads = []
+                        for ch in channels:
+                            for th in ch.get("threads", []):
+                                all_threads.append(f"{ch['name']}/{th}")
+                        threads_assigned = []
+                        if all_threads:
+                            print(f"    {'참여 Thread (복수 선택)' if ko else 'Threads (multi-select)'}:")
+                            for ti, th in enumerate(all_threads, 1):
+                                print(f"      [{ti}] {th}")
+                            th_sel = input(f"    {'선택 (예: 1,2)' if ko else 'Select (e.g. 1,2)'}: ").strip()
+                            for p in th_sel.split(","):
+                                p = p.strip()
+                                if p.isdigit() and 1 <= int(p) <= len(all_threads):
+                                    threads_assigned.append(all_threads[int(p) - 1])
                         crew_members.append({
                             "name": name, "role": role, "department": dept,
-                            "persona": persona, "channel": ch_assign,
+                            "persona": persona, "threads": threads_assigned,
                         })
                         print(f"    + @{name} ({role})")
 
@@ -661,14 +693,23 @@ def cmd_onboard(_args: argparse.Namespace) -> None:
             role = input(f"    {'역할' if ko else 'Role'}: ").strip()
             department = input(f"    {'부서' if ko else 'Department'}: ").strip()
             persona = input(f"    {'페르소나' if ko else 'Persona'}: ").strip()
-            if channels:
-                ch_names = ", ".join(ch["name"] for ch in channels)
-                channel = input(f"    {'채널' if ko else 'Channel'} [{ch_names}]: ").strip()
-            else:
-                channel = ""
+            all_threads = []
+            for ch in channels:
+                for th in ch.get("threads", []):
+                    all_threads.append(f"{ch['name']}/{th}")
+            threads_assigned = []
+            if all_threads:
+                print(f"    {'참여 Thread (복수 선택)' if ko else 'Threads (multi-select)'}:")
+                for ti, th in enumerate(all_threads, 1):
+                    print(f"      [{ti}] {th}")
+                th_sel = input(f"    {'선택 (예: 1,2)' if ko else 'Select (e.g. 1,2)'}: ").strip()
+                for p in th_sel.split(","):
+                    p = p.strip()
+                    if p.isdigit() and 1 <= int(p) <= len(all_threads):
+                        threads_assigned.append(all_threads[int(p) - 1])
             crew_members.append({
                 "name": name, "role": role, "department": department,
-                "persona": persona, "channel": channel,
+                "persona": persona, "threads": threads_assigned,
             })
             n += 1
             print()
@@ -720,13 +761,21 @@ def cmd_onboard(_args: argparse.Namespace) -> None:
             plans_flat = []  # plans are inside campaigns
 
         # Work items are NOT collected — what_now() will generate them
-        print("  (Work items will be auto-generated by what_now() from Plans.)")
+        print(f"  ({'Work는 what_now()가 Plan에서 자동 생성합니다.' if ko else '(Work items will be auto-generated by what_now() from Plans.)'})")
         print()
+
+        # Show final complete tree
+        _print_progress_tree(
+            mission=mission, rules=rules, procedures=procedures,
+            space=space_name, channels=channels, crew=crew_members,
+            goal=goal, programs=programs, campaigns=campaigns,
+        )
+        sys.stdout.flush()
 
         # ══════════════════════════════════════════════════════════════
         # Generate files + DB
         # ══════════════════════════════════════════════════════════════
-        print("  Generating...")
+        print(f"  {'생성 중...' if ko else 'Generating...'}")
         cwd = Path.cwd()
 
         # Files: CLAUDE.md, _crew/, _standard/, .mcp.json
@@ -828,6 +877,7 @@ def cmd_onboard(_args: argparse.Namespace) -> None:
 
         # Channels + Threads
         channel_id_map: dict[str, int] = {}
+        thread_id_map: dict[str, int] = {}  # "channel/thread" → id
         for ch in channels:
             cur = conn.execute(
                 "INSERT INTO contexts (tier, parent_id, name) VALUES ('channel', ?, ?)",
@@ -838,23 +888,34 @@ def cmd_onboard(_args: argparse.Namespace) -> None:
             counts["contexts"] += 1
 
             for th_name in ch["threads"]:
-                conn.execute(
+                cur = conn.execute(
                     "INSERT INTO contexts (tier, parent_id, name) VALUES ('thread', ?, ?)",
                     (ch_id, th_name),
                 )
+                thread_id_map[f"{ch['name']}/{th_name}"] = cur.lastrowid
                 counts["contexts"] += 1
 
-        # Crew
+        # Crew — parent is space, linked to threads via channel_access
         for member in crew_members:
-            parent_id = channel_id_map.get(member.get("channel", ""), space_id)
-            conn.execute(
+            cur = conn.execute(
                 "INSERT INTO contexts (tier, parent_id, name, metadata) VALUES ('crew', ?, ?, ?)",
-                (parent_id, member["name"], json.dumps({
+                (space_id, member["name"], json.dumps({
                     "role": member["role"], "department": member["department"],
                     "source_dir": str(crew_dir / member["name"].lower()),
+                    "threads": member.get("threads", []),
                 })),
             )
+            crew_ctx_id = cur.lastrowid
             counts["contexts"] += 1
+
+            # Link crew to assigned threads
+            for th_key in member.get("threads", []):
+                th_id = thread_id_map.get(th_key)
+                if th_id:
+                    conn.execute(
+                        "INSERT INTO channel_access (crew_id, channel_id, permission) VALUES (?, ?, 'rw')",
+                        (member["name"], str(th_id)),
+                    )
 
         conn.commit()
 
