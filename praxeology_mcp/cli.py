@@ -389,13 +389,17 @@ def _try_suggest(parent_tier: str, parent_content: str, child_tier: str, count: 
     return []
 
 
-def _suggest_and_select(parent_tier: str, parent_content: str, child_tier: str, label: str) -> list[str]:
+def _suggest_and_select(parent_tier: str, parent_content: str, child_tier: str, label: str,
+                        progress: str = "") -> list[str]:
     """Suggest items via LLM, let user select + add custom. Returns selected items."""
     global _onboard_llm
+    ko = _onboard_lang == "ko"
+    pfx = f"  {progress} " if progress else "  "
+
     if _onboard_llm is None:
         # No LLM — manual only
         selected: list[str] = []
-        print(f"  {label} (enter empty line to finish):")
+        print(f"{pfx}{label} ({'빈 줄로 종료' if ko else 'enter empty line to finish'}):")
         n = 1
         while True:
             item = input(f"    {label} {n}: ").strip()
@@ -405,30 +409,30 @@ def _suggest_and_select(parent_tier: str, parent_content: str, child_tier: str, 
             n += 1
         return selected
 
-    print(f"  Generating {child_tier} suggestions...", end=" ", flush=True)
+    print(f"{pfx}{child_tier} {'제안 생성 중' if ko else 'suggestions'}...", end=" ", flush=True)
     suggestions = _try_suggest(parent_tier, parent_content, child_tier)
 
     if suggestions:
-        print("done.")
+        print("완료." if ko else "done.")
         print()
         for i, s in enumerate(suggestions, 1):
             print(f"    [{i}] {s}")
-        print(f"    [0] Skip suggestions / enter manually")
+        print(f"    [0] {'건너뛰기 / 직접 입력' if ko else 'Skip / enter manually'}")
         print()
-        sel = input(f"  Select (e.g. 1,3 or 0 for manual): ").strip()
+        sel = input(f"{pfx}{'선택 (예: 1,3 또는 0)' if ko else 'Select (e.g. 1,3 or 0)'}: ").strip()
 
-        selected = []
+        selected: list[str] = []
         if sel != "0":
             for part in sel.split(","):
                 part = part.strip()
                 if part.isdigit() and 1 <= int(part) <= len(suggestions):
                     selected.append(suggestions[int(part) - 1])
     else:
-        print("failed. Manual input.")
+        print("실패. 직접 입력." if ko else "failed. Manual input.")
         selected = []
 
     # Always allow adding more manually
-    print(f"  Add more {label} (enter empty line to finish):")
+    print(f"{pfx}{'추가 입력 (빈 줄로 종료)' if ko else f'Add more {label} (empty line to finish)'}:")
     n = len(selected) + 1
     while True:
         item = input(f"    {label} {n}: ").strip()
@@ -512,13 +516,15 @@ def cmd_onboard(_args: argparse.Namespace) -> None:
 
         # LLM-assisted tree: Strategy → Doctrines
         if mission:
-            rules = _suggest_and_select("strategy", mission, "doctrine rule", "Rule")
+            rules = _suggest_and_select("strategy", mission,
+                                        "교리" if ko else "doctrine rule",
+                                        "교리" if ko else "Rule")
         else:
             rules = []
-            print("  Doctrine rules (enter empty line to finish):")
+            print(f"  {'교리 (빈 줄로 종료)' if ko else 'Doctrine rules (enter empty line to finish)'}:")
             n = 1
             while True:
-                rule = input(f"    Rule {n}: ").strip()
+                rule = input(f"    {'교리' if ko else 'Rule'} {n}: ").strip()
                 if not rule:
                     break
                 rules.append(rule)
@@ -527,18 +533,26 @@ def cmd_onboard(_args: argparse.Namespace) -> None:
 
         # Tree: each Doctrine → Procedures for that doctrine
         procedures: list[dict] = []  # [{"name": str, "doctrine": str}]
-        for rule in rules:
+        for di, rule in enumerate(rules):
             rule_ctx = f"Strategy: {mission}. Doctrine: {rule}"
-            print(f"  Procedures for doctrine: '{rule[:60]}'")
-            procs = _suggest_and_select("doctrine", rule_ctx, "procedure", "Procedure")
+            prog_label = f"({di+1}/{len(rules)}) DOC-{di+1:03d}"
+            print(f"  {prog_label} → {'절차 제안' if ko else 'Procedures'}")
+            procs = _suggest_and_select("doctrine", rule_ctx,
+                                        "절차" if ko else "procedure",
+                                        "절차" if ko else "Procedure",
+                                        progress=prog_label)
             for p in procs:
                 procedures.append({"name": p, "doctrine": rule})
 
             # Tree: each Procedure → Playbooks for that procedure
-            for proc in procs:
+            for pi, proc in enumerate(procs):
                 proc_ctx = f"Strategy: {mission}. Doctrine: {rule}. Procedure: {proc}"
-                print(f"    Playbooks for procedure: '{proc[:50]}'")
-                playbooks = _suggest_and_select("procedure", proc_ctx, "playbook (concrete how-to)", "Playbook")
+                prc_label = f"({di+1}/{len(rules)}) PRC-{di+1}{pi+1:02d}"
+                print(f"    {prc_label} → {'플레이북 제안' if ko else 'Playbooks'}")
+                playbooks = _suggest_and_select("procedure", proc_ctx,
+                                                "플레이북" if ko else "playbook",
+                                                "플레이북" if ko else "Playbook",
+                                                progress=prc_label)
                 for pb in playbooks:
                     procedures.append({"name": pb, "doctrine": rule, "playbook_of": proc})
         print()
