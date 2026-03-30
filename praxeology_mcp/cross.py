@@ -69,7 +69,7 @@ def register(mcp) -> None:
                     """
                     SELECT id, title, description, status, priority, assignee,
                            due_date, created_at
-                    FROM objectives
+                    FROM tactical
                     WHERE tier = 'work'
                       AND status IN ('pending', 'in_progress')
                       AND assignee = ?
@@ -85,7 +85,7 @@ def register(mcp) -> None:
                     """
                     SELECT id, title, description, status, priority, assignee,
                            due_date, created_at
-                    FROM objectives
+                    FROM tactical
                     WHERE tier = 'work'
                       AND status IN ('pending', 'in_progress')
                     ORDER BY
@@ -106,7 +106,7 @@ def register(mcp) -> None:
                     """
                     SELECT DISTINCT s.id, s.tier, s.department, s.code, s.title
                     FROM cases c
-                    JOIN standards s ON s.id = c.standard_id
+                    JOIN logical s ON s.id = c.standard_id
                     WHERE c.objective_id = ?
                       AND c.standard_id IS NOT NULL
                     LIMIT 5
@@ -134,7 +134,7 @@ def register(mcp) -> None:
                 SELECT s.id, s.objective_id, s.cron, s.next_run, s.last_run,
                        o.title AS objective_title
                 FROM schedules s
-                JOIN objectives o ON o.id = s.objective_id
+                JOIN tactical o ON o.id = s.objective_id
                 WHERE s.enabled = 1
                   AND s.next_run IS NOT NULL
                   AND s.next_run < ?
@@ -276,7 +276,7 @@ def register(mcp) -> None:
             result_words = set(result.lower().split())
             if objective_id is not None and completion_words & result_words:
                 conn.execute(
-                    "UPDATE objectives SET status = 'done', updated_at = ? WHERE id = ?",
+                    "UPDATE tactical SET status = 'done', updated_at = ? WHERE id = ?",
                     (_utcnow(), objective_id),
                 )
                 conn.commit()

@@ -21,13 +21,14 @@ from pathlib import Path
 # ---------------------------------------------------------------------------
 
 _SCHEMA = """
--- ── Logical axis ──────────────────────────────────────────────────────────
+-- ── Logical axis (WHY & HOW) ─────────────────────────────────────────────
 
-CREATE TABLE IF NOT EXISTS standards (
+CREATE TABLE IF NOT EXISTS logical (
     id          INTEGER PRIMARY KEY AUTOINCREMENT,
     tier        TEXT NOT NULL CHECK(tier IN ('strategy','doctrine','procedure','playbook')),
-    department  TEXT NOT NULL,
-    code        TEXT NOT NULL,          -- e.g. DOC-201
+    parent_id   INTEGER REFERENCES logical(id) ON DELETE SET NULL,
+    department  TEXT NOT NULL DEFAULT '',
+    code        TEXT NOT NULL DEFAULT '',   -- e.g. DOC-001, PRC-101
     title       TEXT NOT NULL,
     content     TEXT NOT NULL DEFAULT '',
     version     INTEGER NOT NULL DEFAULT 1,
@@ -37,8 +38,8 @@ CREATE TABLE IF NOT EXISTS standards (
 
 CREATE TABLE IF NOT EXISTS cases (
     id           INTEGER PRIMARY KEY AUTOINCREMENT,
-    standard_id  INTEGER REFERENCES standards(id) ON DELETE SET NULL,
-    objective_id INTEGER REFERENCES objectives(id) ON DELETE SET NULL,
+    logical_id   INTEGER REFERENCES logical(id) ON DELETE SET NULL,
+    tactical_id  INTEGER REFERENCES tactical(id) ON DELETE SET NULL,
     crew_id      TEXT,
     session_id   TEXT,
     task         TEXT NOT NULL DEFAULT '',
@@ -71,12 +72,13 @@ CREATE TABLE IF NOT EXISTS proposals (
     created_at      TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ','now'))
 );
 
--- ── Tactical axis ─────────────────────────────────────────────────────────
+-- ── Tactical axis (WHAT & WHEN) ───────────────────────────────────────────
 
-CREATE TABLE IF NOT EXISTS objectives (
+CREATE TABLE IF NOT EXISTS tactical (
     id          INTEGER PRIMARY KEY AUTOINCREMENT,
     tier        TEXT NOT NULL CHECK(tier IN ('goal','program','campaign','plan','work')),
-    parent_id   INTEGER REFERENCES objectives(id) ON DELETE SET NULL,
+    parent_id   INTEGER REFERENCES tactical(id) ON DELETE SET NULL,
+    code        TEXT NOT NULL DEFAULT '',   -- e.g. GOL-001, PLN-001
     title       TEXT NOT NULL,
     description TEXT NOT NULL DEFAULT '',
     status      TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending','in_progress','done','blocked')),
@@ -89,19 +91,20 @@ CREATE TABLE IF NOT EXISTS objectives (
 
 CREATE TABLE IF NOT EXISTS schedules (
     id           INTEGER PRIMARY KEY AUTOINCREMENT,
-    objective_id INTEGER NOT NULL REFERENCES objectives(id) ON DELETE CASCADE,
+    tactical_id  INTEGER NOT NULL REFERENCES tactical(id) ON DELETE CASCADE,
     cron         TEXT NOT NULL,
     next_run     TEXT,
     last_run     TEXT,
     enabled      INTEGER NOT NULL DEFAULT 1
 );
 
--- ── Contextual axis ───────────────────────────────────────────────────────
+-- ── Contextual axis (WHO & WHERE) ────────────────────────────────────────
 
-CREATE TABLE IF NOT EXISTS contexts (
+CREATE TABLE IF NOT EXISTS contextual (
     id         INTEGER PRIMARY KEY AUTOINCREMENT,
     tier       TEXT NOT NULL CHECK(tier IN ('space','channel','thread','crew','session')),
-    parent_id  INTEGER REFERENCES contexts(id) ON DELETE SET NULL,
+    parent_id  INTEGER REFERENCES contextual(id) ON DELETE SET NULL,
+    code       TEXT NOT NULL DEFAULT '',   -- e.g. SPC-001, CRW-001
     name       TEXT NOT NULL,
     metadata   TEXT NOT NULL DEFAULT '{}',   -- JSON
     created_at TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%SZ','now'))
@@ -147,10 +150,10 @@ CREATE TABLE IF NOT EXISTS metrics_log (
 
 -- ── FTS5 ──────────────────────────────────────────────────────────────────
 
-CREATE VIRTUAL TABLE IF NOT EXISTS standards_fts USING fts5(
+CREATE VIRTUAL TABLE IF NOT EXISTS logical_fts USING fts5(
     title,
     content,
-    content=standards,
+    content=logical,
     content_rowid=id
 );
 
@@ -164,14 +167,15 @@ CREATE VIRTUAL TABLE IF NOT EXISTS cases_fts USING fts5(
 
 -- ── Indexes ───────────────────────────────────────────────────────────────
 
-CREATE INDEX IF NOT EXISTS idx_standards_tier       ON standards(tier);
-CREATE INDEX IF NOT EXISTS idx_standards_department ON standards(department);
-CREATE INDEX IF NOT EXISTS idx_standards_code       ON standards(code);
+CREATE INDEX IF NOT EXISTS idx_logical_tier         ON logical(tier);
+CREATE INDEX IF NOT EXISTS idx_logical_parent_id    ON logical(parent_id);
+CREATE INDEX IF NOT EXISTS idx_logical_department   ON logical(department);
+CREATE INDEX IF NOT EXISTS idx_logical_code         ON logical(code);
 
-CREATE INDEX IF NOT EXISTS idx_cases_standard_id    ON cases(standard_id);
-CREATE INDEX IF NOT EXISTS idx_cases_objective_id   ON cases(objective_id);
+CREATE INDEX IF NOT EXISTS idx_cases_logical_id     ON cases(logical_id);
+CREATE INDEX IF NOT EXISTS idx_cases_tactical_id    ON cases(tactical_id);
 CREATE INDEX IF NOT EXISTS idx_cases_crew_id        ON cases(crew_id);
-CREATE INDEX IF NOT EXISTS idx_cases_status         ON cases(result);
+CREATE INDEX IF NOT EXISTS idx_cases_result         ON cases(result);
 
 CREATE INDEX IF NOT EXISTS idx_gaps_case_id         ON gaps(case_id);
 CREATE INDEX IF NOT EXISTS idx_gaps_status          ON gaps(status);
@@ -179,14 +183,14 @@ CREATE INDEX IF NOT EXISTS idx_gaps_status          ON gaps(status);
 CREATE INDEX IF NOT EXISTS idx_proposals_gap_id     ON proposals(gap_id);
 CREATE INDEX IF NOT EXISTS idx_proposals_status     ON proposals(status);
 
-CREATE INDEX IF NOT EXISTS idx_objectives_parent_id ON objectives(parent_id);
-CREATE INDEX IF NOT EXISTS idx_objectives_status    ON objectives(status);
-CREATE INDEX IF NOT EXISTS idx_objectives_assignee  ON objectives(assignee);
+CREATE INDEX IF NOT EXISTS idx_tactical_parent_id   ON tactical(parent_id);
+CREATE INDEX IF NOT EXISTS idx_tactical_status      ON tactical(status);
+CREATE INDEX IF NOT EXISTS idx_tactical_assignee    ON tactical(assignee);
 
-CREATE INDEX IF NOT EXISTS idx_schedules_obj_id     ON schedules(objective_id);
+CREATE INDEX IF NOT EXISTS idx_schedules_tactical   ON schedules(tactical_id);
 
-CREATE INDEX IF NOT EXISTS idx_contexts_parent_id   ON contexts(parent_id);
-CREATE INDEX IF NOT EXISTS idx_contexts_tier        ON contexts(tier);
+CREATE INDEX IF NOT EXISTS idx_contextual_parent_id ON contextual(parent_id);
+CREATE INDEX IF NOT EXISTS idx_contextual_tier      ON contextual(tier);
 
 CREATE INDEX IF NOT EXISTS idx_reviews_crew_id      ON reviews(crew_id);
 
@@ -210,23 +214,23 @@ CREATE TABLE IF NOT EXISTS config (
 
 # FTS triggers keep the virtual tables in sync with their content tables.
 _FTS_TRIGGERS = """
-CREATE TRIGGER IF NOT EXISTS standards_fts_insert
-    AFTER INSERT ON standards BEGIN
-        INSERT INTO standards_fts(rowid, title, content)
+CREATE TRIGGER IF NOT EXISTS logical_fts_insert
+    AFTER INSERT ON logical BEGIN
+        INSERT INTO logical_fts(rowid, title, content)
         VALUES (new.id, new.title, new.content);
     END;
 
-CREATE TRIGGER IF NOT EXISTS standards_fts_update
-    AFTER UPDATE ON standards BEGIN
-        INSERT INTO standards_fts(standards_fts, rowid, title, content)
+CREATE TRIGGER IF NOT EXISTS logical_fts_update
+    AFTER UPDATE ON logical BEGIN
+        INSERT INTO logical_fts(logical_fts, rowid, title, content)
         VALUES ('delete', old.id, old.title, old.content);
-        INSERT INTO standards_fts(rowid, title, content)
+        INSERT INTO logical_fts(rowid, title, content)
         VALUES (new.id, new.title, new.content);
     END;
 
-CREATE TRIGGER IF NOT EXISTS standards_fts_delete
-    AFTER DELETE ON standards BEGIN
-        INSERT INTO standards_fts(standards_fts, rowid, title, content)
+CREATE TRIGGER IF NOT EXISTS logical_fts_delete
+    AFTER DELETE ON logical BEGIN
+        INSERT INTO logical_fts(logical_fts, rowid, title, content)
         VALUES ('delete', old.id, old.title, old.content);
     END;
 
