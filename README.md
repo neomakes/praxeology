@@ -10,7 +10,7 @@
 </p>
 
 <p align="center">
-  <code>git clone → ./setup.sh</code> · <a href="#quick-start">Quick Start</a> · <a href="docs/role-design.md">Role Design</a>
+  <code>./setup.sh → onboard → start → dashboard</code> · <a href="#quick-start">Quick Start</a> · <a href="docs/role-design.md">Role Design</a>
 </p>
 
 ---
@@ -75,11 +75,13 @@ Not a feature list. A coordination problem solver.
 ```bash
 git clone https://github.com/neomakes/praxeology.git
 cd praxeology
-./setup.sh                                  # Python check, venv, install, CLI setup — one command
-praxeology init --name MyOrg --agents 3     # Generates CLAUDE.md, _crew/, _standard/, .mcp.json, DB
+./setup.sh                # Install (Python check, venv, deps — one command)
+praxeology onboard        # Design your org (interactive wizard: name, crew, rules, goals)
+praxeology start           # All agents start working autonomously
+praxeology dashboard       # Monitor everything from your browser
 ```
 
-That's it. Claude Code auto-loads `.mcp.json` — your agents immediately get 20 governance tools. Ask any agent: `what_now()`
+That's it. Each agent runs as an independent daemon — finds its own work via `what_now()`, executes with its own LLM backbone (Ollama or Claude), records results via `backprop()`, and repeats. You monitor from the dashboard.
 
 ---
 
@@ -95,19 +97,47 @@ This makes agents **distinguishable, consistent, and bounded**. A QA agent sound
 
 ---
 
-## MCP Server — Praxeology Runtime
+## Praxeology Runtime — Autonomous Agent Governance
 
-Praxeology v1 is a document framework. The MCP server makes it a **runtime** — agents can search doctrine, track objectives, record cases, detect gaps, and evolve their own governance.
+Each agent runs as an **independent daemon process** with its own LLM backbone. Agents autonomously find work, execute tasks, and learn from results — all governed by the 3-axis doctrine hierarchy.
 
-### Installation
+### Architecture
 
-```bash
-git clone https://github.com/neomakes/praxeology.git
-cd praxeology
-./setup.sh    # Creates venv, installs deps, adds 'praxeology' to PATH
+```
+┌─────────────────────────────────────────────────┐
+│              Praxeology Runtime                  │
+│                                                  │
+│  Agent Daemons (one per crew member):            │
+│    zoro-daemon  → Ollama qwen3:14b              │
+│    robin-daemon → Claude API                     │
+│    nami-daemon  → Ollama qwen3:14b              │
+│                                                  │
+│  Each daemon runs:                               │
+│    what_now() → LLM call → tool execution        │
+│    → backprop() → repeat                         │
+│                                                  │
+│  Heartbeat Daemon:                               │
+│    DB monitoring → Discord alerts                │
+│                                                  │
+│  Channels:                                       │
+│    Discord (bot listener) · Web Dashboard        │
+├─────────────────────────────────────────────────┤
+│  Governance DB (SQLite + FTS5)                   │
+│  20 MCP Tools (Logical × Tactical × Contextual) │
+└─────────────────────────────────────────────────┘
 ```
 
-Requires Python 3.10+. On macOS: `brew install python@3.12` if needed.
+### Backbone Options
+
+Each agent can use a different backbone — mix and match:
+
+| Backbone | Cost | Quality | Setup |
+|----------|------|---------|-------|
+| Ollama (local) | Free | Good (14B+) | `praxeology start --crew zoro --model qwen3:14b` |
+| Claude API | API pricing | Excellent | `praxeology start --crew robin --model claude-opus-4-6` |
+| LM Studio | Free | Varies | Configure endpoint in `praxeology config` |
+
+Requires Python 3.10+. On macOS: `brew install python@3.12` if needed. For Ollama: `brew install ollama && ollama pull qwen3:14b`.
 
 ### 20 MCP Tools — 3 Axes × 5 Operations + 2 Cross-Axis + 3 Metrics
 
@@ -138,14 +168,22 @@ Over time, as gaps are absorbed into doctrine, more situations are handled by th
 
 ## CLI Commands
 
+**Getting Started:**
 ```bash
-praxeology init --name MyOrg --agents 3   # Bootstrap new project
-praxeology init --existing                  # Add MCP to existing Praxeology v1 project
-praxeology migrate --project-dir .          # Import .md standards, todo/weekly.json, crew CLAUDE.md into DB
-praxeology heartbeat start                  # Start independent background heartbeat daemon
-praxeology heartbeat stop                   # Stop heartbeat daemon
-praxeology dashboard                        # Launch web dashboard (localhost:5060)
-praxeology status                           # Show DB stats and heartbeat status
+praxeology onboard                              # Interactive wizard: org name, crew, rules, goals
+praxeology start                                 # Start all agents as independent daemons
+praxeology start --crew zoro --model qwen3:14b   # Start one agent with specific backbone
+praxeology stop                                  # Stop all agents
+praxeology stop --crew zoro                      # Stop one agent
+praxeology dashboard                             # Launch web dashboard (localhost:5060)
+```
+
+**Management:**
+```bash
+praxeology status                           # Show agent states, DB stats, config
+praxeology migrate --project-dir .          # Import existing .md/JSON files into DB
+praxeology config --discord-webhook URL     # Set Discord webhook for alerts
+praxeology config --list                    # Show all config values
 ```
 
 ---
