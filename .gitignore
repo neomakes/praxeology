@@ -22,3 +22,11 @@ node_modules/
 dist/
 build/
 __pycache__/
+
+# Dashboard (proprietary — separate private repo)
+praxeology_mcp/dashboard/
+
+# Python packaging
+*.egg-info/
+.venv/
+.pytest_cache/
