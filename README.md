@@ -139,7 +139,7 @@ Each agent can use a different LLM backbone — mix and match:
 
 Requires Python 3.10+. On macOS: `brew install python@3.12` if needed. For Ollama: `brew install ollama && ollama pull qwen3:14b`.
 
-### 20 MCP Tools — 3 Axes × 5 Operations + 2 Cross-Axis + 3 Metrics
+### 21 MCP Tools — 3 Axes × 5 Operations + 3 Cross-Axis + 3 Metrics
 
 | Axis | search | read | create | escalate | feedback |
 |------|--------|------|--------|----------|----------|
@@ -149,18 +149,37 @@ Requires Python 3.10+. On macOS: `brew install python@3.12` if needed. For Ollam
 
 **Cross-Axis:**
 - `what_now(crew_id)` — "What should I do right now?" Recommends highest-value action by cross-referencing all 3 axes.
-- `backprop(case_id, result, surprise)` — The organizational equivalent of automatic differentiation. Records execution result and propagates feedback simultaneously to all 3 axes: updates doctrine (Logical), adjusts plans (Tactical), and logs crew performance (Contextual). High surprise auto-creates gaps; very high surprise auto-generates amendment proposals. Over time, this is gradient descent for governance.
+- `backprop(case_id, result, surprise)` — Organizational automatic differentiation. Records execution result and propagates feedback across all 3 axes. High surprise auto-creates gaps; very high surprise auto-generates amendment proposals.
+- `onboard_suggest(parent_tier, parent_content, child_tier)` — Forward prediction for onboarding. Suggests 4 child tier items from parent context via local LLM. Enables interactive org design within Claude Code sessions.
 
 **Metrics:**
 - `metrics_summary(period)` — Aggregate tool usage, token cost, and latency for a given period.
 - `metrics_compare(period1, period2)` — Side-by-side comparison to prove cost decreases with use.
 - `metrics_trend(metric, days)` — Time-series trend for any metric — the evidence that `.backprop()` works.
 
-### Heartbeat Engine
+### Onboarding — 3 Paths
 
-Built-in 2-tier background check:
+| Path | Command | LLM | Best for |
+|------|---------|-----|----------|
+| **CLI** | `praxeology onboard` | Ollama / Claude API (auto-detected) | Terminal-native setup |
+| **Web** | Dashboard → Onboard tab | Ollama (Suggest button) | Visual form-based setup |
+| **Claude Code** | Interactive session | Claude (current session model) | Conversational design with AI |
+
+All three paths produce the same result: governance data across all 3 axes (Standards + Contexts + Objectives) with full 5-tier hierarchy.
+
+**LLM-assisted forward prediction:** At each tier, the system suggests 4 items for the next tier down. Select what fits, add your own, and drill deeper.
+
+```
+Strategy → suggest Doctrines → select → suggest Procedures → select → suggest Playbooks
+Goal     → suggest Programs  → select → suggest Campaigns  → select → suggest Plans
+Space    → suggest Channels  → select → suggest Threads    → select → suggest Crew
+```
+
+### Sentinel (Safety Net)
+
+When all agents are stopped, the Sentinel daemon monitors the DB:
 - **Lightweight** (rule-based, cost = 0): Checks pending work, overdue schedules, open gaps
-- **Heavyweight** (LLM, triggered only when needed): Evaluates whether action is required
+- **Heavyweight** (triggered only when needed): Evaluates urgency, sends Discord alerts
 
 Over time, as gaps are absorbed into doctrine, more situations are handled by the lightweight tier — **cost decreases with use**.
 
@@ -176,7 +195,7 @@ praxeology start --crew builder --model qwen3:14b    # Start one agent with spec
 praxeology stop                                      # Stop all agents (sentinel stays as safety net)
 praxeology stop --crew builder                       # Stop one agent
 praxeology stop --all                                # Stop everything including sentinel
-praxeology dashboard                                 # Launch web dashboard (localhost:5060)
+praxeology dashboard                                 # Launch web dashboard (localhost:5160)
 ```
 
 **Management:**
