@@ -336,6 +336,7 @@ def _sanitize_name(raw: str) -> str:
 
 
 _onboard_llm = None  # Set during onboard LLM selection
+_onboard_lang = "en"  # Set during onboard language selection
 
 
 def _detect_backends() -> list[dict]:
@@ -367,10 +368,11 @@ def _try_suggest(parent_tier: str, parent_content: str, child_tier: str, count: 
     if _onboard_llm is None:
         return []
     try:
+        lang_instruction = " Respond in Korean." if _onboard_lang == "ko" else ""
         prompt = (
             f'Given this {parent_tier}: "{parent_content}"\n\n'
             f"Suggest exactly {count} concise {child_tier} items for an AI agent governance system. "
-            f"Return ONLY a JSON array of {count} strings, nothing else."
+            f"Return ONLY a JSON array of {count} strings, nothing else.{lang_instruction}"
         )
         response = _onboard_llm.chat([
             {"role": "system", "content": "You are a governance design assistant. Return only valid JSON arrays."},
@@ -484,7 +486,15 @@ def cmd_onboard(_args: argparse.Namespace) -> None:
             print("    No LLM backends detected. Manual input mode.")
             _onboard_llm = None
 
+        # ── Language selection ──
         print()
+        print("  Language / 언어:")
+        print("    [1] English")
+        print("    [2] 한국어")
+        lang_choice = input("  Select [1]: ").strip() or "1"
+        _onboard_lang = "ko" if lang_choice == "2" else "en"
+        print()
+
         org_name = input("  Organization name: ").strip()
         if not org_name:
             print("  Organization name cannot be empty.")
@@ -640,9 +650,13 @@ def cmd_onboard(_args: argparse.Namespace) -> None:
         # ══════════════════════════════════════════════════════════════
         _print_progress_tree(mission=mission, rules=rules, procedures=procedures,
                              space=space_name, channels=channels, crew=crew_members)
+        sys.stdout.flush()
         print()
+        print("  ══════════════════════════════════════════")
         print("  ── Phase 3/3: What & When (Tactical) ──")
+        print("  ══════════════════════════════════════════")
         print()
+        sys.stdout.flush()
 
         goal = input("  Goal (long-term objective): ").strip()
         print()
