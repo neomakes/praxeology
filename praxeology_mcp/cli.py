@@ -1342,41 +1342,86 @@ def cmd_dashboard(args: argparse.Namespace) -> None:
 def cmd_status(args: argparse.Namespace) -> None:
     db_path = _db_path()
     if not Path(db_path).exists():
-        print("No Praxeology DB found. Run 'praxeology init' first.")
+        print("No Praxeology DB found. Run 'praxeology onboard' first.")
         return
 
     from praxeology_mcp.db import get_db
     conn = get_db(db_path)
 
-    tables = [
-        "standards", "cases", "gaps", "proposals", "objectives",
-        "schedules", "contexts", "reviews", "delegations", "metrics_log",
-    ]
     print("Praxeology Status")
-    print("=" * 40)
+    print("=" * 50)
     print(f"DB: {db_path}")
-    for t in tables:
-        count = conn.execute(f"SELECT COUNT(*) FROM {t}").fetchone()[0]
-        print(f"  {t}: {count} rows")
+    print()
 
-    # Heartbeat status
+    # ── WHY & HOW (Logical) ──
+    print("WHY & HOW (Logical)")
+    str_c = conn.execute("SELECT COUNT(*) FROM standards WHERE tier='strategy'").fetchone()[0]
+    doc_c = conn.execute("SELECT COUNT(*) FROM standards WHERE tier='doctrine'").fetchone()[0]
+    prc_c = conn.execute("SELECT COUNT(*) FROM standards WHERE tier='procedure'").fetchone()[0]
+    ply_c = conn.execute("SELECT COUNT(*) FROM standards WHERE tier='playbook'").fetchone()[0]
+    print(f"  Standards:  {str_c + doc_c + prc_c + ply_c} (STR: {str_c}, DOC: {doc_c}, PRC: {prc_c}, PLY: {ply_c})")
+    print(f"  Cases:      {conn.execute('SELECT COUNT(*) FROM cases').fetchone()[0]}")
+    print(f"  Gaps:       {conn.execute('SELECT COUNT(*) FROM gaps').fetchone()[0]}")
+    print(f"  Proposals:  {conn.execute('SELECT COUNT(*) FROM proposals').fetchone()[0]}")
+    print()
+
+    # ── WHAT & WHEN (Tactical) ──
+    print("WHAT & WHEN (Tactical)")
+    gol_c = conn.execute("SELECT COUNT(*) FROM objectives WHERE tier='goal'").fetchone()[0]
+    prg_c = conn.execute("SELECT COUNT(*) FROM objectives WHERE tier='program'").fetchone()[0]
+    cmp_c = conn.execute("SELECT COUNT(*) FROM objectives WHERE tier='campaign'").fetchone()[0]
+    pln_c = conn.execute("SELECT COUNT(*) FROM objectives WHERE tier='plan'").fetchone()[0]
+    wrk_c = conn.execute("SELECT COUNT(*) FROM objectives WHERE tier='work'").fetchone()[0]
+    total_obj = gol_c + prg_c + cmp_c + pln_c + wrk_c
+    print(f"  Objectives: {total_obj} (GOL: {gol_c}, PRG: {prg_c}, CMP: {cmp_c}, PLN: {pln_c}, WRK: {wrk_c})")
+    print(f"  Schedules:  {conn.execute('SELECT COUNT(*) FROM schedules').fetchone()[0]}")
+    print()
+
+    # ── WHO & WHERE (Contextual) ──
+    print("WHO & WHERE (Contextual)")
+    spc_c = conn.execute("SELECT COUNT(*) FROM contexts WHERE tier='space'").fetchone()[0]
+    chn_c = conn.execute("SELECT COUNT(*) FROM contexts WHERE tier='channel'").fetchone()[0]
+    thr_c = conn.execute("SELECT COUNT(*) FROM contexts WHERE tier='thread'").fetchone()[0]
+    crw_c = conn.execute("SELECT COUNT(*) FROM contexts WHERE tier='crew'").fetchone()[0]
+    ses_c = conn.execute("SELECT COUNT(*) FROM contexts WHERE tier='session'").fetchone()[0]
+    total_ctx = spc_c + chn_c + thr_c + crw_c + ses_c
+    print(f"  Contexts:   {total_ctx} (SPC: {spc_c}, CHN: {chn_c}, THR: {thr_c}, CRW: {crw_c}, SES: {ses_c})")
+    print(f"  Reviews:    {conn.execute('SELECT COUNT(*) FROM reviews').fetchone()[0]}")
+    print(f"  Delegations:{conn.execute('SELECT COUNT(*) FROM delegations').fetchone()[0]}")
+    print()
+
+    # ── CROSS-AXIS ──
+    print("CROSS-AXIS")
+    print(f"  Metrics:    {conn.execute('SELECT COUNT(*) FROM metrics_log').fetchone()[0]}")
+    print()
+
+    # ── Agents ──
     from praxeology_mcp.daemon import DaemonManager
     dm = DaemonManager()
-    hb_status = dm.status("heartbeat")
-    if hb_status["running"]:
-        print(f"\nHeartbeat: running (PID {hb_status['pid']})")
-    elif hb_status.get("stale"):
-        print(f"\nHeartbeat: dead (stale PID {hb_status['pid']})")
+    daemons = dm.list_all()
+    if daemons:
+        print("Agents")
+        for d in daemons:
+            status = "running" if d["running"] else "stopped"
+            name = d["name"]
+            pid = d.get("pid", "?")
+            if name == "heartbeat":
+                print(f"  Sentinel: {status} (PID {pid})")
+            elif name.startswith("agent-"):
+                crew_name = name[6:]
+                print(f"  {crew_name}: {status} (PID {pid})")
+            else:
+                print(f"  {name}: {status} (PID {pid})")
     else:
-        print("\nHeartbeat: not running")
+        print("Agents: none running")
+    print()
 
-    # Config
+    # ── Config ──
     config_rows = conn.execute("SELECT key, value FROM config ORDER BY key").fetchall()
     if config_rows:
-        print("\nConfig:")
+        print("Config")
         for row in config_rows:
             key, value = row[0], row[1]
-            # Mask sensitive values
             if "webhook" in key or "token" in key:
                 value = value[:30] + "***" if len(value) > 30 else "***"
             print(f"  {key} = {value}")
