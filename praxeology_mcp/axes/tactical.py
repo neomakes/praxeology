@@ -91,7 +91,7 @@ def register(mcp) -> None:
 
             where_sql = " AND ".join(where_clauses)
             rows = conn.execute(
-                f"SELECT * FROM objectives WHERE {where_sql} ORDER BY created_at DESC LIMIT 100",
+                f"SELECT * FROM tactical WHERE {where_sql} ORDER BY created_at DESC LIMIT 100",
                 params,
             ).fetchall()
 
@@ -118,7 +118,7 @@ def register(mcp) -> None:
         conn = get_db(_db_path())
         try:
             row = conn.execute(
-                "SELECT * FROM objectives WHERE id = ?", (id,)
+                "SELECT * FROM tactical WHERE id = ?", (id,)
             ).fetchone()
             if row is None:
                 return json.dumps({"error": f"No objective with id={id}"})
@@ -134,7 +134,7 @@ def register(mcp) -> None:
                     break  # cycle guard
                 seen.add(current_parent_id)
                 parent_row = conn.execute(
-                    "SELECT * FROM objectives WHERE id = ?", (current_parent_id,)
+                    "SELECT * FROM tactical WHERE id = ?", (current_parent_id,)
                 ).fetchone()
                 if parent_row is None:
                     break
@@ -190,7 +190,7 @@ def register(mcp) -> None:
         try:
             if parent_id is not None:
                 parent_row = conn.execute(
-                    "SELECT id, tier FROM objectives WHERE id = ?", (parent_id,)
+                    "SELECT id, tier FROM tactical WHERE id = ?", (parent_id,)
                 ).fetchone()
                 if parent_row is None:
                     return json.dumps({"error": f"No parent objective with id={parent_id}"})
@@ -209,7 +209,7 @@ def register(mcp) -> None:
             now = _utcnow()
             cursor = conn.execute(
                 """
-                INSERT INTO objectives
+                INSERT INTO tactical
                     (tier, parent_id, title, description, status, priority,
                      assignee, due_date, created_at, updated_at)
                 VALUES (?, ?, ?, ?, 'pending', ?, ?, ?, ?, ?)
@@ -249,7 +249,7 @@ def register(mcp) -> None:
         conn = get_db(_db_path())
         try:
             row = conn.execute(
-                "SELECT * FROM objectives WHERE id = ?", (id,)
+                "SELECT * FROM tactical WHERE id = ?", (id,)
             ).fetchone()
             if row is None:
                 return json.dumps({"error": f"No objective with id={id}"})
@@ -260,7 +260,7 @@ def register(mcp) -> None:
             new_description = (obj.get("description") or "") + escalation_note
 
             conn.execute(
-                "UPDATE objectives SET status = 'blocked', description = ?, updated_at = ? WHERE id = ?",
+                "UPDATE tactical SET status = 'blocked', description = ?, updated_at = ? WHERE id = ?",
                 (new_description, now, id),
             )
             conn.commit()
@@ -268,19 +268,19 @@ def register(mcp) -> None:
             parent_notified = False
             if obj["tier"] == "work" and obj.get("parent_id") is not None:
                 parent_row = conn.execute(
-                    "SELECT id, status FROM objectives WHERE id = ?",
+                    "SELECT id, status FROM tactical WHERE id = ?",
                     (obj["parent_id"],),
                 ).fetchone()
                 if parent_row and parent_row["status"] in ("pending", "in_progress"):
                     conn.execute(
-                        "UPDATE objectives SET status = 'blocked', updated_at = ? WHERE id = ?",
+                        "UPDATE tactical SET status = 'blocked', updated_at = ? WHERE id = ?",
                         (now, obj["parent_id"]),
                     )
                     conn.commit()
                     parent_notified = True
 
             updated_row = conn.execute(
-                "SELECT * FROM objectives WHERE id = ?", (id,)
+                "SELECT * FROM tactical WHERE id = ?", (id,)
             ).fetchone()
 
             latency = (time.monotonic_ns() - t0) // 1_000_000
@@ -325,7 +325,7 @@ def register(mcp) -> None:
         conn = get_db(_db_path())
         try:
             row = conn.execute(
-                "SELECT * FROM objectives WHERE id = ?", (id,)
+                "SELECT * FROM tactical WHERE id = ?", (id,)
             ).fetchone()
             if row is None:
                 return json.dumps({"error": f"No objective with id={id}"})
@@ -338,20 +338,20 @@ def register(mcp) -> None:
                 new_description += f"\n[{now}] {notes.strip()}"
 
             conn.execute(
-                "UPDATE objectives SET status = ?, description = ?, updated_at = ? WHERE id = ?",
+                "UPDATE tactical SET status = ?, description = ?, updated_at = ? WHERE id = ?",
                 (status, new_description, now, id),
             )
             conn.commit()
 
             updated_row = conn.execute(
-                "SELECT * FROM objectives WHERE id = ?", (id,)
+                "SELECT * FROM tactical WHERE id = ?", (id,)
             ).fetchone()
 
             response: dict[str, Any] = {"objective": _row_to_dict(updated_row)}
 
             if status == "done":
                 incomplete_count = conn.execute(
-                    "SELECT COUNT(*) FROM objectives WHERE parent_id = ? AND status != 'done'",
+                    "SELECT COUNT(*) FROM tactical WHERE parent_id = ? AND status != 'done'",
                     (id,),
                 ).fetchone()[0]
                 response["children_incomplete"] = incomplete_count

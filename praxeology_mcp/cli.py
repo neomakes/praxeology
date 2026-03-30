@@ -840,14 +840,14 @@ def cmd_onboard(_args: argparse.Namespace) -> None:
         # ── Logical axis ──
         if mission:
             conn.execute(
-                "INSERT INTO standards (tier, department, code, title, content) VALUES (?, ?, ?, ?, ?)",
+                "INSERT INTO logical (tier, department, code, title, content) VALUES (?, ?, ?, ?, ?)",
                 ("strategy", "org", "STR-001", f"{org_name} — Strategy", mission),
             )
             counts["standards"] += 1
 
         for i, rule in enumerate(rules, 1):
             conn.execute(
-                "INSERT INTO standards (tier, department, code, title, content) VALUES (?, ?, ?, ?, ?)",
+                "INSERT INTO logical (tier, department, code, title, content) VALUES (?, ?, ?, ?, ?)",
                 ("doctrine", "org", f"DOC-{i:03d}", f"Doctrine {i}", rule),
             )
             counts["standards"] += 1
@@ -859,21 +859,21 @@ def cmd_onboard(_args: argparse.Namespace) -> None:
                 if proc.get("playbook_of"):
                     ply_n += 1
                     conn.execute(
-                        "INSERT INTO standards (tier, department, code, title, content) VALUES (?, ?, ?, ?, ?)",
+                        "INSERT INTO logical (tier, department, code, title, content) VALUES (?, ?, ?, ?, ?)",
                         ("playbook", "org", f"PLY-{ply_n:03d}", proc["name"],
                          f"Playbook for procedure: {proc.get('playbook_of', '')}"),
                     )
                 else:
                     prc_n += 1
                     conn.execute(
-                        "INSERT INTO standards (tier, department, code, title, content) VALUES (?, ?, ?, ?, ?)",
+                        "INSERT INTO logical (tier, department, code, title, content) VALUES (?, ?, ?, ?, ?)",
                         ("procedure", "org", f"PRC-{prc_n:03d}", proc["name"],
                          f"Under doctrine: {proc.get('doctrine', '')}"),
                     )
             else:
                 prc_n += 1
                 conn.execute(
-                    "INSERT INTO standards (tier, department, code, title, content) VALUES (?, ?, ?, ?, ?)",
+                    "INSERT INTO logical (tier, department, code, title, content) VALUES (?, ?, ?, ?, ?)",
                     ("procedure", "org", f"PRC-{prc_n:03d}", f"Procedure {prc_n}", proc),
                 )
             counts["standards"] += 1
@@ -883,7 +883,7 @@ def cmd_onboard(_args: argparse.Namespace) -> None:
         # ── Contextual axis ──
         # Space
         cur = conn.execute(
-            "INSERT INTO contexts (tier, name, metadata) VALUES ('space', ?, ?)",
+            "INSERT INTO contextual (tier, name, metadata) VALUES ('space', ?, ?)",
             (space_name, json.dumps({"org": org_name})),
         )
         space_id = cur.lastrowid
@@ -894,7 +894,7 @@ def cmd_onboard(_args: argparse.Namespace) -> None:
         thread_id_map: dict[str, int] = {}  # "channel/thread" → id
         for ch in channels:
             cur = conn.execute(
-                "INSERT INTO contexts (tier, parent_id, name) VALUES ('channel', ?, ?)",
+                "INSERT INTO contextual (tier, parent_id, name) VALUES ('channel', ?, ?)",
                 (space_id, ch["name"]),
             )
             ch_id = cur.lastrowid
@@ -903,7 +903,7 @@ def cmd_onboard(_args: argparse.Namespace) -> None:
 
             for th_name in ch["threads"]:
                 cur = conn.execute(
-                    "INSERT INTO contexts (tier, parent_id, name) VALUES ('thread', ?, ?)",
+                    "INSERT INTO contextual (tier, parent_id, name) VALUES ('thread', ?, ?)",
                     (ch_id, th_name),
                 )
                 thread_id_map[f"{ch['name']}/{th_name}"] = cur.lastrowid
@@ -912,7 +912,7 @@ def cmd_onboard(_args: argparse.Namespace) -> None:
         # Crew — parent is space, linked to threads via channel_access
         for member in crew_members:
             cur = conn.execute(
-                "INSERT INTO contexts (tier, parent_id, name, metadata) VALUES ('crew', ?, ?, ?)",
+                "INSERT INTO contextual (tier, parent_id, name, metadata) VALUES ('crew', ?, ?, ?)",
                 (space_id, member["name"], json.dumps({
                     "role": member["role"], "department": member["department"],
                     "source_dir": str(crew_dir / member["name"].lower()),
@@ -937,7 +937,7 @@ def cmd_onboard(_args: argparse.Namespace) -> None:
         goal_id = None
         if goal:
             cur = conn.execute(
-                "INSERT INTO objectives (tier, title, description) VALUES ('goal', ?, ?)",
+                "INSERT INTO tactical (tier, title, description) VALUES ('goal', ?, ?)",
                 (f"{org_name} — Goal", goal),
             )
             goal_id = cur.lastrowid
@@ -946,7 +946,7 @@ def cmd_onboard(_args: argparse.Namespace) -> None:
         # Programs → Campaigns → Plans (from LLM-assisted input)
         for prog_name in programs:
             cur = conn.execute(
-                "INSERT INTO objectives (tier, parent_id, title) VALUES ('program', ?, ?)",
+                "INSERT INTO tactical (tier, parent_id, title) VALUES ('program', ?, ?)",
                 (goal_id, prog_name),
             )
             prog_id = cur.lastrowid
@@ -955,7 +955,7 @@ def cmd_onboard(_args: argparse.Namespace) -> None:
             for camp in campaigns:
                 if camp["program"] == prog_name:
                     cur = conn.execute(
-                        "INSERT INTO objectives (tier, parent_id, title) VALUES ('campaign', ?, ?)",
+                        "INSERT INTO tactical (tier, parent_id, title) VALUES ('campaign', ?, ?)",
                         (prog_id, camp["name"]),
                     )
                     camp_id = cur.lastrowid
@@ -963,7 +963,7 @@ def cmd_onboard(_args: argparse.Namespace) -> None:
 
                     for plan_name in camp["plans"]:
                         conn.execute(
-                            "INSERT INTO objectives (tier, parent_id, title) VALUES ('plan', ?, ?)",
+                            "INSERT INTO tactical (tier, parent_id, title) VALUES ('plan', ?, ?)",
                             (camp_id, plan_name),
                         )
                         counts["objectives"] += 1
@@ -972,7 +972,7 @@ def cmd_onboard(_args: argparse.Namespace) -> None:
         if not programs and plans_flat:
             for p in plans_flat:
                 conn.execute(
-                    "INSERT INTO objectives (tier, parent_id, title) VALUES ('plan', ?, ?)",
+                    "INSERT INTO tactical (tier, parent_id, title) VALUES ('plan', ?, ?)",
                     (goal_id, p),
                 )
                 counts["objectives"] += 1
@@ -1083,14 +1083,14 @@ def cmd_migrate(args: argparse.Namespace) -> None:
 
             # Idempotency check
             row = conn.execute(
-                "SELECT id FROM standards WHERE code = ?", (code,)
+                "SELECT id FROM logical WHERE code = ?", (code,)
             ).fetchone()
             if row is not None:
                 skipped += 1
                 continue
 
             conn.execute(
-                "INSERT INTO standards (tier, department, code, title, content)"
+                "INSERT INTO logical (tier, department, code, title, content)"
                 " VALUES (?, ?, ?, ?, ?)",
                 (tier, department, code, title, content),
             )
@@ -1129,7 +1129,7 @@ def cmd_migrate(args: argparse.Namespace) -> None:
 
                     # Idempotency: same title + date
                     row = conn.execute(
-                        "SELECT id FROM objectives WHERE title = ? AND due_date = ?",
+                        "SELECT id FROM tactical WHERE title = ? AND due_date = ?",
                         (title, date_str or None),
                     ).fetchone()
                     if row is not None:
@@ -1137,7 +1137,7 @@ def cmd_migrate(args: argparse.Namespace) -> None:
                         continue
 
                     conn.execute(
-                        "INSERT INTO objectives"
+                        "INSERT INTO tactical"
                         " (tier, title, description, status, priority, assignee, due_date)"
                         " VALUES (?, ?, ?, ?, ?, ?, ?)",
                         ("work", title, notes, status, priority, crew_name, date_str or None),
@@ -1165,7 +1165,7 @@ def cmd_migrate(args: argparse.Namespace) -> None:
 
                     # Idempotency check for the plan objective
                     plan_row = conn.execute(
-                        "SELECT id FROM objectives WHERE title = ? AND tier = 'plan'",
+                        "SELECT id FROM tactical WHERE title = ? AND tier = 'plan'",
                         (plan_title,),
                     ).fetchone()
                     if plan_row is not None:
@@ -1174,7 +1174,7 @@ def cmd_migrate(args: argparse.Namespace) -> None:
                         plan_id = plan_row["id"]
                     else:
                         cur = conn.execute(
-                            "INSERT INTO objectives (tier, title, assignee)"
+                            "INSERT INTO tactical (tier, title, assignee)"
                             " VALUES ('plan', ?, ?)",
                             (plan_title, crew_name),
                         )
@@ -1188,7 +1188,7 @@ def cmd_migrate(args: argparse.Namespace) -> None:
                         priority = _PRIORITY_MAP.get(str(item.get("priority", "mid")), "mid")
 
                         row = conn.execute(
-                            "SELECT id FROM objectives"
+                            "SELECT id FROM tactical"
                             " WHERE title = ? AND parent_id = ?",
                             (task_title, plan_id),
                         ).fetchone()
@@ -1197,7 +1197,7 @@ def cmd_migrate(args: argparse.Namespace) -> None:
                             continue
 
                         conn.execute(
-                            "INSERT INTO objectives"
+                            "INSERT INTO tactical"
                             " (tier, parent_id, title, priority, assignee)"
                             " VALUES ('work', ?, ?, ?, ?)",
                             (plan_id, task_title, priority, crew_name),
@@ -1220,14 +1220,14 @@ def cmd_migrate(args: argparse.Namespace) -> None:
                 display_name = name_match or crew_name
 
                 row = conn.execute(
-                    "SELECT id FROM contexts WHERE tier = 'crew' AND name = ?",
+                    "SELECT id FROM contextual WHERE tier = 'crew' AND name = ?",
                     (display_name,),
                 ).fetchone()
                 if row is not None:
                     skipped += 1
                 else:
                     conn.execute(
-                        "INSERT INTO contexts (tier, name, metadata)"
+                        "INSERT INTO contextual (tier, name, metadata)"
                         " VALUES ('crew', ?, ?)",
                         (display_name, json.dumps({"source_dir": str(member_dir)})),
                     )
@@ -1355,10 +1355,10 @@ def cmd_status(args: argparse.Namespace) -> None:
 
     # ── WHY & HOW (Logical) ──
     print("WHY & HOW (Logical)")
-    str_c = conn.execute("SELECT COUNT(*) FROM standards WHERE tier='strategy'").fetchone()[0]
-    doc_c = conn.execute("SELECT COUNT(*) FROM standards WHERE tier='doctrine'").fetchone()[0]
-    prc_c = conn.execute("SELECT COUNT(*) FROM standards WHERE tier='procedure'").fetchone()[0]
-    ply_c = conn.execute("SELECT COUNT(*) FROM standards WHERE tier='playbook'").fetchone()[0]
+    str_c = conn.execute("SELECT COUNT(*) FROM logical WHERE tier='strategy'").fetchone()[0]
+    doc_c = conn.execute("SELECT COUNT(*) FROM logical WHERE tier='doctrine'").fetchone()[0]
+    prc_c = conn.execute("SELECT COUNT(*) FROM logical WHERE tier='procedure'").fetchone()[0]
+    ply_c = conn.execute("SELECT COUNT(*) FROM logical WHERE tier='playbook'").fetchone()[0]
     print(f"  Standards:  {str_c + doc_c + prc_c + ply_c} (STR: {str_c}, DOC: {doc_c}, PRC: {prc_c}, PLY: {ply_c})")
     print(f"  Cases:      {conn.execute('SELECT COUNT(*) FROM cases').fetchone()[0]}")
     print(f"  Gaps:       {conn.execute('SELECT COUNT(*) FROM gaps').fetchone()[0]}")
@@ -1367,11 +1367,11 @@ def cmd_status(args: argparse.Namespace) -> None:
 
     # ── WHAT & WHEN (Tactical) ──
     print("WHAT & WHEN (Tactical)")
-    gol_c = conn.execute("SELECT COUNT(*) FROM objectives WHERE tier='goal'").fetchone()[0]
-    prg_c = conn.execute("SELECT COUNT(*) FROM objectives WHERE tier='program'").fetchone()[0]
-    cmp_c = conn.execute("SELECT COUNT(*) FROM objectives WHERE tier='campaign'").fetchone()[0]
-    pln_c = conn.execute("SELECT COUNT(*) FROM objectives WHERE tier='plan'").fetchone()[0]
-    wrk_c = conn.execute("SELECT COUNT(*) FROM objectives WHERE tier='work'").fetchone()[0]
+    gol_c = conn.execute("SELECT COUNT(*) FROM tactical WHERE tier='goal'").fetchone()[0]
+    prg_c = conn.execute("SELECT COUNT(*) FROM tactical WHERE tier='program'").fetchone()[0]
+    cmp_c = conn.execute("SELECT COUNT(*) FROM tactical WHERE tier='campaign'").fetchone()[0]
+    pln_c = conn.execute("SELECT COUNT(*) FROM tactical WHERE tier='plan'").fetchone()[0]
+    wrk_c = conn.execute("SELECT COUNT(*) FROM tactical WHERE tier='work'").fetchone()[0]
     total_obj = gol_c + prg_c + cmp_c + pln_c + wrk_c
     print(f"  Objectives: {total_obj} (GOL: {gol_c}, PRG: {prg_c}, CMP: {cmp_c}, PLN: {pln_c}, WRK: {wrk_c})")
     print(f"  Schedules:  {conn.execute('SELECT COUNT(*) FROM schedules').fetchone()[0]}")
@@ -1379,11 +1379,11 @@ def cmd_status(args: argparse.Namespace) -> None:
 
     # ── WHO & WHERE (Contextual) ──
     print("WHO & WHERE (Contextual)")
-    spc_c = conn.execute("SELECT COUNT(*) FROM contexts WHERE tier='space'").fetchone()[0]
-    chn_c = conn.execute("SELECT COUNT(*) FROM contexts WHERE tier='channel'").fetchone()[0]
-    thr_c = conn.execute("SELECT COUNT(*) FROM contexts WHERE tier='thread'").fetchone()[0]
-    crw_c = conn.execute("SELECT COUNT(*) FROM contexts WHERE tier='crew'").fetchone()[0]
-    ses_c = conn.execute("SELECT COUNT(*) FROM contexts WHERE tier='session'").fetchone()[0]
+    spc_c = conn.execute("SELECT COUNT(*) FROM contextual WHERE tier='space'").fetchone()[0]
+    chn_c = conn.execute("SELECT COUNT(*) FROM contextual WHERE tier='channel'").fetchone()[0]
+    thr_c = conn.execute("SELECT COUNT(*) FROM contextual WHERE tier='thread'").fetchone()[0]
+    crw_c = conn.execute("SELECT COUNT(*) FROM contextual WHERE tier='crew'").fetchone()[0]
+    ses_c = conn.execute("SELECT COUNT(*) FROM contextual WHERE tier='session'").fetchone()[0]
     total_ctx = spc_c + chn_c + thr_c + crw_c + ses_c
     print(f"  Contexts:   {total_ctx} (SPC: {spc_c}, CHN: {chn_c}, THR: {thr_c}, CRW: {crw_c}, SES: {ses_c})")
     print(f"  Reviews:    {conn.execute('SELECT COUNT(*) FROM reviews').fetchone()[0]}")
@@ -1452,7 +1452,7 @@ def cmd_start(args: argparse.Namespace) -> None:
     else:
         # Start all registered crew from DB
         rows = conn.execute(
-            "SELECT name FROM contexts WHERE tier = 'crew' ORDER BY name"
+            "SELECT name FROM contextual WHERE tier = 'crew' ORDER BY name"
         ).fetchall()
         if not rows:
             print("No crew members registered. Run 'praxeology onboard' or 'praxeology migrate' first.")

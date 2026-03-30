@@ -62,7 +62,7 @@ def _build_parent_chain(conn, context_id: int) -> list[dict]:
         visited.add(current_id)
         row = conn.execute(
             "SELECT id, tier, name, parent_id, metadata, created_at"
-            " FROM contexts WHERE id = ?",
+            " FROM contextual WHERE id = ?",
             (current_id,),
         ).fetchone()
         if row is None:
@@ -102,7 +102,7 @@ def register(mcp) -> None:
                 rows = conn.execute(
                     """
                     SELECT id, tier, name, parent_id, metadata, created_at
-                    FROM contexts
+                    FROM contextual
                     WHERE name LIKE ? AND tier = ?
                     ORDER BY created_at DESC
                     LIMIT 100
@@ -113,7 +113,7 @@ def register(mcp) -> None:
                 rows = conn.execute(
                     """
                     SELECT id, tier, name, parent_id, metadata, created_at
-                    FROM contexts
+                    FROM contextual
                     WHERE name LIKE ?
                     ORDER BY created_at DESC
                     LIMIT 100
@@ -153,7 +153,7 @@ def register(mcp) -> None:
             if id is not None:
                 row = conn.execute(
                     "SELECT id, tier, name, parent_id, metadata, created_at"
-                    " FROM contexts WHERE id = ?",
+                    " FROM contextual WHERE id = ?",
                     (id,),
                 ).fetchone()
             elif name is not None and tier is not None:
@@ -163,7 +163,7 @@ def register(mcp) -> None:
                     )
                 row = conn.execute(
                     "SELECT id, tier, name, parent_id, metadata, created_at"
-                    " FROM contexts WHERE name = ? AND tier = ?",
+                    " FROM contextual WHERE name = ? AND tier = ?",
                     (name, tier),
                 ).fetchone()
             else:
@@ -232,7 +232,7 @@ def register(mcp) -> None:
             # Validate parent tier hierarchy
             if parent_id is not None:
                 parent_row = conn.execute(
-                    "SELECT id, tier FROM contexts WHERE id = ?", (parent_id,)
+                    "SELECT id, tier FROM contextual WHERE id = ?", (parent_id,)
                 ).fetchone()
                 if parent_row is None:
                     return json.dumps(
@@ -258,7 +258,7 @@ def register(mcp) -> None:
             clean_metadata = json.dumps(meta_obj, ensure_ascii=False)
 
             cursor = conn.execute(
-                "INSERT INTO contexts (tier, name, parent_id, metadata, created_at)"
+                "INSERT INTO contextual (tier, name, parent_id, metadata, created_at)"
                 " VALUES (?, ?, ?, ?, ?)",
                 (tier, name, parent_id, clean_metadata, _utcnow()),
             )
@@ -309,7 +309,7 @@ def register(mcp) -> None:
         conn = get_db(_db_path())
         try:
             session_row = conn.execute(
-                "SELECT id, tier, name, parent_id FROM contexts WHERE id = ?",
+                "SELECT id, tier, name, parent_id FROM contextual WHERE id = ?",
                 (session_id,),
             ).fetchone()
 
@@ -333,7 +333,7 @@ def register(mcp) -> None:
             parent_id = session_row["parent_id"]
             if parent_id is not None:
                 parent_row = conn.execute(
-                    "SELECT tier, name FROM contexts WHERE id = ?", (parent_id,)
+                    "SELECT tier, name FROM contextual WHERE id = ?", (parent_id,)
                 ).fetchone()
                 if parent_row is not None and parent_row["tier"] == "crew":
                     from_crew = parent_row["name"]

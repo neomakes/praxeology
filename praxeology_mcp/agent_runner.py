@@ -221,20 +221,20 @@ class ToolExecutor:
     def _logical_search(self, conn, args) -> str:
         query = args["query"]
         rows = conn.execute(
-            "SELECT id, tier, department, code, title FROM standards WHERE code LIKE ? OR title LIKE ? LIMIT 10",
+            "SELECT id, tier, department, code, title FROM logical WHERE code LIKE ? OR title LIKE ? LIMIT 10",
             (f"%{query}%", f"%{query}%"),
         ).fetchall()
         return json.dumps([dict(r) for r in rows], ensure_ascii=False)
 
     def _logical_read(self, conn, args) -> str:
         row = conn.execute(
-            "SELECT * FROM standards WHERE code = ?", (args["code"],)
+            "SELECT * FROM logical WHERE code = ?", (args["code"],)
         ).fetchone()
         return json.dumps(dict(row) if row else {"error": "not found"}, ensure_ascii=False)
 
     def _logical_create(self, conn, args) -> str:
         conn.execute(
-            "INSERT INTO standards (tier, department, code, title, content) VALUES (?, ?, ?, ?, ?)",
+            "INSERT INTO logical (tier, department, code, title, content) VALUES (?, ?, ?, ?, ?)",
             (args["tier"], args.get("department", ""), args["code"], args["title"], args.get("content", "")),
         )
         conn.commit()
@@ -242,7 +242,7 @@ class ToolExecutor:
 
     def _tactical_search(self, conn, args) -> str:
         query = args["query"]
-        sql = "SELECT id, tier, title, status, priority, assignee FROM objectives WHERE title LIKE ?"
+        sql = "SELECT id, tier, title, status, priority, assignee FROM tactical WHERE title LIKE ?"
         params = [f"%{query}%"]
         if args.get("tier"):
             sql += " AND tier = ?"
@@ -259,13 +259,13 @@ class ToolExecutor:
 
     def _tactical_read(self, conn, args) -> str:
         row = conn.execute(
-            "SELECT * FROM objectives WHERE id = ?", (args["objective_id"],)
+            "SELECT * FROM tactical WHERE id = ?", (args["objective_id"],)
         ).fetchone()
         return json.dumps(dict(row) if row else {"error": "not found"}, ensure_ascii=False)
 
     def _tactical_create(self, conn, args) -> str:
         cur = conn.execute(
-            "INSERT INTO objectives (tier, title, description, priority, assignee, parent_id) VALUES (?, ?, ?, ?, ?, ?)",
+            "INSERT INTO tactical (tier, title, description, priority, assignee, parent_id) VALUES (?, ?, ?, ?, ?, ?)",
             (args["tier"], args["title"], args.get("description", ""),
              args.get("priority", "mid"), args.get("assignee"), args.get("parent_id")),
         )
@@ -275,7 +275,7 @@ class ToolExecutor:
     def _tactical_feedback(self, conn, args) -> str:
         now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
         conn.execute(
-            "UPDATE objectives SET status = ?, updated_at = ? WHERE id = ?",
+            "UPDATE tactical SET status = ?, updated_at = ? WHERE id = ?",
             (args["status"], now, args["objective_id"]),
         )
         conn.commit()
@@ -283,7 +283,7 @@ class ToolExecutor:
 
     def _contextual_search(self, conn, args) -> str:
         query = args["query"]
-        sql = "SELECT id, tier, name, metadata FROM contexts WHERE name LIKE ?"
+        sql = "SELECT id, tier, name, metadata FROM contextual WHERE name LIKE ?"
         params = [f"%{query}%"]
         if args.get("tier"):
             sql += " AND tier = ?"
@@ -332,7 +332,7 @@ class ToolExecutor:
         completion_words = {"done", "completed", "finished", "success"}
         if objective_id and completion_words & set(result.lower().split()):
             now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
-            conn.execute("UPDATE objectives SET status = 'done', updated_at = ? WHERE id = ?", (now, objective_id))
+            conn.execute("UPDATE tactical SET status = 'done', updated_at = ? WHERE id = ?", (now, objective_id))
             conn.commit()
             updates["objective_done"] = objective_id
 
@@ -494,7 +494,7 @@ class AgentRunner:
         work = conn.execute(
             """
             SELECT id, title, description, priority, due_date
-            FROM objectives
+            FROM tactical
             WHERE tier = 'work' AND status IN ('pending', 'in_progress')
               AND assignee = ?
             ORDER BY
@@ -515,7 +515,7 @@ class AgentRunner:
         # Mark as in_progress
         now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
         conn.execute(
-            "UPDATE objectives SET status = 'in_progress', updated_at = ? WHERE id = ? AND status = 'pending'",
+            "UPDATE tactical SET status = 'in_progress', updated_at = ? WHERE id = ? AND status = 'pending'",
             (now, work_dict["id"]),
         )
         conn.commit()
@@ -531,7 +531,7 @@ class AgentRunner:
 
         # 3. Get context — related standards, recent cases
         standards = conn.execute(
-            "SELECT code, title FROM standards ORDER BY tier, code LIMIT 10"
+            "SELECT code, title FROM logical ORDER BY tier, code LIMIT 10"
         ).fetchall()
         standards_ctx = "\n".join(f"- {r['code']}: {r['title']}" for r in standards)
 

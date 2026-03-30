@@ -41,7 +41,7 @@ def _row_to_dict(row) -> dict:
 
 
 _ALLOWED_TABLES = {
-    "standards": "standards",
+    "standards": "logical",
     "cases": "cases",
     "gaps": "gaps",
     "proposals": "proposals",
@@ -82,16 +82,16 @@ def register(mcp) -> None:
         results: list[dict[str, Any]] = []
 
         try:
-            # Search standards_fts
+            # Search logical_fts
             if tier:
                 rows = conn.execute(
                     """
                     SELECT s.id, s.tier, s.department, s.code, s.title,
                            s.content, s.version, s.created_at, s.updated_at,
                            'standards' AS source
-                    FROM standards_fts f
-                    JOIN standards s ON s.id = f.rowid
-                    WHERE standards_fts MATCH ?
+                    FROM logical_fts f
+                    JOIN logical s ON s.id = f.rowid
+                    WHERE logical_fts MATCH ?
                       AND s.tier = ?
                     ORDER BY rank
                     LIMIT 50
@@ -104,9 +104,9 @@ def register(mcp) -> None:
                     SELECT s.id, s.tier, s.department, s.code, s.title,
                            s.content, s.version, s.created_at, s.updated_at,
                            'standards' AS source
-                    FROM standards_fts f
-                    JOIN standards s ON s.id = f.rowid
-                    WHERE standards_fts MATCH ?
+                    FROM logical_fts f
+                    JOIN logical s ON s.id = f.rowid
+                    WHERE logical_fts MATCH ?
                     ORDER BY rank
                     LIMIT 50
                     """,
