@@ -808,7 +808,7 @@ def cmd_config(args: argparse.Namespace) -> None:
 
 def cmd_dashboard(args: argparse.Namespace) -> None:
     from praxeology_mcp.dashboard.app import run_dashboard
-    port = getattr(args, "port", 5060)
+    port = getattr(args, "port", 5160)
     print(f"Starting dashboard at http://localhost:{port}")
     run_dashboard(port=port)
 
@@ -1014,8 +1014,8 @@ def main(argv: list[str] | None = None) -> None:
         "dashboard", help="Launch the Praxeology web dashboard"
     )
     dashboard_parser.add_argument(
-        "--port", type=int, default=5060, metavar="PORT",
-        help="Port to run the dashboard on (default: 5060)",
+        "--port", type=int, default=5160, metavar="PORT",
+        help="Port to run the dashboard on (default: 5160)",
     )
 
     # status
