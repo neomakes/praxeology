@@ -506,8 +506,34 @@ class AgentRunner:
         ).fetchone()
 
         if work is None:
-            logger.debug(f"[{self.crew_id}] No pending work.")
-            return
+            # Forward: find a Plan and create Work from it
+            plan = conn.execute(
+                """
+                SELECT id, title, parent_id
+                FROM tactical
+                WHERE tier = 'plan' AND status IN ('pending', 'in_progress')
+                ORDER BY created_at ASC
+                LIMIT 1
+                """,
+            ).fetchone()
+            if plan is None:
+                logger.debug(f"[{self.crew_id}] No pending work or plans.")
+                return
+
+            plan_dict = dict(plan)
+            now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+            cur = conn.execute(
+                "INSERT INTO tactical (tier, parent_id, title, status, priority, assignee, created_at, updated_at)"
+                " VALUES ('work', ?, ?, 'pending', 'mid', ?, ?, ?)",
+                (plan_dict["id"], f"Auto: {plan_dict['title']}", self.crew_id, now, now),
+            )
+            conn.commit()
+            logger.info(f"[{self.crew_id}] Created work from plan: {plan_dict['title']}")
+
+            work = conn.execute(
+                "SELECT id, title, description, priority, due_date FROM tactical WHERE id = ?",
+                (cur.lastrowid,),
+            ).fetchone()
 
         work_dict = dict(work)
         logger.info(f"[{self.crew_id}] Working on: {work_dict['title']}")

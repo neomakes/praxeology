@@ -1532,13 +1532,16 @@ def cmd_start(args: argparse.Namespace) -> None:
             init_prompt = (
                 f"You are {crew_name}. "
                 f"CRITICAL: You MUST use the actual MCP tools provided to you. "
-                f"Do NOT simulate or pretend to call tools. Do NOT write tool names as text. "
-                f"Use the real tool functions that appear in your tool list. "
-                f"Step 1: Call the what_now tool with crew_id='{crew_name}'. "
-                f"Step 2: Based on the result, execute the recommended task using the available MCP tools (logical_create, tactical_create, etc). "
-                f"Step 3: When done, call the backprop tool with the case_id, result, and surprise score. "
-                f"Step 4: Call what_now again and repeat. "
-                f"If no tools appear in your tool list, say 'NO MCP TOOLS AVAILABLE' and stop."
+                f"Do NOT simulate or pretend to call tools. "
+                f"Step 1: Call what_now with crew_id='{crew_name}'. "
+                f"Step 2: If what_now returns a recommended_action, execute it using MCP tools. "
+                f"Step 3: If what_now returns NO recommended_action (null), do this: "
+                f"  a) Call tactical_search to find plans (tier='plan'). "
+                f"  b) Pick the first plan and call tactical_create to create a work item (tier='work', parent_id=plan_id, assignee='{crew_name}'). "
+                f"  c) Execute the work you just created. "
+                f"Step 4: When done, call backprop with case_id, result, and surprise. "
+                f"Step 5: Call what_now again and repeat from Step 1. "
+                f"If no MCP tools appear in your tool list, say 'NO MCP TOOLS AVAILABLE' and stop."
             )
             subprocess.run([
                 "tmux", "send-keys", "-t", session_name, init_prompt, "Enter",
