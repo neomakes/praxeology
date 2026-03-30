@@ -240,41 +240,64 @@ def cmd_init(args: argparse.Namespace) -> None:
 # ---------------------------------------------------------------------------
 
 def _print_progress_tree(space: str = "", channels: list = None, crew: list = None,
-                         rules: list = None, procedures: list = None,
+                         mission: str = "", rules: list = None, procedures: list = None,
                          goal: str = "", programs: list = None, campaigns: list = None) -> None:
-    """Print current onboard progress as ASCII tree."""
+    """Print current onboard progress as hierarchical ASCII tree."""
     print()
     print("  ── Progress ──")
 
-    if rules is not None:
-        print(f"  WHY & HOW")
-        for i, r in enumerate(rules):
-            is_last = i == len(rules) - 1 and not procedures
-            prefix = "└──" if is_last else "├──"
-            print(f"    {prefix} DOC: {r[:50]}")
-        if procedures:
-            for i, p in enumerate(procedures):
-                name = p["name"] if isinstance(p, dict) else p
-                is_last = i == len(procedures) - 1
-                prefix = "└──" if is_last else "├──"
-                tier = "PLY" if isinstance(p, dict) and p.get("playbook_of") else "PRC"
-                print(f"    {prefix} {tier}: {name[:50]}")
+    # ── Logical: STR → DOC → PRC → PLY (nested) ──
+    if mission or rules:
+        print("  WHY & HOW")
+        if mission:
+            print(f"    STR-001  {mission}")
 
+        if rules:
+            # Build doctrine → procedure → playbook hierarchy
+            for di, rule in enumerate(rules):
+                code = f"DOC-{di + 1:03d}"
+                is_last_doc = di == len(rules) - 1 and not (procedures and any(
+                    isinstance(p, dict) and p.get("doctrine") != rule for p in (procedures or [])))
+                doc_prefix = "└──" if is_last_doc else "├──"
+                print(f"    {doc_prefix} {code}  {rule}")
+
+                # Find procedures under this doctrine
+                if procedures:
+                    doc_procs = [p for p in procedures if isinstance(p, dict)
+                                 and p.get("doctrine") == rule and not p.get("playbook_of")]
+                    for pi, proc in enumerate(doc_procs):
+                        prc_code = f"PRC-{di + 1}{pi + 1:02d}"
+                        indent = "        " if is_last_doc else "    │   "
+                        # Find playbooks under this procedure
+                        doc_plays = [p for p in procedures if isinstance(p, dict)
+                                     and p.get("playbook_of") == proc["name"]]
+                        is_last_prc = pi == len(doc_procs) - 1 and not doc_plays
+                        prc_prefix = "└──" if is_last_prc else "├──"
+                        print(f"{indent}{prc_prefix} {prc_code}  {proc['name']}")
+
+                        for pli, play in enumerate(doc_plays):
+                            ply_code = f"PLY-{di + 1}{pi + 1}{pli + 1}"
+                            play_indent = indent + ("    " if is_last_prc else "│   ")
+                            is_last_ply = pli == len(doc_plays) - 1
+                            ply_prefix = "└──" if is_last_ply else "├──"
+                            print(f"{play_indent}{ply_prefix} {ply_code}  {play['name']}")
+
+    # ── Contextual: Space → Channel → Thread → Crew ──
     if space:
-        print(f"  WHO & WHERE")
+        print("  WHO & WHERE")
         print(f"    {space} (Space)")
         if channels:
-            for i, ch in enumerate(channels):
-                is_last_ch = i == len(channels) - 1 and not crew
-                ch_prefix = "└──" if is_last_ch else "├──"
+            for ci, ch in enumerate(channels):
                 ch_name = ch["name"] if isinstance(ch, dict) else ch
-                print(f"      {ch_prefix} # {ch_name}")
                 threads = ch.get("threads", []) if isinstance(ch, dict) else []
-                for j, th in enumerate(threads):
-                    is_last_th = j == len(threads) - 1
+                is_last_ch = ci == len(channels) - 1 and not crew
+                ch_prefix = "└──" if is_last_ch else "├──"
+                print(f"      {ch_prefix} # {ch_name}")
+                for ti, th in enumerate(threads):
+                    is_last_th = ti == len(threads) - 1
+                    th_indent = "          " if is_last_ch else "      │   "
                     th_prefix = "└──" if is_last_th else "├──"
-                    indent = "          " if is_last_ch else "      │   "
-                    print(f"{indent}{th_prefix} {th}")
+                    print(f"{th_indent}{th_prefix} {th}")
         if crew:
             for i, c in enumerate(crew):
                 is_last = i == len(crew) - 1
@@ -282,20 +305,27 @@ def _print_progress_tree(space: str = "", channels: list = None, crew: list = No
                 name = c["name"] if isinstance(c, dict) else c
                 print(f"      {prefix} @{name}")
 
+    # ── Tactical: Goal → Program → Campaign → Plan ──
     if goal:
-        print(f"  WHAT & WHEN")
+        print("  WHAT & WHEN")
         print(f"    {goal} (Goal)")
         if programs:
-            for i, prog in enumerate(programs):
-                is_last = i == len(programs) - 1
-                prefix = "└──" if is_last else "├──"
-                print(f"      {prefix} {prog}")
+            for pi, prog in enumerate(programs):
+                is_last_prog = pi == len(programs) - 1
+                prog_prefix = "└──" if is_last_prog else "├──"
+                print(f"      {prog_prefix} {prog} (Program)")
                 if campaigns:
-                    for camp in campaigns:
-                        if camp.get("program") == prog:
-                            print(f"      │   ├── {camp['name']}")
-                            for plan in camp.get("plans", []):
-                                print(f"      │   │   └── {plan[:40]}")
+                    prog_camps = [c for c in campaigns if c.get("program") == prog]
+                    for ci, camp in enumerate(prog_camps):
+                        is_last_camp = ci == len(prog_camps) - 1
+                        camp_indent = "          " if is_last_prog else "      │   "
+                        camp_prefix = "└──" if is_last_camp else "├──"
+                        print(f"{camp_indent}{camp_prefix} {camp['name']} (Campaign)")
+                        for pli, plan in enumerate(camp.get("plans", [])):
+                            is_last_plan = pli == len(camp["plans"]) - 1
+                            plan_indent = camp_indent + ("    " if is_last_camp else "│   ")
+                            plan_prefix = "└──" if is_last_plan else "├──"
+                            print(f"{plan_indent}{plan_prefix} {plan}")
 
     print()
 
@@ -506,7 +536,7 @@ def cmd_onboard(_args: argparse.Namespace) -> None:
         # ══════════════════════════════════════════════════════════════
         # Phase 2: WHO & WHERE (Contextual)
         # ══════════════════════════════════════════════════════════════
-        _print_progress_tree(rules=rules, procedures=procedures)
+        _print_progress_tree(mission=mission, rules=rules, procedures=procedures)
         print("  ── Phase 2/3: Who & Where (Contextual) ──")
         print()
 
@@ -521,6 +551,7 @@ def cmd_onboard(_args: argparse.Namespace) -> None:
         for ch_name in ch_suggestions:
             # Show progress tree with current channel highlighted
             _print_progress_tree(
+                mission=mission, rules=rules, procedures=procedures,
                 space=space_name,
                 channels=channels + [{"name": ch_name, "threads": ["(selecting...)"]}],
             )
@@ -532,7 +563,8 @@ def cmd_onboard(_args: argparse.Namespace) -> None:
             channels.append({"name": ch_name, "threads": th_suggestions})
 
         # Show completed contextual tree
-        _print_progress_tree(space=space_name, channels=channels)
+        _print_progress_tree(mission=mission, rules=rules, procedures=procedures,
+                             space=space_name, channels=channels)
         print()
 
         # LLM-assisted: Organization context → Crew role suggestions
@@ -606,7 +638,7 @@ def cmd_onboard(_args: argparse.Namespace) -> None:
         # ══════════════════════════════════════════════════════════════
         # Phase 3: WHAT & WHEN (Tactical)
         # ══════════════════════════════════════════════════════════════
-        _print_progress_tree(rules=rules, procedures=procedures,
+        _print_progress_tree(mission=mission, rules=rules, procedures=procedures,
                              space=space_name, channels=channels, crew=crew_members)
         print()
         print("  ── Phase 3/3: What & When (Tactical) ──")
